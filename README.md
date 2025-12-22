@@ -1,36 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CryptoX 🚀
 
-## Getting Started
+Современная платформа для обмена криптовалют, построенная на стеке **Laravel (Backend)** и **Next.js (Frontend)**. Приложение позволяет пользователям регистрироваться, управлять своим кошельком, просматривать курсы валют в реальном времени и совершать сделки по покупке и продаже криптоактивов.
 
-First, run the development server:
+## ✨ Основные возможности
 
-```bash
+*   🔐 **Аутентификация:** Безопасная регистрация и вход пользователей (Laravel Sanctum).
+*   💰 **Кошелек:** Просмотр баланса в фиатной валюте и криптовалютах.
+*   📈 **Торговля:**
+    *   Покупка криптовалюты по текущему курсу.
+    *   Продажа активов с мгновенным зачислением средств.
+    *   Валидация баланса и защита от ошибочных транзакций.
+*   📊 **Портфолио:** Отображение списка активов пользователя с их текущей стоимостью.
+*   🔄 **История транзакций:** Полный лог операций (покупки, продажи, депозиты).
+*   🌗 **UI/UX:** Адаптивный интерфейс с поддержкой темной/светлой темы (TailwindCSS).
+
+## 🛠 Технический стек
+
+### Backend (API)
+*   **PHP:** 8.3+
+*   **Framework:** Laravel 10/11
+*   **Database:** MySQL
+*   **Auth:** Laravel Sanctum
+*   **API:** RESTful API
+
+### Frontend (Client)
+*   **Framework:** Next.js (React)
+*   **Styling:** Tailwind CSS
+*   **Icons:** Lucide React
+*   **HTTP Client:** Axios
+*   **State Management:** React Hooks
+
+---
+
+## 🚀 Установка и запуск
+
+Следуйте этим инструкциям, чтобы запустить проект локально.
+
+### Предварительные требования
+*   PHP >= 8.3
+*   Composer
+*   Node.js >= 18
+*   MySQL
+
+### 1. Настройка Бэкенда (Laravel)
+
+Клонируйте репозиторий
+git clone https://github.com/your-username/your-repo.git
+cd your-repo/backend
+
+Установите зависимости
+composer install
+
+Создайте файл окружения
+cp .env.example .env
+
+Сгенерируйте ключ приложения
+php artisan key:generate
+
+Настройте базу данных в .env файле
+DB_DATABASE=crypto_exchange
+DB_USERNAME=root
+DB_PASSWORD=
+Запустите миграции
+php artisan migrate
+
+(Опционально) Заполните базу тестовыми данными
+php artisan db:seed
+
+Запустите локальный сервер
+php artisan serve
+
+Бэкенд будет доступен по адресу: `http://127.0.0.1:8000`
+
+### 2. Настройка Фронтенда (Next.js)
+
+Откройте новый терминал и перейдите в папку фронтенда.
+
+cd your-repo/frontend
+
+Установите зависимости
+npm install
+
+или
+yarn install
+
+Создайте файл .env.local (если требуется) и укажите API URL
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api
+Запустите режим разработки
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Фронтенд будет доступен по адресу: `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📂 Структура базы данных
 
-## Learn More
+Проект использует следующие основные таблицы:
+*   `users` - Данные пользователей.
+*   `wallets` - Фиатный баланс пользователя.
+*   `assets` - Криптовалютные активы пользователя (связь с User).
+*   `transactions` - История операций (Buy/Sell).
 
-To learn more about Next.js, take a look at the following resources:
+## 🔧 Конфигурация
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Убедитесь, что настроили **CORS** в Laravel (`config/cors.php`), чтобы разрешить запросы с `http://localhost:3000`:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+'allowed_origins' => ['http://localhost:3000'],
+'supports_credentials' => true,
 
-## Deploy on Vercel
+## 📝 API Endpoints
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Некоторые ключевые эндпоинты:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*   `POST /api/register` - Регистрация
+*   `POST /api/login` - Вход
+*   `GET /api/user` - Получение данных профиля
+*   `POST /api/trade/buy` - Покупка актива
+*   `POST /api/trade/sell` - Продажа актива
+*   `GET /api/assets` - Получение портфеля
+
+## 🤝 Вклад в проект (Contributing)
+
+1.  Форкните репозиторий.
+2.  Создайте ветку для новой фичи (`git checkout -b feature/AmazingFeature`).
+3.  Закоммитьте изменения (`git commit -m 'Add some AmazingFeature'`).
+4.  Запушьте ветку (`git push origin feature/AmazingFeature`).
+5.  Откройте Pull Request.
+
+## 📄 Лицензия
+
+Распространяется под лицензией MIT. Подробнее см. `LICENSE`.
+
