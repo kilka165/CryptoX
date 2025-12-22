@@ -1,4 +1,6 @@
+import React from "react";
 import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
 
 export default function AuthLayout({
   children,
@@ -6,11 +8,12 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen flex flex-col bg-slate-950">
+      <Header />
+      <main className="flex-1 flex items-center justify-center">
         {children}
-        <Footer />
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }
