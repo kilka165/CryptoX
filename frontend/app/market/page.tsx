@@ -2,13 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Search,
-  Flame,
-  TrendingUp,
-  BarChart3,
-  Zap,
-} from "lucide-react";
+import { Search, Flame, TrendingUp, BarChart3, Zap } from "lucide-react";
 
 import { Header } from "@/components/Header";
 import { CoinRow, Coin } from "@/components/market/CoinRow";
@@ -31,16 +25,15 @@ const formatInputAmount = (value: string) => {
   return parts.join(".");
 };
 
-const cleanInputAmount = (value: string) =>
-  value.replace(/\s/g, "");
+const cleanInputAmount = (value: string) => value.replace(/\s/g, "");
 
 export default function MarketPage() {
   const [coins, setCoins] = useState<Coin[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [userCurrency, setUserCurrency] = useState("USD");
-  const [userBalance, setUserBalance] = useState<number>(0);
-  const [exchangeRate, setExchangeRate] = useState<number>(1);
+  const [userBalance, setUserBalance] = useState(0);
+  const [exchangeRate, setExchangeRate] = useState(1);
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const [displayAmount, setDisplayAmount] = useState("");
   const [isBuying, setIsBuying] = useState(false);
@@ -75,9 +68,7 @@ export default function MarketPage() {
 
     axios
       .get("http://localhost:8000/api/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
         if (res.data.currency) {
@@ -140,7 +131,6 @@ export default function MarketPage() {
           coin_id: selectedCoin.id,
           symbol: selectedCoin.symbol,
           amount_usd: amountInUSD,
-          price_usd: selectedCoin.current_price,
         },
         {
           headers: {
