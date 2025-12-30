@@ -43,6 +43,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Торговля
     Route::post('/trade/buy', [TradeController::class, 'buy']);
     Route::post('/trade/sell', [TradeController::class, 'sell']);
+    Route::post('/trade/swap', [TradeController::class, 'swap']);
+    Route::post('/trade/multi-swap', [TradeController::class, 'multiSwap']);
 
     // 👈 ПЕРЕМЕСТИЛ СЮДА - ВСЕ ТРАНЗАКЦИИ
     Route::get('/transactions/history', [TransactionController::class, 'getHistory']);
@@ -51,5 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Настройки
     Route::put('/user/settings', [AuthController::class, 'updateSettings']);
     Route::post('/wallet/withdraw', [WalletController::class, 'withdraw']);
+
+
 
 });
