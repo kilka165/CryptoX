@@ -1,88 +1,95 @@
-"use client";
-
-import React from "react";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
-import { Coin } from "./CoinRow";
-import { CoinImage } from "./CoinImage";
-import { ConvertedPrice } from "./ConvertedPrice";
+import { ComponentType } from "react";
+
+export interface Coin {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+  current_price: number;
+  price_change_percentage_24h?: number | null;
+  market_cap?: number;
+  total_volume?: number;
+}
 
 interface MarketCardProps {
   title: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: ComponentType<{ size?: number; className?: string }>;
   coins: Coin[];
-  userCurrency: string;
-  href: string;
   onBuy: (coin: Coin) => void;
+  userCurrency: string;
+  href?: string;
 }
 
-export const MarketCard: React.FC<MarketCardProps> = ({
-  title,
-  icon: Icon,
-  coins,
-  userCurrency,
-  href,
-  onBuy,
-}) => {
+export function MarketCard({ title, icon: Icon, coins, onBuy, userCurrency, href }: MarketCardProps) {
   return (
-    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-full">
-      <div className="flex justify-between items-center mb-4">
-        <Link
-          href={href}
-          className="flex items-center gap-2 group hover:opacity-80 transition-opacity"
-        >
-          <Icon
-            size={18}
-            className="text-slate-500 group-hover:text-blue-600 transition-colors"
-          />
-          <h3 className="font-bold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 transition-colors">
-            {title}
-          </h3>
-          <ArrowUpRight
-            size={14}
-            className="text-slate-400 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0"
-          />
-        </Link>
+    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 hover:shadow-lg transition-all">
+      <div className="flex items-center justify-between mb-4">
+        {href ? (
+          <Link
+            href={href}
+            className="flex items-center gap-2 group hover:opacity-80 transition-opacity"
+          >
+            <Icon
+              size={18}
+              className="text-slate-500 group-hover:text-blue-600 transition-colors"
+            />
+            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-blue-600 transition-colors">
+              {title}
+            </h3>
+          </Link>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Icon size={18} className="text-slate-500" />
+            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">{title}</h3>
+          </div>
+        )}
       </div>
 
-      <div className="space-y-3 flex-1">
-        {coins.slice(0, 3).map((coin) => (
-          <div
-            key={coin.id}
-            className="flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 py-1 rounded-lg"
-            onClick={() => onBuy(coin)}
-          >
-            <div className="flex items-center gap-7 min-w-0">
-              <CoinImage
-                coinId={coin.id}
-                name={coin.name}
-                className="w-5 h-5 rounded-full shrink-0"
-              />
-              <div className="flex flex-col min-w-0">
-                <div className="font-bold text-sm text-slate-900 dark:text-white truncate">
-                  {coin.symbol.toUpperCase()}
+      <div className="space-y-3">
+        {coins.slice(0, 4).map((coin) => {
+          const priceChange = coin.price_change_percentage_24h ?? 0;
+          const isPositive = priceChange >= 0;
+
+          return (
+            <div
+              key={coin.id}
+              className="flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors cursor-pointer"
+              onClick={() => onBuy(coin)}
+            >
+              <div className="flex items-center gap-2 flex-1">
+                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold">
+                  {coin.symbol.slice(0, 3).toUpperCase()}
                 </div>
-                <div className="text-xs text-slate-500 truncate max-w-[110px]">
-                  <ConvertedPrice
-                    valueUSD={coin.current_price}
-                    currency={userCurrency}
-                  />
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                    {coin.symbol.toUpperCase()}
+                  </span>
+                  <span className="text-xs text-slate-500">{coin.name}</span>
                 </div>
               </div>
+
+              <div className="flex flex-col items-end">
+                <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                  {coin.current_price.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 8,
+                  })}{" "}
+                  {userCurrency}
+                </span>
+                <span
+                  className={`text-xs font-medium ${
+                    isPositive ? "text-green-500" : "text-red-500"
+                  }`}
+                >
+                  {isPositive ? "+" : ""}
+                  {priceChange.toFixed(2)}%
+                </span>
+              </div>
             </div>
-            <span
-              className={`text-xs ml-2 ${
-                coin.price_change_percentage_24h >= 0
-                  ? "text-green-500"
-                  : "text-red-500"
-              }`}
-            >
-              {coin.price_change_percentage_24h > 0 ? "+" : ""}
-              {coin.price_change_percentage_24h.toFixed(1)}%
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
-};
+}

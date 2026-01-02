@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    
+
     public function getHistory(Request $request)
     {
         $query = Transaction::with(['asset']) // загружаем связь asset

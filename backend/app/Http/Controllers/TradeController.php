@@ -164,7 +164,6 @@ class TradeController extends Controller
 
             DB::beginTransaction();
 
-            // Проверяем и вычитаем from_coins
             $totalSoldUSD = 0;
             foreach ($fromCoins as $fc) {
                 $coinId = $fc['coin_id'];
@@ -195,7 +194,6 @@ class TradeController extends Controller
                 $soldUSD = $amount * $priceUsd;
                 $totalSoldUSD += $soldUSD;
 
-                // Транзакция продажи
                 Transaction::create([
                     'user_id' => $user->id,
                     'asset_id' => $assetId,
@@ -206,7 +204,6 @@ class TradeController extends Controller
                 ]);
             }
 
-            // Распределяем купленные монеты по весам
             $totalWeight = 0;
             foreach ($toCoins as $tc) {
                 $totalWeight += $tc['weight'];
@@ -233,7 +230,6 @@ class TradeController extends Controller
                 $asset->amount += $boughtAmount;
                 $asset->save();
 
-                // Транзакция покупки
                 Transaction::create([
                     'user_id' => $user->id,
                     'asset_id' => $asset->id,

@@ -205,7 +205,8 @@ export default function MarketOverviewPage() {
       </div>
 
       <BuyModal
-        openCoin={selectedCoin}
+        isOpen={!!selectedCoin}
+        coin={selectedCoin}
         userCurrency={userCurrency}
         userBalance={userBalance}
         exchangeRate={exchangeRate}
@@ -223,6 +224,7 @@ export default function MarketOverviewPage() {
         }
         onSubmit={handleBuySubmit}
       />
+
       <Footer />
     </div>
   );

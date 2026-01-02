@@ -11,19 +11,13 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('asset_id')->nullable()->constrained('assets')->onDelete('set null');
+            $table->foreignId('asset_id')->nullable()->constrained()->onDelete('set null');
             $table->enum('type', ['buy', 'sell', 'deposit', 'withdraw']);
-            $table->enum('status', ['completed', 'pending', 'failed'])->default('completed');
-            $table->decimal('amount', 18, 8); // Количество крипты или USD
-            $table->decimal('price_usd', 15, 2); // Цена в момент транзакции
-            $table->decimal('total_usd', 15, 2); // Сумма в USD
-            $table->string('description')->nullable();
+            $table->string('coin')->nullable();
+            $table->decimal('amount', 20, 8);
+            $table->decimal('price_usd', 20, 8)->nullable();
+            $table->decimal('total_usd', 20, 8);
             $table->timestamps();
-            
-            // Индексы для быстрого поиска
-            $table->index('user_id');
-            $table->index('type');
-            $table->index('created_at');
         });
     }
 
