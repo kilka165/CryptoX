@@ -1,91 +1,70 @@
-// components/market/CoinRow.tsx
-
-"use client";
-
 import React from "react";
-import { CoinImage } from "./CoinImage";
-import { ConvertedPrice } from "./ConvertedPrice";
-
-export interface Coin {
-  id: string;
-  symbol: string;
-  name: string;
-  image: string;
-  current_price: number;
-  price_change_percentage_24h: number | null;
-  total_volume: number;
-  market_cap: number;
-}
+import { Coin } from "@/types/coin";
 
 interface CoinRowProps {
   coin: Coin;
+  index: number;
   userCurrency: string;
+  exchangeRate: number;
   onBuy: (coin: Coin) => void;
-  formatNumber: (n: number) => string;
+  formatNumber: (num: number) => string;
 }
 
-export const CoinRow: React.FC<CoinRowProps> = ({
-  coin,
-  userCurrency,
-  onBuy,
-  formatNumber,
-}) => {
-  const change = coin.price_change_percentage_24h ?? 0;
+export function CoinRow({ coin, index, userCurrency, exchangeRate, onBuy, formatNumber }: CoinRowProps) {
+  const priceChange = coin.price_change_percentage_24h ?? 0;
+  const isPositive = priceChange >= 0;
+  
+  // Конвертируем цену в выбранную валюту
+  const convertedPrice = coin.current_price * exchangeRate;
 
   return (
-    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800/50">
+    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+      <td className="px-6 py-4 text-slate-500 font-medium">{index}</td>
       <td className="px-6 py-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <CoinImage
-            coinId={coin.id}
-            name={coin.name}
-            className="w-6 h-6 rounded-full shrink-0"
-          />
-          <div className="flex flex-col min-w-0">
-            <div className="font-bold text-slate-900 dark:text-white truncate">
-              {coin.symbol.toUpperCase()}
-            </div>
-            <div className="text-xs text-slate-500 truncate max-w-[120px]">
-              {coin.name}
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold">
+            {coin.symbol.slice(0, 3).toUpperCase()}
+          </div>
+          <div>
+            <div className="font-semibold">{coin.name}</div>
+            <div className="text-xs text-slate-500 uppercase">{coin.symbol}</div>
           </div>
         </div>
       </td>
-
-      <td className="px-6 py-4 text-right font-medium text-slate-900 dark:text-white">
-        <ConvertedPrice
-          valueUSD={coin.current_price}
-          currency={userCurrency}
-        />
+      <td className="px-6 py-4 text-right font-semibold">
+        {convertedPrice.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 8,
+        })}{" "}
+        {userCurrency}
       </td>
-
-      <td
-        className={`px-6 py-4 text-right ${
-          change > 0 ? "text-green-500" : change < 0 ? "text-red-500" : "text-slate-500"
-        }`}
-      >
-        {coin.price_change_percentage_24h != null
-          ? change.toFixed(2)
-          : "0.00"}
-        %
+      <td className="px-6 py-4 text-right">
+        <span
+          className={`inline-flex items-center px-2 py-1 rounded text-xs font-semibold ${
+            isPositive
+              ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+              : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+          }`}
+        >
+          {isPositive ? "+" : ""}
+          {priceChange.toFixed(2)}%
+        </span>
       </td>
-
-      <td className="px-6 py-4 text-right text-slate-500 hidden md:table-cell">
-        {formatNumber(coin.total_volume)}
+      <td className="px-6 py-4 text-right text-slate-600 dark:text-slate-400 hidden md:table-cell">
+        {formatNumber(coin.total_volume ?? 0)} {userCurrency}
       </td>
-
-      <td className="px-6 py-4 text-right text-slate-500 hidden lg:table-cell">
-        {formatNumber(coin.market_cap)}
+      <td className="px-6 py-4 text-right text-slate-600 dark:text-slate-400 hidden lg:table-cell">
+        {formatNumber((coin.market_cap ?? 0) * exchangeRate)} {userCurrency}
       </td>
 
       <td className="px-6 py-4 text-right">
         <button
           onClick={() => onBuy(coin)}
-          className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
         >
           Купить
         </button>
       </td>
     </tr>
   );
-};
+}

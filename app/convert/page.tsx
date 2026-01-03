@@ -5,41 +5,61 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ArrowLeft, ArrowUpDown } from "lucide-react";
-import {
-  CurrencySelectModal,
-  CurrencyItem,
-} from "@/components/convert/CurrencySelectModal";
-
-interface Coin {
-  id: string;
-  symbol: string;
-  name: string;
-  image: string;
-  current_price: number;
-}
+import { ArrowLeft, ArrowUpDown, CheckCircle, X, ChevronDown, AlertTriangle } from "lucide-react";
+import { CurrencySelectModal, CurrencyItem } from "@/components/convert/CurrencySelectModal";
+import { BinanceAPI } from "@/lib/api/binance";
+import { Coin } from "@/types/coin";
 
 interface UserAsset {
   id: number;
-  name: string; // coin_id из CoinGecko (как в Asset::name)
+  name: string;
   symbol: string;
   amount: number;
   logo_url: string | null;
 }
 
-const calcTargetAmount = (
-  amountFrom: string,
-  fromCoin: Coin | null,
-  toCoin: Coin | null
-) => {
-  if (!fromCoin || !toCoin) return "0";
-  const v = parseFloat(amountFrom.replace(",", "."));
-  if (isNaN(v) || v <= 0) return "0";
-  const usdValue = v * fromCoin.current_price;
-  const targetAmount = usdValue / toCoin.current_price;
-  return targetAmount.toLocaleString(undefined, {
-    maximumFractionDigits: 8,
-  });
+interface SelectedCoin {
+  coin: Coin;
+  amount: string;
+}
+
+const normalizeSymbol = (symbol: string): string => {
+  const upperSymbol = symbol.toUpperCase();
+  
+  const symbolMap: Record<string, string> = {
+    'ETHEREUM': 'ETH',
+    'BITCOIN': 'BTC',
+    'BINANCECOIN': 'BNB',
+    'CARDANO': 'ADA',
+    'RIPPLE': 'XRP',
+    'SOLANA': 'SOL',
+    'POLKADOT': 'DOT',
+    'DOGECOIN': 'DOGE',
+    'POLYGON': 'MATIC',
+    'AVALANCHE': 'AVAX',
+    'CHAINLINK': 'LINK',
+    'LITECOIN': 'LTC',
+    'UNISWAP': 'UNI',
+  };
+  
+  if (symbolMap[upperSymbol]) {
+    return symbolMap[upperSymbol];
+  }
+  
+  return upperSymbol;
+};
+
+const getBinancePrice = async (symbol: string): Promise<number> => {
+  try {
+    const normalizedSymbol = normalizeSymbol(symbol);
+    const response = await axios.get(
+      `https://api.binance.com/api/v3/ticker/price?symbol=${normalizedSymbol}USDT`
+    );
+    return parseFloat(response.data.price);
+  } catch (error) {
+    console.error(`Не удалось получить цену для ${symbol}:`, error);
+    throw new Error(`Не удалось получить цену для ${symbol}`);
+  }
 };
 
 export default function ConvertPage() {
@@ -48,37 +68,49 @@ export default function ConvertPage() {
   const [coins, setCoins] = useState<Coin[]>([]);
   const [userAssets, setUserAssets] = useState<UserAsset[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userCurrency, setUserCurrency] = useState<string>("USD");
 
-  const [fromCoin, setFromCoin] = useState<Coin | null>(null);
+  const [fromCoins, setFromCoins] = useState<SelectedCoin[]>([]);
   const [toCoin, setToCoin] = useState<Coin | null>(null);
 
-  const [amountFrom, setAmountFrom] = useState("");
-  const [amountTo, setAmountTo] = useState("0");
-
   const [error, setError] = useState<string | null>(null);
-  const [pickerTarget, setPickerTarget] = useState<"from" | "to" | null>(null);
+  const [pickerTarget, setPickerTarget] = useState<"from" | "to" | "add-from" | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  const [isSwapping, setIsSwapping] = useState(false);
+  const [swapSuccess, setSwapSuccess] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
-        // 1. Монеты из CoinGecko
-        const res = await axios.get<Coin[]>(
-          "https://api.coingecko.com/api/v3/coins/markets",
-          {
-            params: {
-              vs_currency: "usd",
-              order: "market_cap_desc",
-              per_page: 100,
-              page: 1,
-              sparkline: false,
-            },
-          }
-        );
-        setCoins(res.data);
-        setToCoin(res.data[1]);
-
-        // 2. Активы пользователя из Laravel
         const token = localStorage.getItem("auth_token");
+        let currency = "USD";
+        
+        if (token) {
+          try {
+            const settingsRes = await axios.get("http://127.0.0.1:8000/api/user/settings", {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            currency = settingsRes.data.currency || "USD";
+            setUserCurrency(currency);
+          } catch (e) {
+            console.error("Ошибка загрузки настроек:", e);
+          }
+        }
+
+        console.log("Загружаем цены с Binance...");
+        const binancePrices = await BinanceAPI.get24hPrices();
+        
+        const coinsData: Coin[] = binancePrices.map(bp => ({
+          id: bp.id,
+          symbol: bp.symbol,
+          name: bp.name,
+          image: bp.image || "",
+          current_price: bp.current_price,
+        }));
+
+        setCoins(coinsData);
+
         if (token) {
           const assetsRes = await axios.get<UserAsset[]>(
             "http://127.0.0.1:8000/api/user/assets",
@@ -90,17 +122,15 @@ export default function ConvertPage() {
 
           if (assetsRes.data.length > 0) {
             const firstAsset = assetsRes.data[0];
-            const matchCoin = res.data.find((c) => c.id === firstAsset.name);
+            const matchCoin = coinsData.find((c) => c.id === firstAsset.name);
             if (matchCoin) {
-              setFromCoin(matchCoin);
-            } else {
-              setFromCoin(res.data[0]);
+              setFromCoins([{ coin: matchCoin, amount: "" }]);
             }
-          } else {
-            setFromCoin(res.data[0]);
           }
-        } else {
-          setFromCoin(res.data[0]);
+
+          if (coinsData.length > 1) {
+            setToCoin(coinsData[1]);
+          }
         }
       } catch (e) {
         console.error(e);
@@ -113,29 +143,6 @@ export default function ConvertPage() {
     load();
   }, []);
 
-  useEffect(() => {
-    setAmountTo(calcTargetAmount(amountFrom, fromCoin, toCoin));
-  }, [amountFrom, fromCoin, toCoin]);
-
-  const handleSwitch = () => {
-    if (!fromCoin || !toCoin) return;
-    const prev = fromCoin;
-    setFromCoin(toCoin);
-    setToCoin(prev);
-  };
-
-  // баланс выбранной монеты "Из"
-  const fromAsset = fromCoin
-    ? userAssets.find((a) => a.name === fromCoin.id)
-    : undefined;
-  const fromBalance = fromAsset ? fromAsset.amount : 0;
-
-  const fromSymbol = fromCoin ? fromCoin.symbol.toUpperCase() : "...";
-  const toSymbol = toCoin ? toCoin.symbol.toUpperCase() : "...";
-
-  // ================== списки для модалки ==================
-
-  // Все монеты (для выбора "В")
   const allCoinsAsItems: CurrencyItem[] = coins.map((c) => ({
     id: c.id,
     symbol: c.symbol,
@@ -143,7 +150,6 @@ export default function ConvertPage() {
     image: c.image,
   }));
 
-  // Только монеты, которые есть у пользователя (для выбора "Из")
   const fromCoinsAsItems: CurrencyItem[] = userAssets
     .map((asset) => {
       const coin = coins.find((c) => c.id === asset.name);
@@ -157,214 +163,397 @@ export default function ConvertPage() {
     })
     .filter(Boolean) as CurrencyItem[];
 
+  const availableFromCoins = fromCoinsAsItems.filter(
+    (c) => !fromCoins.some((fc) => fc.coin.id === c.id)
+  );
+
   const modalCoins =
-    pickerTarget === "from" ? fromCoinsAsItems : allCoinsAsItems;
+    pickerTarget === "from" || pickerTarget === "add-from"
+      ? fromCoinsAsItems
+      : allCoinsAsItems;
+
+  const openPicker = (target: "from" | "to", index?: number) => {
+    setPickerTarget(target);
+    setEditingIndex(index ?? null);
+  };
+
+  const openAddFromPicker = () => {
+    if (fromCoins.length >= 5) return;
+    if (availableFromCoins.length === 0) return;
+    setPickerTarget("add-from");
+    setEditingIndex(null);
+  };
+
+  const removeFromCoin = (index: number) => {
+    setFromCoins(fromCoins.filter((_, i) => i !== index));
+  };
+
+  const updateFromAmount = (index: number, value: string) => {
+    const updated = [...fromCoins];
+    updated[index].amount = value.replace(/[^0-9.,]/g, "");
+    setFromCoins(updated);
+  };
+
+  const handleCoinSelect = (selectedItem: CurrencyItem) => {
+    const coin = coins.find((c) => c.id === selectedItem.id);
+    if (!coin) return;
+
+    if (pickerTarget === "from" && editingIndex !== null) {
+      const updated = [...fromCoins];
+      updated[editingIndex].coin = coin;
+      setFromCoins(updated);
+    } else if (pickerTarget === "add-from") {
+      if (!fromCoins.some((fc) => fc.coin.id === coin.id)) {
+        setFromCoins([...fromCoins, { coin, amount: "" }]);
+      }
+    } else if (pickerTarget === "to") {
+      setToCoin(coin);
+    }
+
+    setPickerTarget(null);
+    setEditingIndex(null);
+  };
+
+  const validateBalances = () => {
+    const errors: boolean[] = [];
+    
+    for (const fc of fromCoins) {
+      const val = parseFloat(fc.amount.replace(",", ".")) || 0;
+      const asset = userAssets.find((a) => a.name === fc.coin.id);
+      const balance = asset ? asset.amount : 0;
+      errors.push(val > balance || val <= 0);
+    }
+    
+    return errors;
+  };
+
+  const balanceErrors = validateBalances();
+  const hasBalanceError = balanceErrors.some((e) => e);
+
+  const totalInUserCurrency = fromCoins.reduce((sum, fc) => {
+    const val = parseFloat(fc.amount.replace(",", ".")) || 0;
+    return sum + val * fc.coin.current_price;
+  }, 0);
+
+  const calculatedToAmount = toCoin ? totalInUserCurrency / toCoin.current_price : 0;
+
+  const toBalance = toCoin
+    ? userAssets.find((a) => a.name === toCoin.id)?.amount || 0
+    : 0;
+
+  const handleSwapSubmit = async () => {
+    if (fromCoins.length === 0 || !toCoin) {
+      alert("Выберите монеты для обмена");
+      return;
+    }
+
+    setIsSwapping(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        alert("Необходима авторизация");
+        router.push("/login");
+        return;
+      }
+
+      const fromDataWithPrices = await Promise.all(
+        fromCoins.map(async (fc) => {
+          try {
+            const amount = parseFloat(fc.amount.replace(",", ".")) || 0;
+            
+            const asset = userAssets.find((a) => a.name === fc.coin.id);
+            if (!asset || asset.amount < amount) {
+              throw new Error(`Недостаточно ${fc.coin.symbol.toUpperCase()}`);
+            }
+
+            const price = await getBinancePrice(fc.coin.symbol);
+            
+            return {
+              coin_id: fc.coin.id,
+              amount: amount,
+              price_usd: price,
+            };
+          } catch (error: any) {
+            throw new Error(`Ошибка для ${fc.coin.symbol}: ${error.message}`);
+          }
+        })
+      );
+
+      const toPrice = await getBinancePrice(toCoin.symbol);
+
+      const payload = {
+        from_coins: fromDataWithPrices,
+        to_coins: [{ coin_id: toCoin.id, weight: 1 }],
+        price_usd: toPrice,
+      };
+      
+      console.log("Отправляем на сервер:", JSON.stringify(payload, null, 2));
+
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/trade/multi-swap",
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log("Ответ от сервера:", response.data);
+
+      const assetsRes = await axios.get<UserAsset[]>(
+        "http://127.0.0.1:8000/api/user/assets",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setUserAssets(assetsRes.data);
+
+      setSwapSuccess(true);
+      setTimeout(() => {
+        setSwapSuccess(false);
+        setFromCoins([]);
+      }, 2000);
+    } catch (err: any) {
+      console.error("Полная ошибка:", err);
+      console.error("Ответ сервера:", err.response?.data);
+      
+      setError(
+        err.message || 
+        err.response?.data?.message || 
+        JSON.stringify(err.response?.data) ||
+        "Ошибка обмена. Попробуйте позже."
+      );
+    } finally {
+      setIsSwapping(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-50">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50">
       <Header />
 
       <main className="flex-1 max-w-5xl mx-auto px-4 py-10 w-full">
-        {/* back */}
         <button
           type="button"
           onClick={() => router.back()}
-          className="mb-4 inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-100"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
         >
           <ArrowLeft size={18} />
           <span>Назад</span>
         </button>
 
-        {/* заголовок */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            Convert: {fromSymbol} в {toSymbol}
+            Конвертация валют
           </h1>
-          <p className="text-sm text-slate-400">
-            Цена в реальном времени · Гарантированная цена · Любая пара
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Обменивайте несколько монет одновременно в одну целевую валюту
           </p>
         </div>
 
-        {/* карточка конвертации */}
         <div className="max-w-2xl mx-auto">
           {error && (
-            <p className="text-sm text-red-500 mb-3">
-              {error}
-            </p>
+            <div className="text-sm text-red-600 dark:text-red-400 mb-3 bg-red-50 dark:bg-red-500/10 border border-red-300 dark:border-red-500/30 rounded-lg px-3 py-2">
+              <p className="mb-2">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+              >
+                Обновить страницу
+              </button>
+            </div>
           )}
 
-          <div className="bg-slate-900 rounded-2xl border border-slate-700 p-5 space-y-4">
+          <div className="bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-300 dark:border-slate-700 p-5 space-y-4">
             {loading ? (
-              <div className="h-40 animate-pulse bg-slate-800 rounded-xl" />
+              <div className="h-40 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-xl" />
             ) : (
               <>
-                {/* Из */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-slate-400">
-                    <span>Из</span>
-                    <span>
-                      Доступный баланс ·
-                      <span className="text-slate-200 ml-1">
-                        {fromBalance.toLocaleString(undefined, {
-                          maximumFractionDigits: 8,
-                        })}{" "}
-                        {fromCoin?.symbol.toUpperCase() ?? ""}
-                      </span>
-                    </span>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-600 dark:text-slate-400">Из (макс. 5)</span>
+                    {fromCoins.length < 5 && availableFromCoins.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={openAddFromPicker}
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                      >
+                        + Добавить монету
+                      </button>
+                    )}
                   </div>
 
-                  <div className="flex items-center gap-3 bg-slate-950 rounded-xl px-3 py-4 border border-slate-700 min-h-[72px]">
-                    <button
-                      type="button"
-                      onClick={() => setPickerTarget("from")}
-                      className="flex items-center gap-2 bg-slate-900 rounded-lg px-2 py-2 hover:bg-slate-800"
-                    >
-                      <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-[11px] font-bold">
-                        {(fromCoin?.symbol || "?")
-                          .slice(0, 3)
-                          .toUpperCase()}
-                      </div>
-                      <div className="flex flex-col text-left">
-                        <span className="text-xs font-semibold">
-                          {fromCoin
-                            ? fromCoin.symbol.toUpperCase()
-                            : "Выберите монету"}
-                        </span>
-                        <span className="text-[11px] text-slate-400">
-                          {fromCoin?.name || ""}
-                        </span>
-                      </div>
-                    </button>
+                  {fromCoins.map((fc, idx) => {
+                    const asset = userAssets.find((a) => a.name === fc.coin.id);
+                    const balance = asset ? asset.amount : 0;
+                    const inputAmount = parseFloat(fc.amount.replace(",", ".")) || 0;
+                    const hasError = balanceErrors[idx];
 
-                    <input
-                      type="text"
-                      placeholder="Введите сумму"
-                      value={amountFrom}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setAmountFrom(
-                          e.target.value.replace(/[^0-9.,]/g, "")
-                        )
-                      }
-                      className="flex-1 bg-transparent text-right text-lg font-semibold outline-none"
-                    />
-                  </div>
+                    return (
+                      <div key={idx} className="space-y-1">
+                        <div
+                          className={`flex items-center gap-2 bg-white dark:bg-slate-950 rounded-xl px-3 py-3 border ${
+                            hasError
+                              ? "border-red-500/50 bg-red-50 dark:bg-red-950/20"
+                              : "border-slate-300 dark:border-slate-700"
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => openPicker("from", idx)}
+                            className="flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg px-2 py-1"
+                          >
+                            <div className="w-7 h-7 rounded-full bg-slate-300 dark:bg-slate-700 flex items-center justify-center text-[11px] font-bold">
+                              {fc.coin.symbol.slice(0, 3).toUpperCase()}
+                            </div>
+                            <div className="flex flex-col text-left">
+                              <span className="text-xs font-semibold">
+                                {fc.coin.symbol.toUpperCase()}
+                              </span>
+                              <span className="text-xs text-slate-500 dark:text-slate-400">
+                                Баланс: {balance.toFixed(8)}
+                              </span>
+                            </div>
+                            <ChevronDown size={14} className="text-slate-500" />
+                          </button>
+                          <input
+                            type="text"
+                            placeholder="0.00"
+                            value={fc.amount}
+                            onChange={(e) => updateFromAmount(idx, e.target.value)}
+                            className={`flex-1 bg-transparent text-right text-sm font-semibold outline-none ${
+                              hasError ? "text-red-600 dark:text-red-400" : ""
+                            }`}
+                          />
+                          {fromCoins.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeFromCoin(idx)}
+                              className="text-slate-500 hover:text-red-600 dark:hover:text-red-400"
+                            >
+                              <X size={16} />
+                            </button>
+                          )}
+                        </div>
+                        
+                        {hasError && inputAmount > 0 && (
+                          <div className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400 px-3">
+                            <AlertTriangle size={12} />
+                            <span>
+                              Недостаточно средств. Доступно: {balance.toFixed(8)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
-                {/* переключатель */}
                 <div className="flex justify-center">
-                  <button
-                    type="button"
-                    onClick={handleSwitch}
-                    className="h-9 w-9 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-slate-200 hover:bg-slate-700"
-                  >
+                  <div className="h-9 w-9 rounded-full bg-slate-200 dark:bg-slate-800 border border-slate-400 dark:border-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-400">
                     <ArrowUpDown size={16} />
-                  </button>
+                  </div>
                 </div>
 
-                {/* В */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-slate-400">
-                    <span>В</span>
-                    <span>
-                      Доступный баланс ·
-                      <span className="text-slate-200 ml-1">
-                        0 {toCoin?.symbol.toUpperCase() ?? ""}
-                      </span>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-600 dark:text-slate-400">В</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">
+                      Баланс: {toBalance.toFixed(8)} {toCoin?.symbol.toUpperCase() || ""}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-3 bg-slate-950 rounded-xl px-3 py-4 border border-slate-700 min-h-[72px]">
+                  <div className="flex items-center gap-2 bg-white dark:bg-slate-950 rounded-xl px-3 py-4 border border-slate-300 dark:border-slate-700">
                     <button
                       type="button"
-                      onClick={() => setPickerTarget("to")}
-                      className="flex items-center gap-2 bg-slate-900 rounded-lg px-2 py-2 hover:bg-slate-800"
+                      onClick={() => openPicker("to")}
+                      className="flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg px-2 py-1"
                     >
-                      <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-[11px] font-bold">
-                        {(toCoin?.symbol || "?").slice(0, 3).toUpperCase()}
+                      <div className="w-7 h-7 rounded-full bg-slate-300 dark:bg-slate-700 flex items-center justify-center text-[11px] font-bold">
+                        {toCoin
+                          ? toCoin.symbol.slice(0, 3).toUpperCase()
+                          : "?"}
                       </div>
                       <div className="flex flex-col text-left">
                         <span className="text-xs font-semibold">
-                          {toCoin
-                            ? toCoin.symbol.toUpperCase()
-                            : "Выберите монету"}
+                          {toCoin ? toCoin.symbol.toUpperCase() : "Выберите"}
                         </span>
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[10px] text-slate-500">
                           {toCoin?.name || ""}
                         </span>
                       </div>
+                      <ChevronDown size={14} className="text-slate-500" />
                     </button>
 
-                    <input
-                      type="text"
-                      readOnly
-                      value={amountTo}
-                      className="flex-1 bg-transparent text-right text-lg font-semibold text-slate-400 outline-none"
-                    />
+                    <span className="flex-1 text-right text-lg font-semibold text-slate-600 dark:text-slate-400">
+                      ≈ {calculatedToAmount.toFixed(8)}
+                    </span>
                   </div>
                 </div>
 
-                {/* курс */}
-                {fromCoin && toCoin && (
-                  <div className="text-xs text-slate-500 flex justify-between mt-2">
-                    <span>
-                      1 {fromCoin.symbol.toUpperCase()} ≈{" "}
-                      {(
-                        fromCoin.current_price / toCoin.current_price
-                      ).toLocaleString(undefined, {
-                        maximumFractionDigits: 8,
-                      })}{" "}
-                      {toCoin.symbol.toUpperCase()}
-                    </span>
-                    <span>
-                      1 {toCoin.symbol.toUpperCase()} ≈{" "}
-                      {(
-                        toCoin.current_price / fromCoin.current_price
-                      ).toLocaleString(undefined, {
-                        maximumFractionDigits: 8,
-                      })}{" "}
-                      {fromCoin.symbol.toUpperCase()}
-                    </span>
+                <div className="text-sm text-slate-600 dark:text-slate-400 text-center">
+                  Общая сумма обмена: ≈{" "}
+                  <span className="text-slate-900 dark:text-slate-200 font-semibold">
+                    {totalInUserCurrency.toFixed(2)} {userCurrency}
+                  </span>
+                </div>
+
+                {toCoin && fromCoins.length > 0 && (
+                  <div className="space-y-1">
+                    {fromCoins.map((fc, idx) => (
+                      <div key={idx} className="text-xs text-slate-500 flex justify-between px-1">
+                        <span>
+                          1 {fc.coin.symbol.toUpperCase()} ≈{" "}
+                          {(fc.coin.current_price / toCoin.current_price).toFixed(8)}{" "}
+                          {toCoin.symbol.toUpperCase()}
+                        </span>
+                        <span>
+                          1 {toCoin.symbol.toUpperCase()} ≈{" "}
+                          {(toCoin.current_price / fc.coin.current_price).toFixed(8)}{" "}
+                          {fc.coin.symbol.toUpperCase()}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
 
-                {/* кнопка обмена */}
                 <button
                   type="button"
-                  className="mt-3 w-full bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-semibold py-3 rounded-xl disabled:opacity-40"
+                  onClick={handleSwapSubmit}
                   disabled={
-                    !fromCoin ||
+                    fromCoins.length === 0 ||
                     !toCoin ||
-                    !amountFrom ||
-                    parseFloat(amountFrom.replace(",", ".")) <= 0 ||
-                    parseFloat(amountFrom.replace(",", ".")) > fromBalance
+                    isSwapping ||
+                    totalInUserCurrency === 0 ||
+                    hasBalanceError
                   }
-                  onClick={() => {
-                    // сюда позже повесим запрос на Laravel /api/trade/swap
-                    alert("Обмен пока как демо: логика свопа на backend ещё не подключена");
-                  }}
+                  className="mt-3 w-full bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-semibold py-3 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all"
                 >
-                  Обменять
+                  {swapSuccess ? (
+                    <>
+                      <CheckCircle size={18} />
+                      Обмен успешен!
+                    </>
+                  ) : isSwapping ? (
+                    "Обмениваем..."
+                  ) : (
+                    "Обменять"
+                  )}
                 </button>
               </>
             )}
           </div>
         </div>
 
-        {/* модальное окно выбора монеты */}
         <CurrencySelectModal
           open={pickerTarget !== null}
-          onClose={() => setPickerTarget(null)}
-          coins={modalCoins}
-          onSelect={(coin) => {
-            if (pickerTarget === "from") {
-              const match = coins.find((c) => c.id === coin.id);
-              if (match) setFromCoin(match);
-            }
-            if (pickerTarget === "to") {
-              const match = coins.find((c) => c.id === coin.id);
-              if (match) setToCoin(match);
-            }
+          onClose={() => {
+            setPickerTarget(null);
+            setEditingIndex(null);
           }}
+          coins={modalCoins}
+          onSelect={handleCoinSelect}
         />
       </main>
 

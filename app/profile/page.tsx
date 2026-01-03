@@ -4,8 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Header } from "@/components/Header";
-
-// Компоненты
 import { UserCard } from "@/components/profile/UserCard";
 import { UserNavigation } from "@/components/profile/UserNavigation";
 import { BalanceCard } from "@/components/profile/BalanceCard";
@@ -14,7 +12,6 @@ import { AssetsTable } from "@/components/profile/AssetsTable";
 import { TransactionHistory } from "@/components/profile/TransactionHistory";
 import { SellModal } from "@/components/profile/SellModal";
 import { Footer } from "@/components/Footer";
-
 
 // Типы
 interface Asset {
@@ -37,9 +34,10 @@ interface AuthUser {
   assets?: Asset[];
 }
 
-interface CoinPrice {
-  usd: number;
-  usd_24h_change: number;
+interface BinanceTicker {
+  symbol: string;
+  lastPrice: string;
+  priceChangePercent: string;
 }
 
 interface EnrichedAsset extends Asset {
@@ -48,15 +46,13 @@ interface EnrichedAsset extends Asset {
   currentPriceUSD: number;
 }
 
-
 export default function ProfilePage() {
   const router = useRouter();
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [prices, setPrices] = useState<Record<string, CoinPrice>>({});
+  const [prices, setPrices] = useState<Record<string, BinanceTicker>>({});
   const [selectedAsset, setSelectedAsset] = useState<EnrichedAsset | null>(null);
 
-  // Загрузка данных пользователя
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
     if (!token) {
@@ -66,16 +62,9 @@ export default function ProfilePage() {
     loadUserData(token);
   }, [router]);
 
-  // Загрузка цен активов
   useEffect(() => {
     if (authUser?.assets && authUser.assets.length > 0) {
-      const ids = authUser.assets.map((a) => a.name.toLowerCase()).join(",");
-      axios
-        .get(
-          `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`
-        )
-        .then((res) => setPrices(res.data))
-        .catch((err) => console.error("Ошибка загрузки цен", err));
+      loadBinancePrices(authUser.assets);
     }
   }, [authUser]);
 
@@ -95,25 +84,68 @@ export default function ProfilePage() {
       });
   };
 
+  const loadBinancePrices = async (assets: Asset[]) => {
+    try {
+      const response = await axios.get<BinanceTicker[]>(
+        "https://api.binance.com/api/v3/ticker/24hr"
+      );
+
+      const priceMap: Record<string, BinanceTicker> = {};
+      
+      assets.forEach((asset) => {
+        const ticker = response.data.find(
+          (t) => t.symbol === `${asset.symbol.toUpperCase()}USDT`
+        );
+        
+        if (ticker) {
+          priceMap[asset.symbol.toLowerCase()] = ticker;
+        }
+      });
+
+      setPrices(priceMap);
+    } catch (error) {
+      console.error("Ошибка загрузки цен с Binance:", error);
+      
+      try {
+        const priceMap: Record<string, BinanceTicker> = {};
+        
+        for (const asset of assets) {
+          try {
+            const res = await axios.get<BinanceTicker>(
+              `https://api.binance.com/api/v3/ticker/24hr?symbol=${asset.symbol.toUpperCase()}USDT`
+            );
+            priceMap[asset.symbol.toLowerCase()] = res.data;
+          } catch (err) {
+            console.error(`Не удалось загрузить цену для ${asset.symbol}:`, err);
+          }
+        }
+        
+        setPrices(priceMap);
+      } catch (fallbackError) {
+        console.error("Запасной метод загрузки цен тоже не сработал:", fallbackError);
+      }
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("auth_token");
     window.location.href = "/login";
   };
 
-  // Формирование списка активов
-  const assetsList: EnrichedAsset[] = authUser?.assets?.map((asset) => {
-    const priceData = prices[asset.name.toLowerCase()];
-    const currentPriceUSD = priceData?.usd || 0;
-    const change24h = priceData?.usd_24h_change || 0;
-    const valueUSD = Number(asset.amount) * currentPriceUSD;
+  const assetsList: EnrichedAsset[] =
+    authUser?.assets?.map((asset) => {
+      const ticker = prices[asset.symbol.toLowerCase()];
+      const currentPriceUSD = ticker ? parseFloat(ticker.lastPrice) : 0;
+      const change24h = ticker ? parseFloat(ticker.priceChangePercent) : 0;
+      const valueUSD = Number(asset.amount) * currentPriceUSD;
 
-    return {
-      ...asset,
-      valueUSD,
-      change24h,
-      currentPriceUSD,
-    };
-  }) || [];
+      return {
+        ...asset,
+        valueUSD,
+        change24h,
+        currentPriceUSD,
+      };
+    }) || [];
 
   const totalPortfolioUSD = assetsList.reduce(
     (sum, asset) => sum + asset.valueUSD,
@@ -125,8 +157,12 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+        <Header />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+        <Footer />
       </div>
     );
   }
@@ -134,41 +170,40 @@ export default function ProfilePage() {
   if (!authUser) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* ЛЕВАЯ КОЛОНКА */}
-          <aside className="w-full lg:w-64 flex-shrink-0 space-y-6">
+          <div className="space-y-6">
             <UserCard name={authUser.name} email={authUser.email} />
             <UserNavigation onLogout={handleLogout} />
-          </aside>
+          </div>
 
           {/* ПРАВАЯ КОЛОНКА */}
-          <div className="flex-1 space-y-6">
+          <div className="lg:col-span-2 space-y-6">
             <BalanceCard balance={rawBalance} currency={userCurrency} />
-
+            <PortfolioValue 
+              assets={authUser?.assets || []} 
+              userCurrency={userCurrency} 
+            />
             {assetsList.length > 0 && (
-              <PortfolioValue
-                totalPortfolioUSD={totalPortfolioUSD}
+              <AssetsTable
+                assets={assetsList}
                 userCurrency={userCurrency}
+                onSellClick={(asset) => setSelectedAsset(asset as EnrichedAsset)}
               />
             )}
-
-            <AssetsTable
-              assets={assetsList}
-              userCurrency={userCurrency}
-              onSellClick={setSelectedAsset}
-            />
-
-            <TransactionHistory userCurrency={userCurrency} />
           </div>
         </div>
-      </main>
 
-      {/* МОДАЛЬНОЕ ОКНО */}
+        {/* ТРАНЗАКЦИИ НА ВСЮ ШИРИНУ */}
+        <div className="mt-6">
+          <TransactionHistory userCurrency={userCurrency} />
+        </div>
+      </div>
+
       <SellModal
         selectedAsset={selectedAsset}
         onClose={() => setSelectedAsset(null)}
@@ -178,10 +213,8 @@ export default function ProfilePage() {
           if (token) loadUserData(token);
         }}
       />
+
       <Footer />
     </div>
-    
-    
   );
-  
 }
