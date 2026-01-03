@@ -8,6 +8,8 @@ use App\Http\Controllers\TradeController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CoinsController;
 use App\Http\Controllers\Api\UserSettingsController;
+use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\P2PController;
 
 // ========================================
 // 🔓 ПУБЛИЧНЫЕ РОУТЫ (БЕЗ АВТОРИЗАЦИИ)
@@ -25,6 +27,15 @@ Route::post('/coins/sync', [CoinsController::class, 'index']);
 Route::get('/coins/{coinId}', [CoinsController::class, 'show']);
 Route::get('/coins-db/all', [CoinsController::class, 'fromDatabase']);
 Route::get('/coins-db/{coinId}/icon', [CoinsController::class, 'getCoinIcon']);
+
+// Валюты
+Route::get('/currencies', [CurrencyController::class, 'getSupportedCurrencies']);
+Route::get('/currencies/all', [CurrencyController::class, 'getAllCurrencies']);
+Route::get('/currency/rates', [CurrencyController::class, 'getRates']);
+
+// P2P (публичные)
+Route::get('/p2p/offers', [P2PController::class, 'getOffers']);
+Route::get('/p2p/offers/{id}', [P2PController::class, 'getOffer']);
 
 // ========================================
 // 🔐 ЗАЩИЩЁННЫЕ РОУТЫ (ТРЕБУЮТ АВТОРИЗАЦИИ)
@@ -65,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/wallet/deposit', [WalletController::class, 'deposit']);
     Route::post('/wallet/withdraw', [WalletController::class, 'withdraw']);
     Route::get('/user/assets', [WalletController::class, 'userAssets']);
+    
 
     // ========== ТОРГОВЛЯ ==========
 
@@ -79,4 +91,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/transactions', [TransactionController::class, 'index']);
     Route::get('/transactions/history', [TransactionController::class, 'getHistory']);
     Route::get('/transactions/stats', [TransactionController::class, 'getStats']);
+
+    // ========== P2P (защищённые) ==========
+
+    Route::post('/p2p/trades', [P2PController::class, 'createTrade']);
+    Route::get('/p2p/trades/my', [P2PController::class, 'getMyTrades']);
+    Route::post('/p2p/offers', [P2PController::class, 'createOffer']);
+    Route::delete('/p2p/offers/{id}', [P2PController::class, 'deleteOffer']);
 });

@@ -9,17 +9,7 @@ import { MarketCard } from "@/components/market/MarketCard";
 import { BuyModal } from "@/components/market/BuyModal";
 import { Footer } from "@/components/Footer";
 import { BinanceAPI } from "@/lib/api/binance";
-
-interface Coin {
-  id: string;
-  symbol: string;
-  name: string;
-  image: string;
-  current_price: number;
-  price_change_percentage_24h?: number | null;
-  market_cap?: number;
-  total_volume?: number;
-}
+import { Coin } from "@/types/coin";
 
 const formatNumber = (num: number) => {
   if (num >= 1.0e12) return (num / 1.0e12).toFixed(2) + "T";
@@ -135,15 +125,12 @@ export default function MarketPage() {
         return;
       }
 
-      // Получаем актуальную цену с Binance
       const binancePrice = await BinanceAPI.getPrice(selectedCoin.symbol);
-      
-      // Рассчитываем количество крипты
       const cryptoAmountToBuy = amountInUSD / binancePrice;
 
       const payload = {
         coin_id: selectedCoin.id,
-        amount: cryptoAmountToBuy, // ← Количество КРИПТОВАЛЮТЫ, а не USD
+        amount: cryptoAmountToBuy,
         price_usd: binancePrice,
       };
 
@@ -248,35 +235,39 @@ export default function MarketPage() {
             {loading ? null : (
               <>
                 <MarketCard
-                  title="🔥 Популярные"
+                  title="Популярные"
                   icon={Flame}
                   coins={coins}
                   onBuy={setSelectedCoin}
                   userCurrency={userCurrency}
+                  exchangeRate={exchangeRate}
                   href="/market/overview"
                 />
                 <MarketCard
-                  title="📈 Топ роста"
+                  title="Топ роста"
                   icon={TrendingUp}
                   coins={topGainers}
                   onBuy={setSelectedCoin}
                   userCurrency={userCurrency}
+                  exchangeRate={exchangeRate}
                   href="/market/overview"
                 />
                 <MarketCard
-                  title="💰 По объёму"
+                  title="По объёму"
                   icon={BarChart3}
                   coins={topVolume}
                   onBuy={setSelectedCoin}
                   userCurrency={userCurrency}
+                  exchangeRate={exchangeRate}
                   href="/market/overview"
                 />
                 <MarketCard
-                  title="⚡ Новые"
+                  title="Новые"
                   icon={Zap}
                   coins={newGems}
                   onBuy={setSelectedCoin}
                   userCurrency={userCurrency}
+                  exchangeRate={exchangeRate}
                   href="/market/overview"
                 />
               </>
@@ -311,6 +302,7 @@ export default function MarketPage() {
                         coin={coin}
                         index={(currentPage - 1) * perPage + idx + 1}
                         userCurrency={userCurrency}
+                        exchangeRate={exchangeRate}
                         onBuy={setSelectedCoin}
                         formatNumber={formatNumber}
                       />

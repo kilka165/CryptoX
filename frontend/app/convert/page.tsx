@@ -8,14 +8,7 @@ import { Footer } from "@/components/Footer";
 import { ArrowLeft, ArrowUpDown, CheckCircle, X, ChevronDown, AlertTriangle } from "lucide-react";
 import { CurrencySelectModal, CurrencyItem } from "@/components/convert/CurrencySelectModal";
 import { BinanceAPI } from "@/lib/api/binance";
-
-interface Coin {
-  id: string;
-  symbol: string;
-  name: string;
-  image: string;
-  current_price: number;
-}
+import { Coin } from "@/types/coin";
 
 interface UserAsset {
   id: number;

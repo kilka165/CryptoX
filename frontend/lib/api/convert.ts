@@ -1,15 +1,9 @@
+// frontend/lib/api/convertApi.ts
 import axios from "axios";
+import type { Coin } from "@/types/coin";
+import { BinanceAPI } from "@/lib/api/binance";
 
 const API_BASE = "http://127.0.0.1:8000/api";
-const COINGECKO_API = "https://api.coingecko.com/api/v3";
-
-export interface Coin {
-  id: string;
-  symbol: string;
-  name: string;
-  image: string;
-  current_price: number;
-}
 
 export interface UserAsset {
   id: number;
@@ -32,17 +26,18 @@ export const convertApi = {
     return response.data;
   },
 
-  async getMarketCoins(currency: string = "usd") {
-    const response = await axios.get<Coin[]>(`${COINGECKO_API}/coins/markets`, {
-      params: {
-        vs_currency: currency.toLowerCase(),
-        order: "market_cap_desc",
-        per_page: 100,
-        page: 1,
-        sparkline: false,
-      },
-    });
-    return response.data;
+  /**
+   * Получает список монет для маркета (вместо CoinGecko теперь через Binance API)
+   * @param _currency - игнорируется, т.к. все цены с бэкенда в USD
+   */
+  async getMarketCoins(_currency: string = "usd"): Promise<Coin[]> {
+    try {
+      const coins = await BinanceAPI.getMarketCoinsFromBinance();
+      return coins;
+    } catch (error) {
+      console.error("Error fetching market coins:", error);
+      return [];
+    }
   },
 
   async getUserAssets(token: string) {
@@ -57,5 +52,65 @@ export const convertApi = {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
+  },
+
+  /**
+   * Получает топ монет по росту
+   */
+  async getTopGainers(limit: number = 10): Promise<Coin[]> {
+    try {
+      return await BinanceAPI.getTopGainers(limit);
+    } catch (error) {
+      console.error("Error fetching top gainers:", error);
+      return [];
+    }
+  },
+
+  /**
+   * Получает топ монет по падению
+   */
+  async getTopLosers(limit: number = 10): Promise<Coin[]> {
+    try {
+      return await BinanceAPI.getTopLosers(limit);
+    } catch (error) {
+      console.error("Error fetching top losers:", error);
+      return [];
+    }
+  },
+
+  /**
+   * Получает топ монет по объёму
+   */
+  async getTopByVolume(limit: number = 10): Promise<Coin[]> {
+    try {
+      return await BinanceAPI.getTopByVolume(limit);
+    } catch (error) {
+      console.error("Error fetching top by volume:", error);
+      return [];
+    }
+  },
+
+  /**
+   * Поиск монет по названию или символу
+   */
+  async searchCoins(query: string): Promise<Coin[]> {
+    try {
+      return await BinanceAPI.searchCoins(query);
+    } catch (error) {
+      console.error("Error searching coins:", error);
+      return [];
+    }
+  },
+
+  /**
+   * Получает информацию о конкретной монете
+   */
+  async getCoinById(coinId: string): Promise<Coin | null> {
+    try {
+      return await BinanceAPI.getCoinById(coinId);
+    } catch (error) {
+      console.error(`Error fetching coin ${coinId}:`, error);
+      return null;
+    }
   },
 };

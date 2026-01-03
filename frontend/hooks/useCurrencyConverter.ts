@@ -11,7 +11,7 @@ interface Rates {
 export function useCurrencyConverter(baseAmountUSD: number, targetCurrency: string) {
   const [convertedAmount, setConvertedAmount] = useState<string>("...");
   const [rates, setRates] = useState<Rates>({});
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // 1. Загружаем курсы валют (один раз при загрузке сайта)
   useEffect(() => {
@@ -35,6 +35,16 @@ export function useCurrencyConverter(baseAmountUSD: number, targetCurrency: stri
       })
       .catch((err) => {
         console.error("Ошибка загрузки курсов", err);
+        // Фоллбэк курсы на случай ошибки
+        const fallbackRates: Rates = {
+          USD: 1,
+          RUB: 90,
+          EUR: 0.92,
+          KZT: 450,
+          GBP: 0.79,
+          CNY: 7.2,
+        };
+        setRates(fallbackRates);
         setLoading(false);
       });
   }, []);
@@ -45,17 +55,24 @@ export function useCurrencyConverter(baseAmountUSD: number, targetCurrency: stri
 
     if (targetCurrency === "USD") {
       setConvertedAmount(
-        baseAmountUSD.toLocaleString("en-US", { style: "currency", currency: "USD" })
+        baseAmountUSD.toLocaleString("en-US", { 
+          style: "currency", 
+          currency: "USD",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 8,
+        })
       );
     } else {
       const rate = rates[targetCurrency];
       const result = baseAmountUSD * rate;
-      
-      // Форматируем красиво (например: 12 500 ₽)
+
+      // Форматируем красиво (например: 12 500 ₸)
       setConvertedAmount(
-        result.toLocaleString("ru-RU", { 
-          style: "currency", 
-          currency: targetCurrency 
+        result.toLocaleString("ru-RU", {
+          style: "currency",
+          currency: targetCurrency,
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
         })
       );
     }

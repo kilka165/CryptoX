@@ -1,27 +1,21 @@
 import React from "react";
-
-export interface Coin {
-  id: string;
-  symbol: string;
-  name: string;
-  image: string;
-  current_price: number;
-  price_change_percentage_24h?: number | null; // ← Добавьте undefined
-  market_cap?: number;
-  total_volume?: number;
-}
+import { Coin } from "@/types/coin";
 
 interface CoinRowProps {
   coin: Coin;
   index: number;
   userCurrency: string;
+  exchangeRate: number;
   onBuy: (coin: Coin) => void;
   formatNumber: (num: number) => string;
 }
 
-export function CoinRow({ coin, index, userCurrency, onBuy, formatNumber }: CoinRowProps) {
+export function CoinRow({ coin, index, userCurrency, exchangeRate, onBuy, formatNumber }: CoinRowProps) {
   const priceChange = coin.price_change_percentage_24h ?? 0;
   const isPositive = priceChange >= 0;
+  
+  // Конвертируем цену в выбранную валюту
+  const convertedPrice = coin.current_price * exchangeRate;
 
   return (
     <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
@@ -38,7 +32,7 @@ export function CoinRow({ coin, index, userCurrency, onBuy, formatNumber }: Coin
         </div>
       </td>
       <td className="px-6 py-4 text-right font-semibold">
-        {coin.current_price.toLocaleString(undefined, {
+        {convertedPrice.toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 8,
         })}{" "}
@@ -57,11 +51,12 @@ export function CoinRow({ coin, index, userCurrency, onBuy, formatNumber }: Coin
         </span>
       </td>
       <td className="px-6 py-4 text-right text-slate-600 dark:text-slate-400 hidden md:table-cell">
-        {formatNumber(coin.total_volume ?? 0)}
+        {formatNumber(coin.total_volume ?? 0)} {userCurrency}
       </td>
       <td className="px-6 py-4 text-right text-slate-600 dark:text-slate-400 hidden lg:table-cell">
-        {formatNumber(coin.market_cap ?? 0)}
+        {formatNumber((coin.market_cap ?? 0) * exchangeRate)} {userCurrency}
       </td>
+
       <td className="px-6 py-4 text-right">
         <button
           onClick={() => onBuy(coin)}

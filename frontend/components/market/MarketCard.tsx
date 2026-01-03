@@ -1,16 +1,6 @@
 import Link from "next/link";
 import { ComponentType } from "react";
-
-export interface Coin {
-  id: string;
-  symbol: string;
-  name: string;
-  image: string;
-  current_price: number;
-  price_change_percentage_24h?: number | null;
-  market_cap?: number;
-  total_volume?: number;
-}
+import { Coin } from "@/types/coin";
 
 interface MarketCardProps {
   title: string;
@@ -18,10 +8,11 @@ interface MarketCardProps {
   coins: Coin[];
   onBuy: (coin: Coin) => void;
   userCurrency: string;
+  exchangeRate: number;
   href?: string;
 }
 
-export function MarketCard({ title, icon: Icon, coins, onBuy, userCurrency, href }: MarketCardProps) {
+export function MarketCard({ title, icon: Icon, coins, onBuy, userCurrency, exchangeRate, href }: MarketCardProps) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 hover:shadow-lg transition-all">
       <div className="flex items-center justify-between mb-4">
@@ -50,6 +41,9 @@ export function MarketCard({ title, icon: Icon, coins, onBuy, userCurrency, href
         {coins.slice(0, 4).map((coin) => {
           const priceChange = coin.price_change_percentage_24h ?? 0;
           const isPositive = priceChange >= 0;
+          
+          // Конвертируем цену в выбранную валюту
+          const convertedPrice = coin.current_price * exchangeRate;
 
           return (
             <div
@@ -71,7 +65,7 @@ export function MarketCard({ title, icon: Icon, coins, onBuy, userCurrency, href
 
               <div className="flex flex-col items-end">
                 <span className="text-sm font-semibold text-slate-900 dark:text-white">
-                  {coin.current_price.toLocaleString(undefined, {
+                  {convertedPrice.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 8,
                   })}{" "}
