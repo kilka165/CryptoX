@@ -102,7 +102,7 @@ export const Footer = () => {
         <div className="mt-10 border-t border-slate-300 dark:border-slate-800 pt-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-500">
           <span>© {new Date().getFullYear()} CryptoExchange. Все права защищены.</span>
           <span className="text-[11px]">
-            Данные по рынку и ценам предоставлены CoinGecko.
+            Данные по рынку и ценам предоставлены Binanse.
           </span>
         </div>
       </div>
