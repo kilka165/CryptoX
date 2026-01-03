@@ -32,6 +32,7 @@ const getCoinSymbol = (name: string): string => {
     'chainlink': 'LINK',
     'litecoin': 'LTC',
     'uniswap': 'UNI',
+        'usd-coin': 'USDC',
   };
   
   return symbolMap[name.toLowerCase()] || name.toUpperCase();
