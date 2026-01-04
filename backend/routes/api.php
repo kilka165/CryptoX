@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\UserSettingsController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\P2PController;
 use App\Http\Controllers\StakingController;
+use App\Http\Controllers\AssetController;
 
 // ========================================
 // 🔓 ПУБЛИЧНЫЕ РОУТЫ (БЕЗ АВТОРИЗАЦИИ)
@@ -33,6 +34,9 @@ Route::get('/coins-db/{coinId}/icon', [CoinsController::class, 'getCoinIcon']);
 Route::get('/currencies', [CurrencyController::class, 'getSupportedCurrencies']);
 Route::get('/currencies/all', [CurrencyController::class, 'getAllCurrencies']);
 Route::get('/currency/rates', [CurrencyController::class, 'getRates']);
+
+// Активы (публичный список для фильтров)
+Route::get('/assets', [AssetController::class, 'index']);
 
 // P2P (публичные)
 Route::get('/p2p/offers', [P2PController::class, 'getOffers']);
@@ -81,7 +85,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/wallet/withdraw', [WalletController::class, 'withdraw']);
     Route::get('/user/assets', [WalletController::class, 'userAssets']);
 
-
     // ========== ТОРГОВЛЯ ==========
 
     Route::post('/trade/buy', [TradeController::class, 'buy']);
@@ -96,16 +99,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/transactions/history', [TransactionController::class, 'getHistory']);
     Route::get('/transactions/stats', [TransactionController::class, 'getStats']);
 
-    // ========== P2P (защищённые) ==========
+    // ========== P2P ==========
 
+    Route::post('/p2p/offers', [P2PController::class, 'createOffer']);
     Route::post('/p2p/trades', [P2PController::class, 'createTrade']);
     Route::get('/p2p/trades/my', [P2PController::class, 'getMyTrades']);
-    Route::post('/p2p/offers', [P2PController::class, 'createOffer']);
-    Route::delete('/p2p/offers/{id}', [P2PController::class, 'deleteOffer']);
     Route::post('/p2p/trades/{id}/confirm', [P2PController::class, 'confirmTrade']);
     Route::post('/p2p/trades/{id}/cancel', [P2PController::class, 'cancelTrade']);
+    Route::delete('/p2p/offers/{id}', [P2PController::class, 'deleteOffer']);
 
     // ========== СТЕЙКИНГ ==========
+
     Route::get('/staking/assets', [StakingController::class, 'getUserAssets']);
     Route::get('/staking/my', [StakingController::class, 'getMyStaking']);
     Route::post('/staking/stake', [StakingController::class, 'stake']);

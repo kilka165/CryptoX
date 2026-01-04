@@ -32,21 +32,16 @@ return new class extends Migration
 
         // Создаём таблицу сделок P2P
         Schema::create('p2p_trades', function (Blueprint $table) {
-            $table->id();
+             $table->id();
             $table->foreignId('offer_id')->constrained('p2p_offers')->onDelete('cascade');
             $table->foreignId('buyer_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('seller_id')->constrained('users')->onDelete('cascade');
-            $table->string('crypto_currency', 50);
-            $table->string('currency', 10);
-            $table->decimal('amount', 20, 8)->comment('Количество криптовалюты');
-            $table->decimal('price', 20, 2)->comment('Цена за 1 единицу');
-            $table->decimal('total_fiat', 20, 2)->comment('Общая сумма в фиатной валюте');
+            $table->decimal('crypto_amount', 20, 8)->comment('Количество криптовалюты');
+            $table->decimal('amount', 20, 2)->comment('Общая сумма в фиатной валюте');
             $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
 
             // Индексы для быстрой выборки
             $table->index(['buyer_id', 'status']);
-            $table->index(['seller_id', 'status']);
             $table->index('status');
             $table->index('created_at');
         });

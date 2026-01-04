@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class P2PTrade extends Model
 {
-    use HasFactory;
+    protected $table = 'p2p_trades';
 
     protected $fillable = [
         'offer_id',
         'buyer_id',
         'seller_id',
         'crypto_currency',
+        'crypto_amount',
         'currency',
         'amount',
         'price',

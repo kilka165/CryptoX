@@ -335,10 +335,29 @@ class P2PController extends Controller
      */
     public function createTrade(Request $request)
     {
-        $validated = $request->validate([
-            'offer_id' => 'required|exists:p2p_offers,id',
-            'amount' => 'required|numeric|min:0', // Количество крипты
+        // Диагностика (можно удалить после решения проблемы)
+        Log::info('P2P createTrade - Request received', [
+            'all_data' => $request->all(),
+            'user_id' => auth()->id(),
         ]);
+
+        try {
+            $validated = $request->validate([
+                'offer_id' => 'required|exists:p2p_offers,id',
+                'crypto_amount' => 'required|numeric|min:0', // ✅ Изменили с 'amount' на 'crypto_amount'
+                'amount' => 'nullable|numeric|min:0', // Фиатная сумма (опционально)
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('P2P createTrade - Validation failed', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all(),
+            ]);
+
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        }
 
         $user = auth()->user();
         $offer = P2POffer::with('seller')->findOrFail($validated['offer_id']);
@@ -351,12 +370,15 @@ class P2PController extends Controller
             return response()->json(['message' => 'Заявка неактивна'], 400);
         }
 
-        if ($validated['amount'] > $offer->available_amount) {
+        // ✅ Используем crypto_amount вместо amount
+        $cryptoAmount = $validated['crypto_amount'];
+
+        if ($cryptoAmount > $offer->available_amount) {
             return response()->json(['message' => 'Недостаточно криптовалюты в заявке'], 400);
         }
 
-        // Считаем сумму в валюте заявки
-        $fiatAmount = $validated['amount'] * $offer->price;
+        // Считаем фиатную сумму
+        $fiatAmount = $cryptoAmount * $offer->price;
 
         if ($fiatAmount < $offer->min_limit || $fiatAmount > $offer->max_limit) {
             return response()->json([
@@ -369,7 +391,7 @@ class P2PController extends Controller
 
         DB::beginTransaction();
         try {
-            // Проверяем баланс покупателя (если он покупает крипту - нужны USD)
+            // Проверяем баланс покупателя
             if ($offer->type === 'sell') {
                 // Продавец продает крипту, покупателю нужны USD
                 $buyerWallet = Wallet::where('user_id', $user->id)->first();
@@ -388,11 +410,11 @@ class P2PController extends Controller
                     ->where('name', $offer->crypto_currency)
                     ->first();
 
-                if (!$buyerCrypto || $buyerCrypto->amount < $validated['amount']) {
+                if (!$buyerCrypto || $buyerCrypto->amount < $cryptoAmount) {
                     DB::rollBack();
                     return response()->json([
                         'message' => "Недостаточно {$offer->crypto_currency} на балансе",
-                        'required' => $validated['amount'],
+                        'required' => $cryptoAmount,
                         'available' => $buyerCrypto ? $buyerCrypto->amount : 0,
                     ], 400);
                 }
@@ -402,13 +424,13 @@ class P2PController extends Controller
             $trade = P2PTrade::create([
                 'offer_id' => $offer->id,
                 'buyer_id' => $user->id,
-                'amount' => $fiatAmount, // Сумма в валюте заявки
-                'crypto_amount' => $validated['amount'], // Количество крипты
+                'amount' => $fiatAmount, // Фиатная сумма
+                'crypto_amount' => $cryptoAmount, // Количество крипты
                 'status' => 'pending',
             ]);
 
             // Уменьшаем доступное количество в заявке
-            $offer->available_amount -= $validated['amount'];
+            $offer->available_amount -= $cryptoAmount;
 
             if ($offer->available_amount <= 0) {
                 $offer->is_active = false;
@@ -422,7 +444,7 @@ class P2PController extends Controller
                 'trade_id' => $trade->id,
                 'buyer_id' => $user->id,
                 'seller_id' => $offer->seller_id,
-                'crypto_amount' => $validated['amount'],
+                'crypto_amount' => $cryptoAmount,
                 'fiat_amount_display' => $fiatAmount,
                 'fiat_amount_usd' => $fiatAmountUSD,
             ]);
@@ -434,10 +456,17 @@ class P2PController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('P2P Trade Creation Failed', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Ошибка при создании сделки'], 500);
+            Log::error('P2P Trade Creation Failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'message' => 'Ошибка при создании сделки: ' . $e->getMessage()
+            ], 500);
         }
     }
+
+
 
     /**
      * Получить свои сделки
