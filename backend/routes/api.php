@@ -10,6 +10,7 @@ use App\Http\Controllers\CoinsController;
 use App\Http\Controllers\Api\UserSettingsController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\P2PController;
+use App\Http\Controllers\StakingController;
 
 // ========================================
 // 🔓 ПУБЛИЧНЫЕ РОУТЫ (БЕЗ АВТОРИЗАЦИИ)
@@ -36,6 +37,9 @@ Route::get('/currency/rates', [CurrencyController::class, 'getRates']);
 // P2P (публичные)
 Route::get('/p2p/offers', [P2PController::class, 'getOffers']);
 Route::get('/p2p/offers/{id}', [P2PController::class, 'getOffer']);
+
+// Стейкинг (публичные)
+Route::get('/staking/plans', [StakingController::class, 'getPlans']);
 
 // ========================================
 // 🔐 ЗАЩИЩЁННЫЕ РОУТЫ (ТРЕБУЮТ АВТОРИЗАЦИИ)
@@ -100,4 +104,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/p2p/offers/{id}', [P2PController::class, 'deleteOffer']);
     Route::post('/p2p/trades/{id}/confirm', [P2PController::class, 'confirmTrade']);
     Route::post('/p2p/trades/{id}/cancel', [P2PController::class, 'cancelTrade']);
+
+    // ========== СТЕЙКИНГ ==========
+    Route::get('/staking/assets', [StakingController::class, 'getUserAssets']);
+    Route::get('/staking/my', [StakingController::class, 'getMyStaking']);
+    Route::post('/staking/stake', [StakingController::class, 'stake']);
+    Route::post('/staking/unstake/{id}', [StakingController::class, 'unstake']);
+    Route::post('/staking/cancel/{id}', [StakingController::class, 'cancelFlexible']);
 });
