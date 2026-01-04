@@ -49,11 +49,11 @@
 
 ### 1. Настройка Backend (Laravel)
 
-# Клонируйте репозиторий
+Клонируйте репозиторий
 git clone https://github.com/kilka165/CryptoX.git
 cd CryptoX/backend
 
-# Установите зависимости
+Установите зависимости
 composer install
 
 # Создайте файл окружения
@@ -251,3 +251,4 @@ CryptoX/
 
 ⭐ Если проект был полезен, поставьте звезду на GitHub!
 ```
+
