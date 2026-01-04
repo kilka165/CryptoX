@@ -56,24 +56,24 @@ cd CryptoX/backend
 Установите зависимости
 composer install
 
-# Создайте файл окружения
+Создайте файл окружения
 cp .env.example .env
 
-# Сгенерируйте ключ приложения
+Сгенерируйте ключ приложения
 php artisan key:generate
 
-# Настройте базу данных в .env файле
-# DB_DATABASE=crypto_exchange
-# DB_USERNAME=root
-# DB_PASSWORD=
+Настройте базу данных в .env файле
+DB_DATABASE=crypto_exchange
+DB_USERNAME=root
+DB_PASSWORD=
 
-# Запустите миграции
+Запустите миграции
 php artisan migrate
 
-# (Опционально) Заполните базу тестовыми данными
+(Опционально) Заполните базу тестовыми данными
 php artisan db:seed
 
-# Запустите локальный сервер
+Запустите локальный сервер
 php artisan serve
 
 Backend будет доступен по адресу: `http://127.0.0.1:8000`
@@ -81,20 +81,20 @@ Backend будет доступен по адресу: `http://127.0.0.1:8000`
 ### 2. Настройка Frontend (Next.js)
 
 
-# Откройте новый терминал и перейдите в папку frontend
+Откройте новый терминал и перейдите в папку frontend
 cd CryptoX/frontend
 
-# Установите зависимости
+Установите зависимости
 npm install
-# или
+или
 yarn install
 
-# Создайте файл .env.local (если требуется) и укажите API URL
+Создайте файл .env.local (если требуется) и укажите API URL
 # NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api
 
-# Запустите режим разработки
+Запустите режим разработки
 npm run dev
-# или
+или
 yarn dev
 
 Frontend будет доступен по адресу: `http://localhost:3000`
@@ -251,4 +251,5 @@ CryptoX/
 
 ⭐ Если проект был полезен, поставьте звезду на GitHub!
 ```
+
 
