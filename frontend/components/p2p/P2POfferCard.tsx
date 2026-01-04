@@ -1,7 +1,7 @@
 // frontend/components/p2p/P2POfferCard.tsx
 import React, { useState } from "react";
 import { P2POffer } from "@/lib/api/p2pApi";
-import { TrendingUp, Clock, CheckCircle, X, Eye, AlertTriangle } from "lucide-react";
+import { TrendingUp, CheckCircle, X, Eye, AlertTriangle } from "lucide-react";
 import axios from "axios";
 
 interface P2POfferCardProps {
@@ -95,9 +95,8 @@ export function P2POfferCard({
             <div className="text-sm font-medium">
               {offer.available_amount.toLocaleString()} {offer.crypto_currency}
             </div>
-            <div className="text-xs text-slate-500 flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              ~{offer.avg_completion_time} мин
+            <div className="text-xs text-slate-500">
+              Доступно
             </div>
           </div>
 

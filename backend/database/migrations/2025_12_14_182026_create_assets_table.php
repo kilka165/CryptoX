@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');   // Например: Bitcoin
             $table->decimal('amount', 18, 8); // Количество (до 8 знаков после запятой)
             $table->timestamps();
-            
+
             // Защита от дублей: у юзера может быть только одна запись про BTC
             $table->unique(['user_id', 'symbol']);
         });

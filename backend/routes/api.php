@@ -76,7 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/wallet/deposit', [WalletController::class, 'deposit']);
     Route::post('/wallet/withdraw', [WalletController::class, 'withdraw']);
     Route::get('/user/assets', [WalletController::class, 'userAssets']);
-    
+
 
     // ========== ТОРГОВЛЯ ==========
 
@@ -98,4 +98,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/p2p/trades/my', [P2PController::class, 'getMyTrades']);
     Route::post('/p2p/offers', [P2PController::class, 'createOffer']);
     Route::delete('/p2p/offers/{id}', [P2PController::class, 'deleteOffer']);
+    Route::post('/p2p/trades/{id}/confirm', [P2PController::class, 'confirmTrade']);
+    Route::post('/p2p/trades/{id}/cancel', [P2PController::class, 'cancelTrade']);
 });

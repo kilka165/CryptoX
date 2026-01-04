@@ -1,7 +1,9 @@
 // frontend/components/p2p/P2PBuyModal.tsx
 import React, { useState, useEffect } from "react";
-import { X, TrendingUp, TrendingDown, AlertCircle, Wallet } from "lucide-react";
+import { X, TrendingUp, TrendingDown, AlertCircle, Wallet, BarChart3 } from "lucide-react";
 import { P2POffer } from "@/lib/api/p2pApi";
+import { BinanceAPI } from "@/lib/api/binance";
+import axios from "axios";
 
 interface P2PBuyModalProps {
   isOpen: boolean;
@@ -20,25 +22,105 @@ export function P2PBuyModal({
   const [fiatAmount, setFiatAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
+  const [marketPrice, setMarketPrice] = useState<number | null>(null);
+  const [loadingMarketPrice, setLoadingMarketPrice] = useState(false);
+  const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (!isOpen) {
       setCryptoAmount("");
       setFiatAmount("");
       setError("");
+      setMarketPrice(null);
+      setExchangeRates({});
     }
   }, [isOpen]);
+
+  // Конвертация USD в выбранную валюту
+  const convertFromUSD = (amountUSD: number, toCurrency: string): number => {
+    if (toCurrency === "USD") return amountUSD;
+    const rate = exchangeRates[toCurrency] || 1;
+    return amountUSD * rate;
+  };
+
+  // Получаем рыночную цену
+  const fetchMarketPrice = async (cryptoName: string, currency: string, rates: Record<string, number>) => {
+    setLoadingMarketPrice(true);
+    try {
+      const coins = await BinanceAPI.get24hPrices();
+      const coin = coins.find(c => c.name.toLowerCase() === cryptoName.toLowerCase());
+      
+      if (coin && coin.current_price) {
+        const priceInUSD = coin.current_price;
+        // Используем переданные курсы вместо state
+        const rate = rates[currency] || 1;
+        const priceInCurrency = currency === "USD" ? priceInUSD : priceInUSD * rate;
+        
+        setMarketPrice(priceInCurrency);
+        console.log("💰 Market price loaded:", {
+          crypto: cryptoName,
+          priceUSD: priceInUSD,
+          currency,
+          rate,
+          priceInCurrency
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch market price:", error);
+      setMarketPrice(null);
+    } finally {
+      setLoadingMarketPrice(false);
+    }
+  };
+
+  // Загружаем курсы и рыночную цену при открытии
+  useEffect(() => {
+    if (isOpen && offer) {
+      const fetchData = async () => {
+        try {
+          // Сначала загружаем курсы
+          const response = await axios.get("https://api.exchangerate-api.com/v4/latest/USD");
+          const rates = response.data.rates || {
+            USD: 1,
+            KZT: 450,
+            RUB: 90,
+            EUR: 0.85,
+            GBP: 0.73,
+          };
+          
+          setExchangeRates(rates);
+          
+          // Затем загружаем рыночную цену с уже полученными курсами
+          await fetchMarketPrice(offer.crypto_currency, offer.currency, rates);
+        } catch (error) {
+          console.error("Failed to fetch exchange rates:", error);
+          // Fallback курсы
+          const fallbackRates = {
+            USD: 1,
+            KZT: 450,
+            RUB: 90,
+            EUR: 0.85,
+            GBP: 0.73,
+          };
+          setExchangeRates(fallbackRates);
+          await fetchMarketPrice(offer.crypto_currency, offer.currency, fallbackRates);
+        }
+      };
+
+      fetchData();
+    }
+  }, [isOpen, offer]);
 
   // Рассчитываем минимальное количество криптовалюты на основе цены
   const getMinCryptoAmount = (price: number) => {
     if (price < 1000) {
-      return 0.1; // Цена < 1000: минимум 0.1 крипты
+      return 0.1;
     } else if (price < 10000) {
-      return 0.01; // Цена 1000-9999: минимум 0.01 крипты
+      return 0.01;
     } else if (price < 100000) {
-      return 0.001; // Цена 10000-99999: минимум 0.001 крипты
+      return 0.001;
     } else {
-      return 0.0001; // Цена >= 100000: минимум 0.0001 крипты
+      return 0.0001;
     }
   };
 
@@ -49,6 +131,9 @@ export function P2PBuyModal({
 
   const minCryptoAmount = getMinCryptoAmount(offer.price);
   const minFiatAmount = minCryptoAmount * offer.price;
+
+  // Рассчитываем разницу с рынком
+  const priceDifference = marketPrice ? ((offer.price - marketPrice) / marketPrice) * 100 : null;
 
   const handleCryptoChange = (value: string) => {
     setCryptoAmount(value);
@@ -90,7 +175,6 @@ export function P2PBuyModal({
       return;
     }
 
-    // Проверка минимального количества криптовалюты
     if (cryptoNum < minCryptoAmount) {
       setError(`Минимальное количество: ${minCryptoAmount} ${offer.crypto_currency} (≈${minFiatAmount.toFixed(2)} ${offer.currency})`);
       return;
@@ -167,12 +251,40 @@ export function P2PBuyModal({
             </div>
           </div>
 
-          {/* Цена */}
-          <div className="flex justify-between items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-            <span className="text-sm text-slate-600 dark:text-slate-400">Цена</span>
-            <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
-              {offer.price.toLocaleString()} {offer.currency}
-            </span>
+          {/* Цена с рыночным сравнением */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+              <span className="text-sm text-slate-600 dark:text-slate-400">Цена заявки</span>
+              <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                {offer.price.toLocaleString()} {offer.currency}
+              </span>
+            </div>
+
+            {/* Рыночная цена */}
+            {loadingMarketPrice ? (
+              <div className="flex items-center justify-center gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+                <span className="text-xs text-slate-500">Загрузка рыночной цены...</span>
+              </div>
+            ) : marketPrice && priceDifference !== null ? (
+              <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-slate-500" />
+                  <span className="text-xs text-slate-600 dark:text-slate-400">
+                    Рыночная цена: <strong>{marketPrice.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {offer.currency}</strong>
+                  </span>
+                </div>
+                <span className={`text-xs font-medium px-2 py-1 rounded ${
+                  priceDifference > 0 
+                    ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' 
+                    : priceDifference < 0
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                    : 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-400'
+                }`}>
+                  {priceDifference > 0 ? '+' : ''}{priceDifference.toFixed(2)}%
+                </span>
+              </div>
+            ) : null}
           </div>
 
           {/* Доступно */}

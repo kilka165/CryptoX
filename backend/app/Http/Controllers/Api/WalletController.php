@@ -39,14 +39,16 @@ class WalletController extends Controller
             $wallet->balance += $validated['amount'];
             $wallet->save();
 
+            // Создаём транзакцию без asset_id (для фиатных операций)
             Transaction::create([
                 'user_id' => $user->id,
+                'asset_id' => null,
                 'type' => 'deposit',
-                'coin' => null, // ← ДОБАВЬТЕ
+                'status' => 'completed',
                 'amount' => $validated['amount'],
                 'price_usd' => 1,
                 'total_usd' => $validated['amount'],
-                // УДАЛИТЕ asset_id, status, description
+                'description' => 'Пополнение кошелька',
             ]);
 
             DB::commit();
@@ -81,14 +83,16 @@ class WalletController extends Controller
             $wallet->balance -= $validated['amount'];
             $wallet->save();
 
+            // Создаём транзакцию без asset_id (для фиатных операций)
             Transaction::create([
                 'user_id' => $user->id,
+                'asset_id' => null,
                 'type' => 'withdraw',
-                'coin' => null, // ← ДОБАВЬТЕ
+                'status' => 'completed',
                 'amount' => $validated['amount'],
                 'price_usd' => 1,
                 'total_usd' => $validated['amount'],
-                // УДАЛИТЕ asset_id, status, description
+                'description' => 'Вывод средств из кошелька',
             ]);
 
             DB::commit();

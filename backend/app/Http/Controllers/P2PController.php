@@ -10,53 +10,139 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class P2PController extends Controller
 {
     /**
+     * Получить курс валюты к USD
+     */
+    private function getExchangeRate($currency)
+    {
+        if ($currency === 'USD') {
+            return 1;
+        }
+
+        try {
+            $response = Http::get("https://api.exchangerate-api.com/v4/latest/USD");
+            $rates = $response->json()['rates'] ?? [];
+            return $rates[$currency] ?? 1;
+        } catch (\Exception $e) {
+            Log::error('Exchange rate fetch failed', ['error' => $e->getMessage()]);
+
+            // Fallback курсы
+            $fallbackRates = [
+                'KZT' => 450,
+                'RUB' => 90,
+                'EUR' => 0.85,
+                'GBP' => 0.73,
+            ];
+
+            return $fallbackRates[$currency] ?? 1;
+        }
+    }
+
+    /**
+     * Конвертировать сумму из одной валюты в другую через USD
+     */
+    private function convertCurrency($amount, $fromCurrency, $toCurrency)
+    {
+        if ($fromCurrency === $toCurrency) {
+            return $amount;
+        }
+
+        // Конвертируем в USD
+        $fromRate = $this->getExchangeRate($fromCurrency);
+        $amountInUSD = $amount / $fromRate;
+
+        // Конвертируем из USD в целевую валюту
+        $toRate = $this->getExchangeRate($toCurrency);
+        return $amountInUSD * $toRate;
+    }
+
+        /**
      * Получить все предложения P2P
      */
     public function getOffers(Request $request)
     {
-        $query = P2POffer::with('seller')
-            ->where('is_active', true)
-            ->where('available_amount', '>', 0);
+        try {
+            $query = P2POffer::with('seller')
+                ->where('is_active', true)
+                ->where('available_amount', '>', 0);
 
-        if ($request->filled('crypto_currency')) {
-            $query->where('crypto_currency', $request->crypto_currency);
+            if ($request->filled('crypto_currency')) {
+                $query->where('crypto_currency', $request->crypto_currency);
+            }
+
+            if ($request->filled('currency')) {
+                $query->where('currency', $request->currency);
+            }
+
+            if ($request->filled('type')) {
+                $userWants = $request->type;
+                $showType = $userWants === 'buy' ? 'sell' : 'buy';
+                $query->where('type', $showType);
+            }
+
+            $offers = $query->orderBy('price', 'asc')->get();
+
+            return response()->json($offers->map(function ($offer) {
+                // Получаем реальное количество завершённых сделок пользователя
+                $completedTrades = 0;
+                $totalTrades = 0;
+
+                try {
+                    $completedTrades = P2PTrade::where(function ($query) use ($offer) {
+                            $query->where('buyer_id', $offer->seller_id)
+                                  ->orWhere('seller_id', $offer->seller_id);
+                        })
+                        ->where('status', 'completed')
+                        ->count();
+
+                    $totalTrades = P2PTrade::where(function ($query) use ($offer) {
+                            $query->where('buyer_id', $offer->seller_id)
+                                  ->orWhere('seller_id', $offer->seller_id);
+                        })
+                        ->whereIn('status', ['completed', 'cancelled'])
+                        ->count();
+                } catch (\Exception $e) {
+                    Log::warning('Error fetching P2P trade stats', ['error' => $e->getMessage()]);
+                }
+
+                // Вычисляем процент выполнения
+                $completionRate = $totalTrades > 0
+                    ? round(($completedTrades / $totalTrades) * 100)
+                    : 100;
+
+                return [
+                    'id' => $offer->id,
+                    'seller_id' => $offer->seller_id,
+                    'seller_name' => $offer->seller->name,
+                    'orders_count' => $completedTrades,
+                    'completion_rate' => $completionRate,
+                    'price' => (float) $offer->price,
+                    'currency' => $offer->currency,
+                    'crypto_currency' => $offer->crypto_currency,
+                    'min_limit' => (float) $offer->min_limit,
+                    'max_limit' => (float) $offer->max_limit,
+                    'available_amount' => (float) $offer->available_amount,
+                    'type' => $offer->type,
+                    'created_at' => $offer->created_at,
+                ];
+            }));
+        } catch (\Exception $e) {
+            Log::error('Error fetching P2P offers', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'message' => 'Ошибка при получении заявок',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        if ($request->filled('currency')) {
-            $query->where('currency', $request->currency);
-        }
-
-        if ($request->filled('type')) {
-            $userWants = $request->type;
-            $showType = $userWants === 'buy' ? 'sell' : 'buy';
-            $query->where('type', $showType);
-        }
-
-        $offers = $query->orderBy('price', 'asc')->get();
-
-        return response()->json($offers->map(function ($offer) {
-            return [
-                'id' => $offer->id,
-                'seller_id' => $offer->seller_id,
-                'seller_name' => $offer->seller->name,
-                'orders_count' => $offer->seller->p2p_orders_count ?? rand(10, 500),
-                'completion_rate' => $offer->seller->completion_rate ?? rand(95, 100),
-                'price' => (float) $offer->price,
-                'currency' => $offer->currency,
-                'crypto_currency' => $offer->crypto_currency,
-                'min_limit' => (float) $offer->min_limit,
-                'max_limit' => (float) $offer->max_limit,
-                'available_amount' => (float) $offer->available_amount,
-                'type' => $offer->type,
-                'avg_completion_time' => rand(5, 30),
-                'created_at' => $offer->created_at,
-            ];
-        }));
     }
+
+
 
     /**
      * Создать своё предложение с блокировкой средств
@@ -65,11 +151,11 @@ class P2PController extends Controller
     {
         $validated = $request->validate([
             'crypto_currency' => 'required|string',
-            'currency' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'min_limit' => 'required|numeric|min:0',
+            'currency' => 'required|string', // Валюта для отображения цены
+            'price' => 'required|numeric|min:0', // Цена в выбранной валюте
+            'min_limit' => 'required|numeric|min:0', // Лимиты в выбранной валюте
             'max_limit' => 'required|numeric|min:0',
-            'available_amount' => 'required|numeric|min:0',
+            'available_amount' => 'required|numeric|min:0', // Количество крипты
             'type' => 'required|in:buy,sell',
         ]);
 
@@ -94,41 +180,54 @@ class P2PController extends Controller
                 $asset->amount -= $validated['available_amount'];
                 $asset->save();
 
+                Log::info('P2P Sell Offer - Crypto locked', [
+                    'user_id' => $user->id,
+                    'crypto' => $validated['crypto_currency'],
+                    'amount' => $validated['available_amount'],
+                ]);
+
             } else {
                 // Покупка криптовалюты - блокируем USD из wallet
-                $totalCost = $validated['price'] * $validated['available_amount'];
-
-                // ВАЖНО: цена уже в той валюте, которую выбрал пользователь
-                // Нужно конвертировать в USD для списания из wallet
-                // Предполагаем, что фронтенд отправляет цену УЖЕ в USD
-                // Или нужно конвертировать здесь
+                // Конвертируем цену из выбранной валюты в USD
+                $priceInUSD = $this->convertCurrency($validated['price'], $validated['currency'], 'USD');
+                $totalCostUSD = $priceInUSD * $validated['available_amount'];
 
                 $wallet = Wallet::where('user_id', $user->id)->first();
 
-                if (!$wallet || $wallet->balance < $totalCost) {
+                if (!$wallet || $wallet->balance < $totalCostUSD) {
                     DB::rollBack();
+
+                    // Для удобства покажем сумму в обеих валютах
+                    $totalCostInCurrency = $validated['price'] * $validated['available_amount'];
+
                     return response()->json([
-                        'message' => "Недостаточно USD на балансе. Требуется: {$totalCost} USD, доступно: " . ($wallet ? $wallet->balance : 0) . " USD"
+                        'message' => "Недостаточно средств на балансе.",
+                        'required_usd' => round($totalCostUSD, 2),
+                        'required_' . strtolower($validated['currency']) => round($totalCostInCurrency, 2),
+                        'available_usd' => $wallet ? round($wallet->balance, 2) : 0,
                     ], 400);
                 }
 
                 // Списываем USD с баланса
-                $wallet->balance -= $totalCost;
+                $wallet->balance -= $totalCostUSD;
                 $wallet->save();
 
                 Log::info('P2P Buy Offer - USD deducted from wallet', [
                     'user_id' => $user->id,
-                    'total_cost' => $totalCost,
-                    'remaining_balance' => $wallet->balance,
+                    'price_display_currency' => $validated['currency'],
+                    'price_display' => $validated['price'],
+                    'price_usd' => $priceInUSD,
+                    'total_cost_usd' => $totalCostUSD,
+                    'remaining_balance_usd' => $wallet->balance,
                 ]);
             }
 
-            // Создаём заявку
+            // Создаём заявку (цена сохраняется в той валюте, которую выбрал пользователь)
             $offer = P2POffer::create([
                 'seller_id' => $user->id,
                 'crypto_currency' => $validated['crypto_currency'],
-                'currency' => $validated['currency'],
-                'price' => $validated['price'],
+                'currency' => $validated['currency'], // Валюта отображения
+                'price' => $validated['price'], // Цена в валюте отображения
                 'min_limit' => $validated['min_limit'],
                 'max_limit' => $validated['max_limit'],
                 'available_amount' => $validated['available_amount'],
@@ -192,17 +291,31 @@ class P2PController extends Controller
                         'amount' => $offer->available_amount,
                     ]);
                 }
+
+                Log::info('P2P Offer Deleted - Crypto returned', [
+                    'offer_id' => $id,
+                    'crypto' => $offer->crypto_currency,
+                    'amount' => $offer->available_amount,
+                ]);
+
             } else {
-                // Возвращаем USD в wallet
-                $totalCost = $offer->price * $offer->available_amount;
+                // Возвращаем USD в wallet (конвертируем из валюты заявки)
+                $priceInUSD = $this->convertCurrency($offer->price, $offer->currency, 'USD');
+                $totalCostUSD = $priceInUSD * $offer->available_amount;
 
                 $wallet = Wallet::firstOrCreate(
                     ['user_id' => $user->id],
                     ['balance' => 0]
                 );
 
-                $wallet->balance += $totalCost;
+                $wallet->balance += $totalCostUSD;
                 $wallet->save();
+
+                Log::info('P2P Offer Deleted - USD returned', [
+                    'offer_id' => $id,
+                    'returned_usd' => $totalCostUSD,
+                    'new_balance' => $wallet->balance,
+                ]);
             }
 
             $offer->delete();
@@ -224,7 +337,7 @@ class P2PController extends Controller
     {
         $validated = $request->validate([
             'offer_id' => 'required|exists:p2p_offers,id',
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required|numeric|min:0', // Количество крипты
         ]);
 
         $user = auth()->user();
@@ -242,6 +355,7 @@ class P2PController extends Controller
             return response()->json(['message' => 'Недостаточно криптовалюты в заявке'], 400);
         }
 
+        // Считаем сумму в валюте заявки
         $fiatAmount = $validated['amount'] * $offer->price;
 
         if ($fiatAmount < $offer->min_limit || $fiatAmount > $offer->max_limit) {
@@ -250,18 +364,46 @@ class P2PController extends Controller
             ], 400);
         }
 
+        // Конвертируем в USD для проверки баланса
+        $fiatAmountUSD = $this->convertCurrency($fiatAmount, $offer->currency, 'USD');
+
         DB::beginTransaction();
         try {
+            // Проверяем баланс покупателя (если он покупает крипту - нужны USD)
+            if ($offer->type === 'sell') {
+                // Продавец продает крипту, покупателю нужны USD
+                $buyerWallet = Wallet::where('user_id', $user->id)->first();
+
+                if (!$buyerWallet || $buyerWallet->balance < $fiatAmountUSD) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'Недостаточно средств на балансе',
+                        'required_usd' => round($fiatAmountUSD, 2),
+                        'available_usd' => $buyerWallet ? round($buyerWallet->balance, 2) : 0,
+                    ], 400);
+                }
+            } else {
+                // Продавец покупает крипту, покупателю нужна крипта
+                $buyerCrypto = Asset::where('user_id', $user->id)
+                    ->where('name', $offer->crypto_currency)
+                    ->first();
+
+                if (!$buyerCrypto || $buyerCrypto->amount < $validated['amount']) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => "Недостаточно {$offer->crypto_currency} на балансе",
+                        'required' => $validated['amount'],
+                        'available' => $buyerCrypto ? $buyerCrypto->amount : 0,
+                    ], 400);
+                }
+            }
+
             // Создаём сделку
             $trade = P2PTrade::create([
                 'offer_id' => $offer->id,
                 'buyer_id' => $user->id,
-                'seller_id' => $offer->seller_id,
-                'crypto_currency' => $offer->crypto_currency,
-                'currency' => $offer->currency,
-                'amount' => $validated['amount'],
-                'price' => $offer->price,
-                'total_fiat' => $fiatAmount,
+                'amount' => $fiatAmount, // Сумма в валюте заявки
+                'crypto_amount' => $validated['amount'], // Количество крипты
                 'status' => 'pending',
             ]);
 
@@ -280,7 +422,9 @@ class P2PController extends Controller
                 'trade_id' => $trade->id,
                 'buyer_id' => $user->id,
                 'seller_id' => $offer->seller_id,
-                'amount' => $validated['amount'],
+                'crypto_amount' => $validated['amount'],
+                'fiat_amount_display' => $fiatAmount,
+                'fiat_amount_usd' => $fiatAmountUSD,
             ]);
 
             return response()->json([
@@ -302,10 +446,12 @@ class P2PController extends Controller
     {
         $user = auth()->user();
 
-        $trades = P2PTrade::with(['buyer', 'seller', 'offer'])
+        $trades = P2PTrade::with(['buyer', 'offer.seller'])
             ->where(function ($query) use ($user) {
                 $query->where('buyer_id', $user->id)
-                      ->orWhere('seller_id', $user->id);
+                      ->orWhereHas('offer', function ($q) use ($user) {
+                          $q->where('seller_id', $user->id);
+                      });
             })
             ->orderBy('created_at', 'desc')
             ->get();
@@ -313,16 +459,20 @@ class P2PController extends Controller
         return response()->json($trades->map(function ($trade) use ($user) {
             $isBuyer = $trade->buyer_id === $user->id;
 
+            // Конвертируем сумму в USD для справки
+            $totalUSD = $this->convertCurrency($trade->amount, $trade->offer->currency, 'USD');
+
             return [
                 'id' => $trade->id,
-                'crypto_currency' => $trade->crypto_currency,
-                'currency' => $trade->currency,
-                'amount' => (float) $trade->amount,
-                'price' => (float) $trade->price,
-                'total_fiat' => (float) $trade->total_fiat,
+                'crypto_currency' => $trade->offer->crypto_currency,
+                'currency' => $trade->offer->currency,
+                'crypto_amount' => (float) $trade->crypto_amount,
+                'price' => (float) $trade->offer->price,
+                'total_fiat' => (float) $trade->amount,
+                'total_usd' => (float) $totalUSD,
                 'status' => $trade->status,
                 'role' => $isBuyer ? 'buyer' : 'seller',
-                'counterparty' => $isBuyer ? $trade->seller->name : $trade->buyer->name,
+                'counterparty' => $isBuyer ? $trade->offer->seller->name : $trade->buyer->name,
                 'created_at' => $trade->created_at,
                 'updated_at' => $trade->updated_at,
             ];
@@ -337,7 +487,8 @@ class P2PController extends Controller
         $user = auth()->user();
         $trade = P2PTrade::with('offer')->findOrFail($id);
 
-        if ($trade->seller_id !== $user->id && $trade->buyer_id !== $user->id) {
+        // Проверяем права доступа
+        if ($trade->offer->seller_id !== $user->id && $trade->buyer_id !== $user->id) {
             return response()->json(['message' => 'Нет доступа к этой сделке'], 403);
         }
 
@@ -347,79 +498,99 @@ class P2PController extends Controller
 
         DB::beginTransaction();
         try {
-            // Обмен активами
-            if ($trade->offer->type === 'sell') {
+            $offer = $trade->offer;
+
+            // Конвертируем фиатную сумму в USD для операций с кошельком
+            $fiatAmountUSD = $this->convertCurrency($trade->amount, $offer->currency, 'USD');
+
+            if ($offer->type === 'sell') {
                 // Продавец продаёт крипту за фиат
                 // Крипта уже списана при создании заявки, просто переводим покупателю
-                $buyerCrypto = UserAsset::firstOrCreate(
-                    ['user_id' => $trade->buyer_id, 'coin_symbol' => $trade->crypto_currency],
-                    ['coin_name' => $trade->crypto_currency, 'amount' => 0]
+                $buyerCrypto = Asset::firstOrCreate(
+                    [
+                        'user_id' => $trade->buyer_id,
+                        'name' => $offer->crypto_currency
+                    ],
+                    [
+                        'symbol' => strtoupper(substr($offer->crypto_currency, 0, 3)),
+                        'amount' => 0
+                    ]
                 );
-                $buyerCrypto->amount += $trade->amount;
+                $buyerCrypto->amount += $trade->crypto_amount;
                 $buyerCrypto->save();
 
-                // Фиат от покупателя к продавцу
-                $buyerFiat = UserAsset::where('user_id', $trade->buyer_id)
-                    ->where('coin_symbol', $trade->currency)
-                    ->first();
+                // USD от покупателя к продавцу
+                $buyerWallet = Wallet::where('user_id', $trade->buyer_id)->first();
 
-                if (!$buyerFiat || $buyerFiat->amount < $trade->total_fiat) {
+                if (!$buyerWallet || $buyerWallet->balance < $fiatAmountUSD) {
                     DB::rollBack();
                     return response()->json(['message' => 'Недостаточно средств у покупателя'], 400);
                 }
 
-                $buyerFiat->amount -= $trade->total_fiat;
-                $buyerFiat->save();
+                $buyerWallet->balance -= $fiatAmountUSD;
+                $buyerWallet->save();
 
-                $sellerFiat = UserAsset::firstOrCreate(
-                    ['user_id' => $trade->seller_id, 'coin_symbol' => $trade->currency],
-                    ['coin_name' => $trade->currency, 'amount' => 0]
+                $sellerWallet = Wallet::firstOrCreate(
+                    ['user_id' => $offer->seller_id],
+                    ['balance' => 0]
                 );
-                $sellerFiat->amount += $trade->total_fiat;
-                $sellerFiat->save();
+                $sellerWallet->balance += $fiatAmountUSD;
+                $sellerWallet->save();
+
+                Log::info('P2P Trade Confirmed - Sell', [
+                    'trade_id' => $trade->id,
+                    'crypto_to_buyer' => $trade->crypto_amount,
+                    'usd_to_seller' => $fiatAmountUSD,
+                ]);
 
             } else {
                 // Продавец покупает крипту за фиат
-                // Фиат уже списан при создании заявки
-                $sellerCrypto = UserAsset::firstOrCreate(
-                    ['user_id' => $trade->seller_id, 'coin_symbol' => $trade->crypto_currency],
-                    ['coin_name' => $trade->crypto_currency, 'amount' => 0]
+                // USD уже списан при создании заявки, выдаём крипту продавцу
+                $sellerCrypto = Asset::firstOrCreate(
+                    [
+                        'user_id' => $offer->seller_id,
+                        'name' => $offer->crypto_currency
+                    ],
+                    [
+                        'symbol' => strtoupper(substr($offer->crypto_currency, 0, 3)),
+                        'amount' => 0
+                    ]
                 );
-                $sellerCrypto->amount += $trade->amount;
+                $sellerCrypto->amount += $trade->crypto_amount;
                 $sellerCrypto->save();
 
                 // Крипта от покупателя (который на самом деле продаёт)
-                $buyerCrypto = UserAsset::where('user_id', $trade->buyer_id)
-                    ->where('coin_symbol', $trade->crypto_currency)
+                $buyerCrypto = Asset::where('user_id', $trade->buyer_id)
+                    ->where('name', $offer->crypto_currency)
                     ->first();
 
-                if (!$buyerCrypto || $buyerCrypto->amount < $trade->amount) {
+                if (!$buyerCrypto || $buyerCrypto->amount < $trade->crypto_amount) {
                     DB::rollBack();
                     return response()->json(['message' => 'Недостаточно криптовалюты'], 400);
                 }
 
-                $buyerCrypto->amount -= $trade->amount;
+                $buyerCrypto->amount -= $trade->crypto_amount;
                 $buyerCrypto->save();
 
-                // Фиат передаём от заблокированных средств продавца покупателю
-                $buyerFiat = UserAsset::firstOrCreate(
-                    ['user_id' => $trade->buyer_id, 'coin_symbol' => $trade->currency],
-                    ['coin_name' => $trade->currency, 'amount' => 0]
+                // USD передаём от заблокированных средств продавца покупателю
+                $buyerWallet = Wallet::firstOrCreate(
+                    ['user_id' => $trade->buyer_id],
+                    ['balance' => 0]
                 );
-                $buyerFiat->amount += $trade->total_fiat;
-                $buyerFiat->save();
+                $buyerWallet->balance += $fiatAmountUSD;
+                $buyerWallet->save();
+
+                Log::info('P2P Trade Confirmed - Buy', [
+                    'trade_id' => $trade->id,
+                    'crypto_to_seller' => $trade->crypto_amount,
+                    'usd_to_buyer' => $fiatAmountUSD,
+                ]);
             }
 
             $trade->status = 'completed';
             $trade->save();
 
             DB::commit();
-
-            Log::info('P2P Trade Confirmed', [
-                'trade_id' => $trade->id,
-                'buyer_id' => $trade->buyer_id,
-                'seller_id' => $trade->seller_id,
-            ]);
 
             return response()->json([
                 'message' => 'Сделка успешно завершена',
@@ -429,7 +600,7 @@ class P2PController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('P2P Trade Confirmation Failed', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Ошибка при подтверждении сделки'], 500);
+            return response()->json(['message' => 'Ошибка при подтверждении сделки: ' . $e->getMessage()], 500);
         }
     }
 
@@ -441,7 +612,7 @@ class P2PController extends Controller
         $user = auth()->user();
         $trade = P2PTrade::with('offer')->findOrFail($id);
 
-        if ($trade->seller_id !== $user->id && $trade->buyer_id !== $user->id) {
+        if ($trade->offer->seller_id !== $user->id && $trade->buyer_id !== $user->id) {
             return response()->json(['message' => 'Нет доступа к этой сделке'], 403);
         }
 
@@ -453,7 +624,7 @@ class P2PController extends Controller
         try {
             // Возвращаем количество обратно в заявку
             $offer = $trade->offer;
-            $offer->available_amount += $trade->amount;
+            $offer->available_amount += $trade->crypto_amount;
             $offer->is_active = true;
             $offer->save();
 
