@@ -27,7 +27,7 @@ export function FromCoinCard({
   return (
     <div className="space-y-1">
       <div
-        className={`flex items-center gap-2 bg-white dark:bg-slate-950 rounded-xl px-3 py-3 border ${
+        className={`flex items-center gap-2 bg-white dark:bg-[#0d0d0d] rounded-xl px-3 py-3 border ${
           hasError
             ? "border-red-500/50 bg-red-50 dark:bg-red-950/20"
             : "border-slate-300 dark:border-slate-700"

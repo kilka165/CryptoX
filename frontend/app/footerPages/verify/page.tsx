@@ -36,7 +36,7 @@ export default function VerifyPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-white dark:bg-slate-950">
+      <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
         {/* Hero секция */}
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-16">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -76,7 +76,7 @@ export default function VerifyPage() {
               {verificationLevels.map((level, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800"
+                  className="flex items-center justify-between p-6 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800"
                 >
                   <div>
                     <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">
@@ -103,7 +103,7 @@ export default function VerifyPage() {
               Как пройти верификацию
             </h2>
             
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-8">
               {/* Шаг 1: Личные данные */}
               {step === 1 && (
                 <div className="space-y-4">

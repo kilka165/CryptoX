@@ -6,7 +6,7 @@ export default function PrivacyPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-white dark:bg-slate-950">
+      <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
         {/* Hero секция */}
         <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-12">
           <div className="container mx-auto px-4 text-center" style={{ maxWidth: '900px' }}>
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
               1. Какую информацию мы собираем
             </h2>
             <div className="space-y-4">
-              <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
                   <Database size={20} className="text-blue-600 dark:text-blue-400" />
                   Персональные данные
@@ -51,7 +51,7 @@ export default function PrivacyPage() {
                 </ul>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
                   <Eye size={20} className="text-blue-600 dark:text-blue-400" />
                   Данные об использовании
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
                 </ul>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
                   <Lock size={20} className="text-blue-600 dark:text-blue-400" />
                   Финансовая информация
@@ -85,7 +85,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               2. Как мы используем вашу информацию
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
               <ul className="space-y-3 text-slate-600 dark:text-slate-400">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 dark:text-blue-400 mt-1">•</span>
@@ -125,25 +125,25 @@ export default function PrivacyPage() {
                 Мы применяем современные меры безопасности для защиты ваших данных:
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-green-50 dark:bg-slate-900 border border-green-200 dark:border-green-900 rounded-lg p-4">
+                <div className="bg-green-50 dark:bg-[#131416] border border-green-200 dark:border-green-900 rounded-lg p-4">
                   <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-2">Шифрование</h4>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
                     SSL/TLS шифрование для всех передаваемых данных
                   </p>
                 </div>
-                <div className="bg-green-50 dark:bg-slate-900 border border-green-200 dark:border-green-900 rounded-lg p-4">
+                <div className="bg-green-50 dark:bg-[#131416] border border-green-200 dark:border-green-900 rounded-lg p-4">
                   <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-2">Двухфакторная аутентификация</h4>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
                     Дополнительный уровень защиты аккаунта
                   </p>
                 </div>
-                <div className="bg-green-50 dark:bg-slate-900 border border-green-200 dark:border-green-900 rounded-lg p-4">
+                <div className="bg-green-50 dark:bg-[#131416] border border-green-200 dark:border-green-900 rounded-lg p-4">
                   <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-2">Холодное хранение</h4>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
                     95% средств в офлайн кошельках
                   </p>
                 </div>
-                <div className="bg-green-50 dark:bg-slate-900 border border-green-200 dark:border-green-900 rounded-lg p-4">
+                <div className="bg-green-50 dark:bg-[#131416] border border-green-200 dark:border-green-900 rounded-lg p-4">
                   <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-2">Мониторинг 24/7</h4>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
                     Постоянный контроль безопасности
@@ -158,7 +158,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               4. Передача данных третьим лицам
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 Мы можем передавать вашу информацию следующим третьим лицам:
               </p>
@@ -179,7 +179,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               5. Ваши права
             </h2>
-            <div className="bg-blue-50 dark:bg-slate-900 rounded-lg p-5 border border-blue-200 dark:border-slate-700">
+            <div className="bg-blue-50 dark:bg-[#131416] rounded-lg p-5 border border-blue-200 dark:border-slate-700">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 В соответствии с законодательством о защите данных, вы имеете право:
               </p>
@@ -217,7 +217,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               7. Cookies и аналогичные технологии
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 Мы используем cookies для улучшения работы платформы. Подробнее читайте в нашей{' '}
                 <a href="/footerPages/cookies" className="text-blue-600 dark:text-blue-400 hover:underline">
@@ -232,7 +232,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               8. Контактная информация
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 По вопросам конфиденциальности обращайтесь:
               </p>

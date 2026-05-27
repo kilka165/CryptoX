@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { clearAuthToken } from "@/lib/auth";
 import { Header } from "@/components/Header";
 import { UserCard } from "@/components/profile/UserCard";
 import { UserNavigation } from "@/components/profile/UserNavigation";
@@ -79,7 +80,7 @@ export default function ProfilePage() {
       })
       .catch((error) => {
         console.error("Ошибка авторизации", error);
-        localStorage.removeItem("auth_token");
+        clearAuthToken();
         router.push("/login");
       });
   };
@@ -91,12 +92,12 @@ export default function ProfilePage() {
       );
 
       const priceMap: Record<string, BinanceTicker> = {};
-      
+
       assets.forEach((asset) => {
         const ticker = response.data.find(
           (t) => t.symbol === `${asset.symbol.toUpperCase()}USDT`
         );
-        
+
         if (ticker) {
           priceMap[asset.symbol.toLowerCase()] = ticker;
         }
@@ -105,10 +106,10 @@ export default function ProfilePage() {
       setPrices(priceMap);
     } catch (error) {
       console.error("Ошибка загрузки цен с Binance:", error);
-      
+
       try {
         const priceMap: Record<string, BinanceTicker> = {};
-        
+
         for (const asset of assets) {
           try {
             const res = await axios.get<BinanceTicker>(
@@ -119,7 +120,7 @@ export default function ProfilePage() {
             console.error(`Не удалось загрузить цену для ${asset.symbol}:`, err);
           }
         }
-        
+
         setPrices(priceMap);
       } catch (fallbackError) {
         console.error("Запасной метод загрузки цен тоже не сработал:", fallbackError);
@@ -128,7 +129,7 @@ export default function ProfilePage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("auth_token");
+    clearAuthToken();
     window.location.href = "/login";
   };
 
@@ -157,7 +158,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d]">
         <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -170,7 +171,7 @@ export default function ProfilePage() {
   if (!authUser) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d]">
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -184,9 +185,9 @@ export default function ProfilePage() {
           {/* ПРАВАЯ КОЛОНКА */}
           <div className="lg:col-span-2 space-y-6">
             <BalanceCard balance={rawBalance} currency={userCurrency} />
-            <PortfolioValue 
-              assets={authUser?.assets || []} 
-              userCurrency={userCurrency} 
+            <PortfolioValue
+              assets={authUser?.assets || []}
+              userCurrency={userCurrency}
             />
             {assetsList.length > 0 && (
               <AssetsTable

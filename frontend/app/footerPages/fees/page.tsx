@@ -26,7 +26,7 @@ export default function FeesPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-white dark:bg-slate-950">
+      <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
         {/* Hero секция */}
         <div className="bg-gradient-to-r from-emerald-500 to-teal-500 dark:from-emerald-600 dark:to-teal-600 text-white py-12">
           <div className="container mx-auto px-4 text-center" style={{ maxWidth: '900px' }}>
@@ -77,7 +77,7 @@ export default function FeesPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               Комиссии за вывод криптовалюты
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-100 dark:bg-slate-800">
@@ -117,7 +117,7 @@ export default function FeesPage() {
                 </table>
               </div>
             </div>
-            <div className="mt-3 flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 bg-blue-50 dark:bg-slate-900 p-3 rounded-lg">
+            <div className="mt-3 flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 bg-blue-50 dark:bg-[#131416] p-3 rounded-lg">
               <Info className="flex-shrink-0 mt-0.5 text-blue-600 dark:text-blue-400" size={14} />
               <p>
                 Комиссии могут меняться в зависимости от загруженности сети. Переводы между пользователями CryptoX бесплатны.
@@ -130,7 +130,7 @@ export default function FeesPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               Комиссии за вывод фиатных средств
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-100 dark:bg-slate-800">

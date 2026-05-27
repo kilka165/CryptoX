@@ -23,7 +23,7 @@ export function ToCoinCard({
         </span>
       </div>
 
-      <div className="flex items-center gap-2 bg-white dark:bg-slate-950 rounded-xl px-3 py-4 border border-slate-300 dark:border-slate-700">
+      <div className="flex items-center gap-2 bg-white dark:bg-[#0d0d0d] rounded-xl px-3 py-4 border border-slate-300 dark:border-slate-700">
         <button
           type="button"
           onClick={onOpenPicker}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { setAuthToken } from "@/lib/auth";
 import { LogIn, Mail, Lock, ArrowLeft, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
@@ -32,7 +33,7 @@ export default function LoginPage() {
         formData
       );
 
-      localStorage.setItem("auth_token", response.data.token);
+      setAuthToken(response.data.token);
 
       // сразу в профиль, без alert
       router.push("/profile");

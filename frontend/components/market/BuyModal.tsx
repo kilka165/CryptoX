@@ -57,7 +57,7 @@ export function BuyModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-800">
+      <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-800">
         <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
           <h2 className="text-xl font-bold">
             {coin.name} ({coin.symbol.toUpperCase()})

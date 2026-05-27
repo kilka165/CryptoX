@@ -51,7 +51,7 @@ export function P2POfferCard({
 
   return (
     <>
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 hover:border-blue-500 dark:hover:border-blue-500 transition-all">
+      <div className="bg-white dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-4 hover:border-blue-500 dark:hover:border-blue-500 transition-all">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
           {/* Продавец */}
           <div className="flex-1 min-w-[180px]">
@@ -136,7 +136,7 @@ export function P2POfferCard({
       {/* Модалка подтверждения отмены */}
       {showCancelModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md shadow-xl">
+          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md shadow-xl">
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">

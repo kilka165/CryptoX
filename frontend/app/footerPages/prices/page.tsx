@@ -63,7 +63,7 @@ export default function PricesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950">
+    <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
         <Header />
       {/* Hero секция */}
       <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white py-20">
@@ -85,7 +85,7 @@ export default function PricesPage() {
               placeholder="Поиск криптовалюты..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
+              className="w-full pl-12 pr-4 py-3 bg-slate-100 dark:bg-[#131416] border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
             />
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function PricesPage() {
             <p className="mt-4 text-slate-600 dark:text-slate-400">Загрузка данных...</p>
           </div>
         ) : (
-          <div className="bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+          <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-100 dark:bg-slate-800">

@@ -157,7 +157,7 @@ export default function GlossaryPage() {
   }, {} as Record<string, GlossaryTerm[]>);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950">
+    <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
         <Header />
       {/* Hero секция */}
       <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-20">
@@ -183,7 +183,7 @@ export default function GlossaryPage() {
               placeholder="Поиск термина..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-900 dark:text-slate-100"
+              className="w-full pl-12 pr-4 py-3 bg-slate-100 dark:bg-[#131416] border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-900 dark:text-slate-100"
             />
           </div>
 
@@ -196,7 +196,7 @@ export default function GlossaryPage() {
                 className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
                   selectedCategory === category
                     ? "bg-purple-600 text-white"
-                    : "bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-purple-500 hover:text-white"
+                    : "bg-slate-100 dark:bg-[#131416] text-slate-700 dark:text-slate-300 hover:bg-purple-500 hover:text-white"
                 }`}
               >
                 {category}
@@ -216,7 +216,7 @@ export default function GlossaryPage() {
                 {groupedTerms[letter].map((item, index) => (
                   <div
                     key={index}
-                    className="bg-slate-50 dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800 hover:border-purple-500 dark:hover:border-purple-500 transition-all duration-200"
+                    className="bg-slate-50 dark:bg-[#131416] rounded-lg p-6 border border-slate-200 dark:border-slate-800 hover:border-purple-500 dark:hover:border-purple-500 transition-all duration-200"
                   >
                     <div className="flex items-start justify-between gap-4 mb-2">
                       <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">

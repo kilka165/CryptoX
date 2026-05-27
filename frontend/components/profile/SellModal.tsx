@@ -123,7 +123,7 @@ export function SellModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-300 dark:border-slate-800">
+      <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-2xl w-full max-w-md border border-slate-300 dark:border-slate-800">
         <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
           <h3 className="text-xl font-bold">Продать {selectedAsset.symbol.toUpperCase()}</h3>
           <button
@@ -169,7 +169,7 @@ export function SellModal({
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950 text-lg font-semibold outline-none focus:border-blue-500"
+              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-[#0d0d0d] text-lg font-semibold outline-none focus:border-blue-500"
             />
             <div className="mt-2 flex justify-between">
               <button

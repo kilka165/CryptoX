@@ -6,7 +6,7 @@ export default function LegalPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-white dark:bg-slate-950">
+      <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
         {/* Hero секция */}
         <div className="bg-gradient-to-r from-slate-700 to-slate-900 text-white py-12">
           <div className="container mx-auto px-4 text-center" style={{ maxWidth: '900px' }}>
@@ -27,7 +27,7 @@ export default function LegalPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <a
                 href="/legal/terms"
-                className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
+                className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
               >
                 <FileText className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1 group-hover:scale-110 transition-transform" size={28} />
                 <div>
@@ -42,7 +42,7 @@ export default function LegalPage() {
 
               <a
                 href="/legal/privacy"
-                className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
+                className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
               >
                 <Shield className="text-green-600 dark:text-green-400 flex-shrink-0 mt-1 group-hover:scale-110 transition-transform" size={28} />
                 <div>
@@ -57,7 +57,7 @@ export default function LegalPage() {
 
               <a
                 href="/legal/aml"
-                className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
+                className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
               >
                 <AlertCircle className="text-orange-600 dark:text-orange-400 flex-shrink-0 mt-1 group-hover:scale-110 transition-transform" size={28} />
                 <div>
@@ -72,7 +72,7 @@ export default function LegalPage() {
 
               <a
                 href="/legal/risk"
-                className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
+                className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
               >
                 <Scale className="text-red-600 dark:text-red-400 flex-shrink-0 mt-1 group-hover:scale-110 transition-transform" size={28} />
                 <div>
@@ -92,7 +92,7 @@ export default function LegalPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
               О компании
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-6">
               <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
                 <div>
                   <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">Юридическое название</h3>

@@ -22,7 +22,7 @@ export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 text-slate-700 dark:text-slate-300 border-t border-slate-300 dark:border-slate-800 mt-16">
+    <footer className="bg-gradient-to-b from-slate-50 to-slate-100 dark:from-[#0d0d0d]   dark:to-[#131416] text-slate-700 dark:text-slate-300 border-t border-slate-300 dark:border-slate-800 mt-16">
       <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
         {/* Верхняя секция с логотипом и описанием */}
         <div className="mb-12 pb-10 border-b border-slate-300 dark:border-slate-800">
@@ -230,7 +230,7 @@ export const Footer = () => {
         </div>
 
         {/* Дополнительная информация */}
-        <div className="mb-8 p-6 bg-slate-200/50 dark:bg-slate-800/30 rounded-xl border border-slate-300 dark:border-slate-700">
+        <div className="mb-8 p-6 bg-slate-200/50 dark:bg-[#16181c] rounded-xl border border-slate-300 dark:border-slate-700">
           <div className="flex items-start gap-3">
             <Shield className="text-blue-500 mt-0.5 flex-shrink-0" size={20} />
             <div className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">

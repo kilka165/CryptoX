@@ -13,7 +13,7 @@ export default function BugBountyPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-white dark:bg-slate-950">
+      <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
         {/* Hero секция */}
         <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white py-16">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -46,7 +46,7 @@ export default function BugBountyPage() {
               {rewards.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800"
+                  className="flex items-center justify-between p-6 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800"
                 >
                   <div>
                     <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold bg-${item.color}-100 dark:bg-${item.color}-900/30 text-${item.color}-700 dark:text-${item.color}-400 mb-2`}>
@@ -70,7 +70,7 @@ export default function BugBountyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
               Что мы ищем?
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-6">
               <ul className="space-y-3 text-slate-600 dark:text-slate-400">
                 <li className="flex items-start gap-2">
                   <span className="text-red-600 dark:text-red-400 mt-1">•</span>
@@ -113,7 +113,7 @@ export default function BugBountyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
               Как отправить отчет
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl p-6 border border-slate-200 dark:border-slate-800">
               <div className="flex items-start gap-4 mb-6">
                 <AlertCircle className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" size={28} />
                 <div className="flex-1">
@@ -144,7 +144,7 @@ export default function BugBountyPage() {
               Частые вопросы
             </h2>
             <div className="space-y-4">
-              <div className="bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg border border-slate-200 dark:border-slate-800 p-6">
                 <h4 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">
                   Когда я получу вознаграждение?
                 </h4>
@@ -152,7 +152,7 @@ export default function BugBountyPage() {
                   После проверки и устранения уязвимости (обычно 1-2 недели). Выплата производится в USDT или Bitcoin.
                 </p>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg border border-slate-200 dark:border-slate-800 p-6">
                 <h4 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">
                   Могу ли я оставаться анонимным?
                 </h4>
@@ -160,7 +160,7 @@ export default function BugBountyPage() {
                   Да, мы уважаем вашу конфиденциальность. Можете использовать псевдоним.
                 </p>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg border border-slate-200 dark:border-slate-800 p-6">
                 <h4 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">
                   Что если уязвимость уже известна?
                 </h4>

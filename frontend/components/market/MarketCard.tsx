@@ -14,7 +14,7 @@ interface MarketCardProps {
 
 export function MarketCard({ title, icon: Icon, coins, onBuy, userCurrency, exchangeRate, href }: MarketCardProps) {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 hover:shadow-lg transition-all">
+    <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 hover:shadow-lg transition-all">
       <div className="flex items-center justify-between mb-4">
         {href ? (
           <Link

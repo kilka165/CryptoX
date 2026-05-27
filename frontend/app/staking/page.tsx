@@ -193,7 +193,7 @@ export default function StakingPage() {
   const activePositions = positions.filter((p) => p.status === "active").length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white transition-colors">
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-6">
@@ -294,7 +294,7 @@ export default function StakingPage() {
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="h-48 bg-slate-100 dark:bg-slate-900 rounded-xl animate-pulse"
+                className="h-48 bg-slate-100 dark:bg-[#131416] rounded-xl animate-pulse"
               />
             ))}
           </div>
@@ -321,7 +321,7 @@ export default function StakingPage() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 dark:bg-[#131416] rounded-full flex items-center justify-center">
               <Lock className="w-8 h-8 text-slate-400" />
             </div>
             <h3 className="text-lg font-semibold mb-2">

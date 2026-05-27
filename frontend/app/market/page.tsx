@@ -212,7 +212,7 @@ export default function MarketPage() {
   const maxBalanceInUserCurrency = userBalance * exchangeRate;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white transition-colors duration-300">
       <Header />
 
       <div className="p-4 md:p-8">
@@ -226,7 +226,7 @@ export default function MarketPage() {
                 placeholder="Поиск монет..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900 outline-none focus:border-blue-500 transition-all"
+                className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-[#131416] outline-none focus:border-blue-500 transition-all"
               />
             </div>
           </div>
@@ -275,7 +275,7 @@ export default function MarketPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div className="max-w-7xl mx-auto bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs uppercase text-slate-500">
@@ -292,7 +292,7 @@ export default function MarketPage() {
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                 {loading
                   ? [...Array(5)].map((_, i) => (
-                      <tr key={i} className="h-16 animate-pulse bg-slate-50 dark:bg-slate-900">
+                      <tr key={i} className="h-16 animate-pulse bg-slate-50 dark:bg-[#131416]">
                         <td colSpan={7}></td>
                       </tr>
                     ))

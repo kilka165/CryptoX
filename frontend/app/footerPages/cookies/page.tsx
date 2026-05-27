@@ -6,7 +6,7 @@ export default function CookiesPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-white dark:bg-slate-950">
+      <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
         {/* Hero секция */}
         <div className="bg-gradient-to-r from-orange-600 to-amber-600 text-white py-12 " >
           <div className="container mx-auto px-4 text-center" style={{ maxWidth: '900px' }}>
@@ -19,7 +19,7 @@ export default function CookiesPage() {
         </div>
         
 
-        <div className="container mx-auto px-4 py-10 bg-slate-50 dark:bg-slate-900" style={{ maxWidth: '900px' }}>
+        <div className="container mx-auto px-4 py-10 bg-slate-50 dark:bg-[#131416]" style={{ maxWidth: '900px' }}>
           {/* Введение */}
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
@@ -44,7 +44,7 @@ export default function CookiesPage() {
               Какие типы cookies мы используем
             </h2>
             <div className="space-y-4">
-              <div className="bg-blue-50 dark:bg-slate-900 rounded-lg p-5 border border-blue-200 dark:border-slate-700">
+              <div className="bg-blue-50 dark:bg-[#131416] rounded-lg p-5 border border-blue-200 dark:border-slate-700">
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-2">
                   1. Необходимые cookies
                 </h3>
@@ -58,7 +58,7 @@ export default function CookiesPage() {
                 </ul>
               </div>
 
-              <div className="bg-green-50 dark:bg-slate-900 rounded-lg p-5 border border-green-200 dark:border-slate-700">
+              <div className="bg-green-50 dark:bg-[#131416] rounded-lg p-5 border border-green-200 dark:border-slate-700">
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-2">
                   2. Функциональные cookies
                 </h3>
@@ -72,7 +72,7 @@ export default function CookiesPage() {
                 </ul>
               </div>
 
-              <div className="bg-purple-50 dark:bg-slate-900 rounded-lg p-5 border border-purple-200 dark:border-slate-700">
+              <div className="bg-purple-50 dark:bg-[#131416] rounded-lg p-5 border border-purple-200 dark:border-slate-700">
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-2">
                   3. Аналитические cookies
                 </h3>
@@ -86,7 +86,7 @@ export default function CookiesPage() {
                 </ul>
               </div>
 
-              <div className="bg-orange-50 dark:bg-slate-900 rounded-lg p-5 border border-orange-200 dark:border-slate-700">
+              <div className="bg-orange-50 dark:bg-[#131416] rounded-lg p-5 border border-orange-200 dark:border-slate-700">
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-2">
                   4. Маркетинговые cookies
                 </h3>
@@ -107,7 +107,7 @@ export default function CookiesPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               Список используемых cookies
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-100 dark:bg-slate-800">
@@ -168,7 +168,7 @@ export default function CookiesPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               Как управлять cookies
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
               <div className="flex items-start gap-4 mb-4">
                 <Settings className="text-orange-600 dark:text-orange-400 flex-shrink-0 mt-1" size={24} />
                 <div>
@@ -220,7 +220,7 @@ export default function CookiesPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               Обновления политики
             </h2>
-            <div className="bg-blue-50 dark:bg-slate-900 rounded-lg p-5 border border-blue-200 dark:border-slate-700">
+            <div className="bg-blue-50 dark:bg-[#131416] rounded-lg p-5 border border-blue-200 dark:border-slate-700">
               <p className="text-slate-600 dark:text-slate-400">
                 Мы можем обновлять эту Политику cookies время от времени. Все изменения будут опубликованы 
                 на этой странице. Рекомендуем периодически проверять эту страницу для получения актуальной информации.
@@ -233,7 +233,7 @@ export default function CookiesPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               Вопросы?
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 Если у вас есть вопросы о нашем использовании cookies, свяжитесь с нами:
               </p>

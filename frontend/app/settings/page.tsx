@@ -77,7 +77,7 @@ export default function SettingsPage() {
   if (loading) return <div className="flex h-screen items-center justify-center bg-slate-950 text-white">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white">
       <Header />
 
       <main className="max-w-3xl mx-auto px-4 py-8">
@@ -87,7 +87,7 @@ export default function SettingsPage() {
 
         <h1 className="text-3xl font-bold mb-8">Настройки профиля</h1>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8">
+        <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8">
           <form onSubmit={handleSave} className="space-y-6">
             
             {/* Имя */}
@@ -152,7 +152,7 @@ export default function SettingsPage() {
       {/* МОДАЛЬНОЕ ОКНО ВЫБОРА ВАЛЮТЫ */}
       {isCurrencyModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[80vh]">
+          <div className="bg-white dark:bg-[#131416] w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[80vh]">
             
             {/* Заголовок и поиск */}
             <div className="p-4 border-b border-slate-100 dark:border-slate-800">

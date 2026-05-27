@@ -133,7 +133,7 @@ export default function SupportPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-white dark:bg-slate-950">
+      <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
         {/* Hero секция */}
         <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-12">
           <div className="max-w-4xl mx-auto px-4 text-center">
@@ -155,7 +155,7 @@ export default function SupportPage() {
                 placeholder="Поиск по вопросам..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
+                className="w-full pl-12 pr-4 py-3 bg-slate-100 dark:bg-[#131416] border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
               />
             </div>
           </div>
@@ -210,7 +210,7 @@ export default function SupportPage() {
                   className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
                     selectedCategory === category
                       ? "bg-blue-600 text-white"
-                      : "bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-blue-500 hover:text-white"
+                      : "bg-slate-100 dark:bg-[#131416] text-slate-700 dark:text-slate-300 hover:bg-blue-500 hover:text-white"
                   }`}
                 >
                   {category}
@@ -224,7 +224,7 @@ export default function SupportPage() {
             {filteredFAQ.map((item, index) => (
               <div
                 key={index}
-                className="bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden"
+                className="bg-slate-50 dark:bg-[#131416] rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden"
               >
                 <button
                   type="button"

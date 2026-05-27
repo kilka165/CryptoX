@@ -117,7 +117,7 @@ export default function MarketOverviewPage() {
     .slice(0, 20);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white transition-colors duration-300">
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-10 space-y-8">
@@ -131,7 +131,7 @@ export default function MarketOverviewPage() {
         </header>
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-500">
                 Общая капитализация
@@ -146,7 +146,7 @@ export default function MarketOverviewPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-500">
                 Объём за 24 часа
@@ -161,7 +161,7 @@ export default function MarketOverviewPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-500">
                 Монет в плюсе за 24ч
@@ -204,7 +204,7 @@ export default function MarketOverviewPage() {
           />
         </section>
 
-        <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <section className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <h2 className="text-sm md:text-base font-semibold">
               Топ‑20 монет по капитализации
@@ -236,7 +236,7 @@ export default function MarketOverviewPage() {
                   ? [...Array(8)].map((_, i) => (
                       <tr
                         key={i}
-                        className="h-14 animate-pulse bg-slate-50 dark:bg-slate-900/40"
+                        className="h-14 animate-pulse bg-slate-50 dark:bg-[#131416]/40"
                       >
                         <td colSpan={7}></td>
                       </tr>

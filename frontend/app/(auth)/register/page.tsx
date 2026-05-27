@@ -1,6 +1,7 @@
 "use client";
 
 import api from "@/lib/axios";
+import { setAuthToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
@@ -83,7 +84,7 @@ export default function RegisterPage() {
 
       // сразу логиним пользователя
       if (response.data.token) {
-        localStorage.setItem("auth_token", response.data.token);
+        setAuthToken(response.data.token);
       }
 
       // без alert — прямой переход в профиль

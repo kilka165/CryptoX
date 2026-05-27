@@ -112,7 +112,7 @@ export function StakingModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md shadow-xl">
+      <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md shadow-xl">
         {/* Заголовок */}
         <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
           <div>

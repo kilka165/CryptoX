@@ -9,7 +9,7 @@ interface UserNavigationProps {
 
 export function UserNavigation({ onLogout }: UserNavigationProps) {
   return (
-    <nav className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+    <nav className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
       <div className="p-2 space-y-1">
         <button className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl transition-colors">
           <Wallet size={18} /> Обзор кошелька

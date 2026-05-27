@@ -80,7 +80,7 @@ export function P2PFilters({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
+    <div className="bg-white dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Тип сделки */}
         <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">

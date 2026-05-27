@@ -89,7 +89,7 @@ export default function DepositPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] flex items-center justify-center">
         <div className="text-center animate-bounce-in">
           <CheckCircle size={80} className="text-green-500 mx-auto mb-4" />
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Успешно!</h2>
@@ -100,7 +100,7 @@ export default function DepositPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white transition-colors duration-300">
       <Header />
 
       <main className="max-w-2xl mx-auto px-4 py-12">
@@ -111,7 +111,7 @@ export default function DepositPage() {
           <ArrowLeft size={20} /> Назад
         </button>
 
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 p-6 md:p-10">
+        <div className="bg-white dark:bg-[#131416] rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 p-6 md:p-10">
           <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
             <CreditCard className="text-blue-600" />
             Пополнение баланса

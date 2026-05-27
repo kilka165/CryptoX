@@ -54,7 +54,7 @@ export default function AboutPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-white dark:bg-slate-950">
+      <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
         {/* Hero секция */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12">
           <div className="container mx-auto px-4 text-center" style={{ maxWidth: '900px' }}>
@@ -95,7 +95,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
               Наша история
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-6">
               <p className="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
                 CryptoX была основана в 2020 году командой энтузиастов блокчейн-технологий 
                 и опытных финансистов. Наша цель — создать надежную и удобную платформу для 
@@ -145,7 +145,7 @@ export default function AboutPage() {
                 return (
                   <div
                     key={index}
-                    className="bg-slate-50 dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800"
+                    className="bg-slate-50 dark:bg-[#131416] p-5 rounded-xl border border-slate-200 dark:border-slate-800"
                   >
                     <Icon className="text-blue-600 dark:text-blue-400 mb-3" size={28} />
                     <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-2">

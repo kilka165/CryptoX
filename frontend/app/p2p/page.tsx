@@ -143,7 +143,7 @@ export default function P2PPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white transition-colors">
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-6">
@@ -184,7 +184,7 @@ export default function P2PPage() {
             {[...Array(5)].map((_, i) => (
               <div
                 key={i}
-                className="h-24 bg-slate-100 dark:bg-slate-900 rounded-xl animate-pulse"
+                className="h-24 bg-slate-100 dark:bg-[#131416] rounded-xl animate-pulse"
               />
             ))}
           </div>
@@ -233,7 +233,7 @@ export default function P2PPage() {
       {/* Модалка с подробностями */}
       {isDetailsModalOpen && selectedOffer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg p-6">
+          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg p-6">
             <h3 className="text-xl font-bold mb-4">Детали заявки</h3>
             <div className="space-y-3">
               <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">

@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white transition-colors duration-300">
       
       <Header />
 
@@ -39,7 +39,7 @@ export default function Home() {
             { title: 'Мгновенный обмен', desc: 'Исполнение ордеров за миллисекунды' },
             { title: 'Поддержка 24/7', desc: 'Всегда на связи, чтобы помочь вам' },
           ].map((item, i) => (
-            <div key={i} className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl hover:border-blue-500 transition-colors shadow-sm dark:shadow-none">
+            <div key={i} className="bg-white dark:bg-[#131416]/50 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl hover:border-blue-500 transition-colors shadow-sm dark:shadow-none">
               <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">{item.title}</h3>
               <p className="text-slate-600 dark:text-slate-400">{item.desc}</p>
             </div>

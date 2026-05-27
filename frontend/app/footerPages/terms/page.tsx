@@ -6,7 +6,7 @@ export default function TermsPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-white dark:bg-slate-950">
+      <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
         {/* Hero секция */}
         <div className="bg-gradient-to-r from-slate-700 to-slate-900 text-white py-12">
           <div className="container mx-auto px-4 text-center" style={{ maxWidth: '900px' }}>
@@ -20,7 +20,7 @@ export default function TermsPage() {
 
         <div className="container mx-auto px-4 py-10" style={{ maxWidth: '900px' }}>
           {/* Важное уведомление */}
-          <div className="bg-amber-50 dark:bg-slate-900 border-2 border-amber-300 dark:border-amber-900 rounded-xl p-5 mb-8">
+          <div className="bg-amber-50 dark:bg-[#131416] border-2 border-amber-300 dark:border-amber-900 rounded-xl p-5 mb-8">
             <div className="flex items-start gap-3">
               <AlertCircle className="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-1" size={24} />
               <div>
@@ -61,7 +61,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               2. Регистрация и аккаунт
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
               <ul className="space-y-3 text-slate-600 dark:text-slate-400">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 dark:text-blue-400 mt-1">•</span>
@@ -116,7 +116,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               4. Торговля и комиссии
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 Торговля на платформе осуществляется на условиях, указанных на сайте:
               </p>
@@ -146,7 +146,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               5. Запрещенная деятельность
             </h2>
-            <div className="bg-red-50 dark:bg-slate-900 border border-red-200 dark:border-red-900 rounded-lg p-5">
+            <div className="bg-red-50 dark:bg-[#131416] border border-red-200 dark:border-red-900 rounded-lg p-5">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 При использовании платформы строго запрещено:
               </p>
@@ -202,7 +202,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               7. Изменение условий
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
               <p className="text-slate-600 dark:text-slate-400">
                 Мы оставляем за собой право изменять настоящее Соглашение в любое время. 
                 Все изменения вступают в силу с момента публикации на сайте. Продолжая использовать 
@@ -216,7 +216,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               8. Контактная информация
             </h2>
-            <div className="bg-blue-50 dark:bg-slate-900 rounded-lg p-5 border border-blue-200 dark:border-slate-700">
+            <div className="bg-blue-50 dark:bg-[#131416] rounded-lg p-5 border border-blue-200 dark:border-slate-700">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 По вопросам, связанным с условиями использования, обращайтесь:
               </p>

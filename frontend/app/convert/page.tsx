@@ -330,7 +330,7 @@ export default function ConvertPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#0d0d0d] text-slate-900 dark:text-slate-50">
       <Header />
 
       <main className="flex-1 max-w-5xl mx-auto px-4 py-10 w-full">
@@ -365,7 +365,7 @@ export default function ConvertPage() {
             </div>
           )}
 
-          <div className="bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-300 dark:border-slate-700 p-5 space-y-4">
+          <div className="bg-slate-100 dark:bg-[#131416] rounded-2xl border border-slate-300 dark:border-slate-700 p-5 space-y-4">
             {loading ? (
               <div className="h-40 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-xl" />
             ) : (
@@ -393,7 +393,7 @@ export default function ConvertPage() {
                     return (
                       <div key={idx} className="space-y-1">
                         <div
-                          className={`flex items-center gap-2 bg-white dark:bg-slate-950 rounded-xl px-3 py-3 border ${
+                          className={`flex items-center gap-2 bg-white dark:bg-[#0d0d0d] rounded-xl px-3 py-3 border ${
                             hasError
                               ? "border-red-500/50 bg-red-50 dark:bg-red-950/20"
                               : "border-slate-300 dark:border-slate-700"
@@ -464,7 +464,7 @@ export default function ConvertPage() {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 bg-white dark:bg-slate-950 rounded-xl px-3 py-4 border border-slate-300 dark:border-slate-700">
+                  <div className="flex items-center gap-2 bg-white dark:bg-[#0d0d0d] rounded-xl px-3 py-4 border border-slate-300 dark:border-slate-700">
                     <button
                       type="button"
                       onClick={() => openPicker("to")}

@@ -137,15 +137,15 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
   const getTypeColor = (type: string) => {
     switch (type) {
       case "buy":
-        return "bg-green-900/30 text-green-400 border border-green-900/50";
+        return "bg-green-100 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900/50";
       case "deposit":
-        return "bg-blue-900/30 text-blue-400 border border-blue-900/50";
+        return "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-900/50";
       case "sell":
-        return "bg-red-900/30 text-red-400 border border-red-900/50";
+        return "bg-red-100 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900/50";
       case "withdraw":
-        return "bg-blue-900/30 text-blue-400 border border-blue-900/50";
+        return "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-900/50";
       default:
-        return "bg-slate-800 text-slate-400";
+        return "bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-transparent";
     }
   };
 
@@ -163,7 +163,7 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
   const currencySymbol = getCurrencySymbol(userCurrency);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+    <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
       <div className="mb-6">
         <h3 className="text-lg font-bold mb-4">История операций</h3>
 
