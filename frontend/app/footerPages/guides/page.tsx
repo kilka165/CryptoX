@@ -1,73 +1,84 @@
+"use client";
+
 import Link from "next/link";
 import { BookOpen, TrendingUp, Shield, Wallet, ArrowRight, Clock, User } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "react-i18next";
 
 export default function GuidesPage() {
+  const { t } = useTranslation();
+
   const guides = [
     {
       id: 1,
-      title: "Как начать торговать криптовалютой",
-      description: "Пошаговое руководство для новичков по первым шагам в криптотрейдинге",
-      category: "Для начинающих",
-      readTime: "10 мин",
-      author: "Команда CryptoX",
+      title: t("footerPages.guides.g1Title"),
+      description: t("footerPages.guides.g1Desc"),
+      category: t("footerPages.guides.catBeginner"),
+      readTime: t("footerPages.guides.minutes", { n: 10 }),
+      author: t("footerPages.guides.author"),
       icon: TrendingUp,
       color: "blue"
     },
     {
       id: 2,
-      title: "Как обезопасить свой криптокошелек",
-      description: "Полное руководство по безопасности криптовалютных активов",
-      category: "Безопасность",
-      readTime: "8 мин",
-      author: "Команда CryptoX",
+      title: t("footerPages.guides.g2Title"),
+      description: t("footerPages.guides.g2Desc"),
+      category: t("footerPages.guides.catSecurity"),
+      readTime: t("footerPages.guides.minutes", { n: 8 }),
+      author: t("footerPages.guides.author"),
       icon: Shield,
       color: "green"
     },
     {
       id: 3,
-      title: "Понимание технического анализа",
-      description: "Изучите основные паттерны графиков и индикаторы для трейдинга",
-      category: "Продвинутый",
-      readTime: "15 мин",
-      author: "Команда CryptoX",
+      title: t("footerPages.guides.g3Title"),
+      description: t("footerPages.guides.g3Desc"),
+      category: t("footerPages.guides.catAdvanced"),
+      readTime: t("footerPages.guides.minutes", { n: 15 }),
+      author: t("footerPages.guides.author"),
       icon: TrendingUp,
       color: "purple"
     },
     {
       id: 4,
-      title: "Что такое стейкинг криптовалюты",
-      description: "Руководство по заработку пассивного дохода через стейкинг",
-      category: "Для начинающих",
-      readTime: "7 мин",
-      author: "Команда CryptoX",
+      title: t("footerPages.guides.g4Title"),
+      description: t("footerPages.guides.g4Desc"),
+      category: t("footerPages.guides.catBeginner"),
+      readTime: t("footerPages.guides.minutes", { n: 7 }),
+      author: t("footerPages.guides.author"),
       icon: Wallet,
       color: "yellow"
     },
     {
       id: 5,
-      title: "P2P торговля: полное руководство",
-      description: "Как безопасно покупать и продавать криптовалюту напрямую",
-      category: "Средний",
-      readTime: "12 мин",
-      author: "Команда CryptoX",
+      title: t("footerPages.guides.g5Title"),
+      description: t("footerPages.guides.g5Desc"),
+      category: t("footerPages.guides.catIntermediate"),
+      readTime: t("footerPages.guides.minutes", { n: 12 }),
+      author: t("footerPages.guides.author"),
       icon: TrendingUp,
       color: "red"
     },
     {
       id: 6,
-      title: "Управление рисками в крипто",
-      description: "Стратегии защиты вашего капитала на волатильном рынке",
-      category: "Продвинутый",
-      readTime: "13 мин",
-      author: "Команда CryptoX",
+      title: t("footerPages.guides.g6Title"),
+      description: t("footerPages.guides.g6Desc"),
+      category: t("footerPages.guides.catAdvanced"),
+      readTime: t("footerPages.guides.minutes", { n: 13 }),
+      author: t("footerPages.guides.author"),
       icon: Shield,
       color: "orange"
     }
   ];
 
-  const categories = ["Все", "Для начинающих", "Средний", "Продвинутый", "Безопасность"];
+  const categories = [
+    t("footerPages.guides.catAll"),
+    t("footerPages.guides.catBeginner"),
+    t("footerPages.guides.catIntermediate"),
+    t("footerPages.guides.catAdvanced"),
+    t("footerPages.guides.catSecurity")
+  ];
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
@@ -77,10 +88,10 @@ export default function GuidesPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <BookOpen size={40} />
-            <h1 className="text-4xl md:text-5xl font-bold">Гайды по криптовалютам</h1>
+            <h1 className="text-4xl md:text-5xl font-bold">{t("footerPages.guides.title")}</h1>
           </div>
           <p className="text-xl text-blue-100 max-w-3xl">
-            Изучите основы торговли, безопасности и стратегии с нашими подробными руководствами
+            {t("footerPages.guides.subtitle")}
           </p>
         </div>
       </div>
@@ -154,16 +165,16 @@ export default function GuidesPage() {
         {/* Дополнительная информация */}
         <div className="mt-16 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 rounded-2xl p-8 border border-blue-200 dark:border-slate-700">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-            Не нашли нужный гайд?
+            {t("footerPages.guides.notFoundTitle")}
           </h2>
           <p className="text-slate-600 dark:text-slate-400 mb-6">
-            Напишите нам, и мы создадим руководство специально для вас!
+            {t("footerPages.guides.notFoundText")}
           </p>
           <Link
             href="/support"
             className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
           >
-            Связаться с нами
+            {t("footer.contactUs")}
             <ArrowRight size={18} />
           </Link>
         </div>

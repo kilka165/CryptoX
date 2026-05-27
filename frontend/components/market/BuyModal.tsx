@@ -1,6 +1,9 @@
+"use client";
+
 import React from "react";
 import { X, CheckCircle } from "lucide-react";
 import { Coin } from "@/types/coin";
+import { useTranslation } from "react-i18next";
 
 interface BuyModalProps {
   isOpen: boolean;
@@ -49,6 +52,7 @@ export function BuyModal({
   onSetMax,
   onSubmit,
 }: BuyModalProps) {
+  const { t } = useTranslation();
   if (!isOpen || !coin) return null;
 
   const canBuy = amountUserEntered > 0 && calculatedUSD <= userBalance;
@@ -70,7 +74,7 @@ export function BuyModal({
         <form onSubmit={onSubmit} className="p-6 space-y-6">
           <div>
             <label className="block text-sm font-medium mb-2">
-              Текущая цена 1 {coin.symbol.toUpperCase()}
+              {t("market.buyModal.currentPrice", { symbol: coin.symbol.toUpperCase() })}
             </label>
             <div className="text-2xl font-bold text-blue-600">
               {currencySymbol}
@@ -83,9 +87,9 @@ export function BuyModal({
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium">Сумма ({userCurrency})</label>
+              <label className="block text-sm font-medium">{t("market.buyModal.amount", { currency: userCurrency })}</label>
               <button type="button" onClick={onSetMax} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
-                Макс: {maxBalanceInUserCurrency.toFixed(2)} {currencySymbol}
+                {t("market.buyModal.max", { amount: maxBalanceInUserCurrency.toFixed(2), symbol: currencySymbol })}
               </button>
             </div>
             <input
@@ -99,17 +103,17 @@ export function BuyModal({
 
           <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-slate-600 dark:text-slate-400">Сумма в USD</span>
+              <span className="text-slate-600 dark:text-slate-400">{t("market.buyModal.amountUsd")}</span>
               <span className="font-semibold">${calculatedUSD.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-600 dark:text-slate-400">Вы получите</span>
+              <span className="text-slate-600 dark:text-slate-400">{t("market.buyModal.youReceive")}</span>
               <span className="font-semibold">
                 {cryptoAmount.toFixed(8)} {coin.symbol.toUpperCase()}
               </span>
             </div>
             <div className="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
-              <span className="text-slate-600 dark:text-slate-400">Доступный баланс</span>
+              <span className="text-slate-600 dark:text-slate-400">{t("market.buyModal.availableBalance")}</span>
               <span className="font-semibold">
                 ${userBalance.toFixed(2)} ({maxBalanceInUserCurrency.toFixed(2)} {currencySymbol})
               </span>
@@ -118,7 +122,7 @@ export function BuyModal({
 
           {calculatedUSD > userBalance && amountUserEntered > 0 && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm text-red-700 dark:text-red-400">
-              Недостаточно средств
+              {t("common.insufficientFunds")}
             </div>
           )}
 
@@ -130,12 +134,12 @@ export function BuyModal({
             {buySuccess ? (
               <>
                 <CheckCircle size={20} />
-                Успешно!
+                {t("common.success")}
               </>
             ) : isBuying ? (
-              "Покупка..."
+              t("market.buyModal.buying")
             ) : (
-              "Купить"
+              t("market.buy")
             )}
           </button>
         </form>

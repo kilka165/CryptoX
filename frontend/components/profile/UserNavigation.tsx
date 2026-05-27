@@ -2,24 +2,26 @@
 
 import Link from "next/link";
 import { History, Settings, LogOut, Wallet } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface UserNavigationProps {
   onLogout: () => void;
 }
 
 export function UserNavigation({ onLogout }: UserNavigationProps) {
+  const { t } = useTranslation();
   return (
     <nav className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
       <div className="p-2 space-y-1">
         <button className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl transition-colors">
-          <Wallet size={18} /> Обзор кошелька
+          <Wallet size={18} /> {t("profile.nav.walletOverview")}
         </button>
         <button className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors">
-          <History size={18} /> История операций
+          <History size={18} /> {t("profile.nav.history")}
         </button>
         <Link href="/settings">
           <button className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors">
-            <Settings size={18} /> Настройки
+            <Settings size={18} /> {t("nav.settings")}
           </button>
         </Link>
         <div className="h-px bg-slate-100 dark:bg-slate-800 my-2"></div>
@@ -27,7 +29,7 @@ export function UserNavigation({ onLogout }: UserNavigationProps) {
           onClick={onLogout}
           className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
         >
-          <LogOut size={18} /> Выйти
+          <LogOut size={18} /> {t("nav.logout")}
         </button>
       </div>
     </nav>

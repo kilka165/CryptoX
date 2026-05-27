@@ -10,8 +10,10 @@ import { StakingModal } from "@/components/staking/StakingModal";
 import { ConfirmDialog } from "@/components/staking/ConfirmDialog";
 import { stakingApi, StakingPlan, StakingPosition } from "@/lib/api/stakingApi";
 import { TrendingUp, Wallet, Lock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function StakingPage() {
+  const { t } = useTranslation();
   const [plans, setPlans] = useState<StakingPlan[]>([]);
   const [positions, setPositions] = useState<StakingPosition[]>([]);
   const [loading, setLoading] = useState(true);
@@ -126,8 +128,8 @@ export default function StakingPage() {
         type: "unstake",
         stakingId: null,
         result: {
-          message: `Успешно! Получено: ${totalFormatted}`,
-          details: `(награда: ${rewardFormatted})`,
+          message: t("staking.successReceived", { total: totalFormatted }),
+          details: t("staking.rewardDetails", { reward: rewardFormatted }),
         },
       });
 
@@ -139,7 +141,7 @@ export default function StakingPage() {
         type: "unstake",
         stakingId: null,
         result: {
-          message: error.response?.data?.message || "Ошибка при выводе средств",
+          message: error.response?.data?.message || t("staking.errUnstake"),
         },
       });
     }
@@ -163,7 +165,7 @@ export default function StakingPage() {
         type: "cancel",
         stakingId: null,
         result: {
-          message: "Стейкинг отменён, средства возвращены",
+          message: t("staking.cancelledMsg"),
         },
       });
 
@@ -175,7 +177,7 @@ export default function StakingPage() {
         type: "cancel",
         stakingId: null,
         result: {
-          message: error.response?.data?.message || "Ошибка при отмене",
+          message: error.response?.data?.message || t("staking.errCancel"),
         },
       });
     }
@@ -199,9 +201,9 @@ export default function StakingPage() {
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-6">
         {/* Заголовок */}
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Стейкинг</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">{t("staking.title")}</h1>
           <p className="text-sm text-slate-500 mt-1">
-            Зарабатывайте пассивный доход, размещая свои активы в стейкинг
+            {t("staking.subtitle")}
           </p>
         </div>
 
@@ -213,13 +215,13 @@ export default function StakingPage() {
                 <div className="p-2 bg-white/20 rounded-lg">
                   <Lock className="w-5 h-5" />
                 </div>
-                <div className="text-sm opacity-90">Застейкано</div>
+                <div className="text-sm opacity-90">{t("staking.staked")}</div>
               </div>
               <div className="text-2xl font-bold">
                 {totalStaked.toFixed(4)}
               </div>
               <div className="text-xs opacity-75 mt-1">
-                {activePositions} активных позиций
+                {t("staking.activePositions", { n: activePositions })}
               </div>
             </div>
 
@@ -228,12 +230,12 @@ export default function StakingPage() {
                 <div className="p-2 bg-white/20 rounded-lg">
                   <TrendingUp className="w-5 h-5" />
                 </div>
-                <div className="text-sm opacity-90">Заработано</div>
+                <div className="text-sm opacity-90">{t("staking.earned")}</div>
               </div>
               <div className="text-2xl font-bold">
                 +{totalEarned.toFixed(8)}
               </div>
-              <div className="text-xs opacity-75 mt-1">Текущая награда</div>
+              <div className="text-xs opacity-75 mt-1">{t("staking.currentReward")}</div>
             </div>
 
             <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white">
@@ -241,7 +243,7 @@ export default function StakingPage() {
                 <div className="p-2 bg-white/20 rounded-lg">
                   <Wallet className="w-5 h-5" />
                 </div>
-                <div className="text-sm opacity-90">Средний APY</div>
+                <div className="text-sm opacity-90">{t("staking.avgApy")}</div>
               </div>
               <div className="text-2xl font-bold">
                 {activePositions > 0
@@ -254,7 +256,7 @@ export default function StakingPage() {
                   : 0}
                 %
               </div>
-              <div className="text-xs opacity-75 mt-1">По всем позициям</div>
+              <div className="text-xs opacity-75 mt-1">{t("staking.allPositions")}</div>
             </div>
           </div>
         )}
@@ -269,7 +271,7 @@ export default function StakingPage() {
                 : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
             }`}
           >
-            Планы стейкинга
+            {t("staking.tabPlans")}
           </button>
           <button
             onClick={() => setActiveTab("positions")}
@@ -279,7 +281,7 @@ export default function StakingPage() {
                 : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
             }`}
           >
-            Мои позиции
+            {t("staking.tabPositions")}
             {activePositions > 0 && (
               <span className="ml-2 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs rounded-full">
                 {activePositions}
@@ -325,16 +327,16 @@ export default function StakingPage() {
               <Lock className="w-8 h-8 text-slate-400" />
             </div>
             <h3 className="text-lg font-semibold mb-2">
-              У вас пока нет активных позиций
+              {t("staking.noPositionsTitle")}
             </h3>
             <p className="text-slate-500 mb-4">
-              Создайте свою первую позицию стейкинга
+              {t("staking.noPositionsText")}
             </p>
             <button
               onClick={() => setActiveTab("plans")}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
             >
-              Смотреть планы
+              {t("staking.viewPlans")}
             </button>
           </div>
         )}
@@ -357,11 +359,11 @@ export default function StakingPage() {
         title={confirmDialog.result ? "" : ""}
         message={
           confirmDialog.type === "unstake"
-            ? "Вы уверены, что хотите вывести средства?"
-            : "Вы уверены, что хотите отменить стейкинг?"
+            ? t("staking.confirmUnstake")
+            : t("staking.confirmCancel")
         }
-        confirmText="ОК"
-        cancelText="Отмена"
+        confirmText={t("staking.ok")}
+        cancelText={t("common.cancel")}
         type={confirmDialog.type === "cancel" ? "warning" : "info"}
         result={confirmDialog.result}
         onConfirm={confirmUnstake}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { BinanceAPI } from "@/lib/api/binance";
+import { useTranslation } from "react-i18next";
 
 interface Asset {
   id: number;
@@ -66,6 +67,7 @@ const getExchangeRate = (currency: string): number => {
 };
 
 export function AssetsTable({ assets, userCurrency = "USD", onSellClick }: AssetsTableProps) {
+  const { t } = useTranslation();
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [changes, setChanges] = useState<Record<string, number>>({});
 
@@ -113,19 +115,19 @@ export function AssetsTable({ assets, userCurrency = "USD", onSellClick }: Asset
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-lg font-semibold">Ваши активы</h3>
+        <h3 className="text-lg font-semibold">{t("profile.assets.title")}</h3>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="text-left border-b border-slate-200 dark:border-slate-700">
-              <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Актив</th>
-              <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Количество</th>
-              <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Цена</th>
-              <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Стоимость ({userCurrency})</th>
-              <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">24ч %</th>
-              <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Действие</th>
+              <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">{t("profile.assets.asset")}</th>
+              <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">{t("profile.assets.amount")}</th>
+              <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">{t("profile.assets.price")}</th>
+              <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">{t("profile.assets.value", { currency: userCurrency })}</th>
+              <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">{t("profile.assets.change24h")}</th>
+              <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">{t("profile.assets.action")}</th>
             </tr>
           </thead>
           <tbody>
@@ -181,7 +183,7 @@ export function AssetsTable({ assets, userCurrency = "USD", onSellClick }: Asset
                       onClick={() => onSellClick?.(asset)}
                       className="px-4 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg"
                     >
-                      Продать
+                      {t("profile.assets.sell")}
                     </button>
                   </td>
                 </tr>

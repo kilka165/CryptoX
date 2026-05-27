@@ -4,6 +4,7 @@ import React from "react";
 import { CoinImage } from "./CoinImage";
 import { ConvertedPrice } from "./ConvertedPrice";
 import { Coin } from "@/types/coin";
+import { useTranslation } from "react-i18next";
 
 interface CoinListProps {
   title: string;
@@ -14,6 +15,7 @@ interface CoinListProps {
 }
 
 export const CoinList: React.FC<CoinListProps> = ({ title, coins, type, userCurrency, onBuy }) => {
+  const { t } = useTranslation();
   return (
     <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm h-full flex flex-col">
       <h3 className="text-xl font-bold mb-6 text-center">{title}</h3>
@@ -23,9 +25,9 @@ export const CoinList: React.FC<CoinListProps> = ({ title, coins, type, userCurr
           <thead>
             <tr className="text-xs text-slate-500 border-b border-slate-100 dark:border-slate-800">
               <th className="pb-3 text-left pl-2 w-8">#</th>
-              <th className="pb-3 text-left">Монета</th>
-              <th className="pb-3 text-right">Цена</th>
-              <th className="pb-3 text-right">24ч %</th>
+              <th className="pb-3 text-left">{t("market.coin")}</th>
+              <th className="pb-3 text-right">{t("market.price")}</th>
+              <th className="pb-3 text-right">{t("market.change24h")} %</th>
               <th className="pb-3 text-right w-16"></th>
             </tr>
           </thead>
@@ -69,7 +71,7 @@ export const CoinList: React.FC<CoinListProps> = ({ title, coins, type, userCurr
                     onClick={() => onBuy(coin)}
                     className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 p-2 rounded-lg text-xs font-bold transition-colors whitespace-nowrap"
                   >
-                    Купить
+                    {t("market.buy")}
                   </button>
                 </td>
               </tr>

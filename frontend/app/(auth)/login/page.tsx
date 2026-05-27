@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { setAuthToken } from "@/lib/auth";
 import { LogIn, Mail, Lock, ArrowLeft, AlertCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -40,9 +42,9 @@ export default function LoginPage() {
     } catch (err: any) {
       console.error("Login error:", err);
       if (err.response && err.response.status === 401) {
-        setError("Неверный email или пароль");
+        setError(t("auth.login.invalidCredentials"));
       } else {
-        setError("Ошибка сервера. Попробуйте позже.");
+        setError(t("auth.login.serverError"));
       }
     } finally {
       setIsLoading(false);
@@ -60,7 +62,7 @@ export default function LoginPage() {
             className="mb-6 inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 transition-colors"
           >
             <ArrowLeft size={18} />
-            На главную
+            {t("auth.backToHome")}
           </button>
 
           <div className="flex items-center gap-3 mb-2">
@@ -68,9 +70,9 @@ export default function LoginPage() {
               <LogIn className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">С возвращением!</h1>
+              <h1 className="text-2xl font-bold">{t("auth.login.title")}</h1>
               <p className="text-slate-400 text-sm">
-                Войдите, чтобы управлять активами
+                {t("auth.login.subtitle")}
               </p>
             </div>
           </div>
@@ -85,7 +87,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5 mt-4">
             {/* Email */}
             <div className="space-y-1">
-              <label className="text-sm text-slate-300">Email адрес</label>
+              <label className="text-sm text-slate-300">{t("auth.emailLabel")}</label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -95,14 +97,14 @@ export default function LoginPage() {
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  placeholder="you@example.com"
+                  placeholder={t("common.emailPlaceholder")}
                 />
               </div>
             </div>
 
             {/* Пароль */}
             <div className="space-y-1">
-              <label className="text-sm text-slate-300">Пароль</label>
+              <label className="text-sm text-slate-300">{t("auth.passwordLabel")}</label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -112,7 +114,7 @@ export default function LoginPage() {
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  placeholder="Введите пароль"
+                  placeholder={t("auth.passwordPlaceholder")}
                 />
               </div>
               <div className="flex justify-end">
@@ -120,7 +122,7 @@ export default function LoginPage() {
                   type="button"
                   className="text-xs text-slate-400 hover:text-slate-200"
                 >
-                  Забыли пароль?
+                  {t("auth.login.forgotPassword")}
                 </button>
               </div>
             </div>
@@ -130,17 +132,17 @@ export default function LoginPage() {
               disabled={isLoading}
               className="w-full mt-2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
             >
-              {isLoading ? "Вход..." : "Войти"}
+              {isLoading ? t("auth.login.submitting") : t("auth.login.submit")}
             </button>
           </form>
 
           <p className="mt-6 text-center text-sm text-slate-400">
-            Нет аккаунта?{" "}
+            {t("auth.login.noAccount")}{" "}
             <Link
               href="/register"
               className="text-blue-400 hover:text-blue-300 font-medium"
             >
-              Зарегистрироваться
+              {t("auth.login.registerLink")}
             </Link>
           </p>
         </div>

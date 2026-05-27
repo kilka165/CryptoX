@@ -1,53 +1,40 @@
+"use client";
+
 import { Users, Target, Award, TrendingUp, Globe, Shield, Zap, Heart } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "react-i18next";
 
 export default function AboutPage() {
+  const { t } = useTranslation();
+
   const stats = [
-    { value: "2M+", label: "Пользователей", icon: Users },
-    { value: "$50B+", label: "Торговый объем", icon: TrendingUp },
-    { value: "150+", label: "Стран", icon: Globe },
-    { value: "500+", label: "Криптовалют", icon: Award }
+    { value: "2M+", label: t("footerPages.about.statUsers"), icon: Users },
+    { value: "$50B+", label: t("footerPages.about.statVolume"), icon: TrendingUp },
+    { value: "150+", label: t("footerPages.about.statCountries"), icon: Globe },
+    { value: "500+", label: t("footerPages.about.statCryptos"), icon: Award }
   ];
 
   const values = [
     {
       icon: Shield,
-      title: "Безопасность",
-      description: "Защита средств пользователей — наш главный приоритет"
+      title: t("footerPages.about.value1Title"),
+      description: t("footerPages.about.value1Desc")
     },
     {
       icon: Zap,
-      title: "Инновации",
-      description: "Постоянное развитие и внедрение новых технологий"
+      title: t("footerPages.about.value2Title"),
+      description: t("footerPages.about.value2Desc")
     },
     {
       icon: Heart,
-      title: "Прозрачность",
-      description: "Честность и открытость во всех наших действиях"
+      title: t("footerPages.about.value3Title"),
+      description: t("footerPages.about.value3Desc")
     },
     {
       icon: Users,
-      title: "Сообщество",
-      description: "Мы строим платформу вместе с нашими пользователями"
-    }
-  ];
-
-  const team = [
-    {
-      name: "Алексей Иванов",
-      position: "CEO & Основатель",
-      description: "15 лет опыта в финтех и блокчейн технологиях"
-    },
-    {
-      name: "Мария Петрова",
-      position: "CTO",
-      description: "Эксперт по кибербезопасности и криптографии"
-    },
-    {
-      name: "Дмитрий Сидоров",
-      position: "CFO",
-      description: "Опыт в традиционных финансах и аудите"
+      title: t("footerPages.about.value4Title"),
+      description: t("footerPages.about.value4Desc")
     }
   ];
 
@@ -58,10 +45,9 @@ export default function AboutPage() {
         {/* Hero секция */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12">
           <div className="container mx-auto px-4 text-center" style={{ maxWidth: '900px' }}>
-            <h1 className="text-3xl md:text-4xl font-bold mb-3">О CryptoX</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-3">{t("footerPages.about.heroTitle")}</h1>
             <p className="text-lg text-blue-100 max-w-2xl mx-auto">
-              Ведущая криптовалютная биржа, которая делает торговлю цифровыми активами 
-              простой, безопасной и доступной для каждого
+              {t("footerPages.about.heroSubtitle")}
             </p>
           </div>
         </div>
@@ -93,21 +79,17 @@ export default function AboutPage() {
           {/* Наша история */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              Наша история
+              {t("footerPages.about.historyTitle")}
             </h2>
             <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-6">
               <p className="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                CryptoX была основана в 2020 году командой энтузиастов блокчейн-технологий 
-                и опытных финансистов. Наша цель — создать надежную и удобную платформу для 
-                торговли криптовалютами, доступную каждому.
+                {t("footerPages.about.historyP1")}
               </p>
               <p className="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                За четыре года мы выросли от небольшого стартапа до одной из ведущих бирж 
-                в регионе. Сегодня нам доверяют более 2 миллионов пользователей по всему миру.
+                {t("footerPages.about.historyP2")}
               </p>
               <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                Мы продолжаем развиваться, добавляя новые функции и улучшая безопасность, 
-                чтобы предоставить нашим пользователям лучший опыт торговли криптовалютами.
+                {t("footerPages.about.historyP3")}
               </p>
             </div>
           </section>
@@ -115,19 +97,17 @@ export default function AboutPage() {
           {/* Наша миссия */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              Наша миссия
+              {t("footerPages.about.missionTitle")}
             </h2>
             <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 rounded-xl border border-blue-200 dark:border-slate-700 p-6">
               <div className="flex items-start gap-4">
                 <Target className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" size={32} />
                 <div>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">
-                    Демократизация финансов
+                    {t("footerPages.about.missionHeading")}
                   </h3>
                   <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                    Мы верим, что каждый человек заслуживает доступа к современным финансовым 
-                    инструментам. Наша миссия — сделать торговлю криптовалютами простой, безопасной 
-                    и доступной для всех, независимо от опыта и географического положения.
+                    {t("footerPages.about.missionText")}
                   </p>
                 </div>
               </div>
@@ -137,7 +117,7 @@ export default function AboutPage() {
           {/* Наши ценности */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              Наши ценности
+              {t("footerPages.about.valuesTitle")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {values.map((value, index) => {
@@ -163,23 +143,23 @@ export default function AboutPage() {
           {/* Связаться с нами */}
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-slate-900 dark:to-slate-800 rounded-xl p-6 border border-purple-200 dark:border-slate-700 text-center">
             <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">
-              Присоединяйтесь к CryptoX
+              {t("footerPages.about.joinTitle")}
             </h3>
             <p className="text-slate-600 dark:text-slate-400 mb-4">
-              Станьте частью крупнейшего криптовалютного сообщества
+              {t("footerPages.about.joinSubtitle")}
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <a
                 href="/register"
                 className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
               >
-                Начать торговлю
+                {t("footerPages.about.startTrading")}
               </a>
               <a
                 href="/footerPages/support"
                 className="px-6 py-3 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-2 border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-lg font-semibold transition-colors"
               >
-                Связаться с нами
+                {t("footerPages.about.contactUs")}
               </a>
             </div>
           </div>

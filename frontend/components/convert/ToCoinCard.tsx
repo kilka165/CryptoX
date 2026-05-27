@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import { ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ToCoinCardProps {
   toCoin: { symbol: string; name: string } | null;
@@ -14,12 +17,13 @@ export function ToCoinCard({
   balance,
   onOpenPicker,
 }: ToCoinCardProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-3">
       <div className="flex justify-between items-center">
-        <span className="text-xs text-slate-600 dark:text-slate-400">В</span>
+        <span className="text-xs text-slate-600 dark:text-slate-400">{t("convert.to")}</span>
         <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">
-          Баланс: {balance.toFixed(8)} {toCoin?.symbol.toUpperCase() || ""}
+          {t("convert.balanceWithSymbol", { amount: balance.toFixed(8), symbol: toCoin?.symbol.toUpperCase() || "" })}
         </span>
       </div>
 
@@ -34,7 +38,7 @@ export function ToCoinCard({
           </div>
           <div className="flex flex-col text-left">
             <span className="text-xs font-semibold">
-              {toCoin ? toCoin.symbol.toUpperCase() : "Выберите"}
+              {toCoin ? toCoin.symbol.toUpperCase() : t("convert.select")}
             </span>
             <span className="text-[10px] text-slate-500">
               {toCoin?.name || ""}

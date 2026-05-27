@@ -1,5 +1,8 @@
+"use client";
+
 import React, { useState } from "react";
 import { Search, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export interface CurrencyItem {
   id: string;
@@ -21,6 +24,7 @@ export function CurrencySelectModal({
   coins,
   onSelect,
 }: CurrencySelectModalProps) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
 
   if (!open) return null;
@@ -35,7 +39,7 @@ export function CurrencySelectModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-2xl w-full max-w-md border border-slate-300 dark:border-slate-800">
         <div className="flex items-center justify-between p-4 border-b border-slate-300 dark:border-slate-800">
-          <h3 className="text-lg font-bold">Выберите монету</h3>
+          <h3 className="text-lg font-bold">{t("convert.selectCoin")}</h3>
           <button
             onClick={onClose}
             className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
@@ -49,7 +53,7 @@ export function CurrencySelectModal({
             <Search className="absolute left-3 top-3 h-4 w-4 text-slate-500 dark:text-slate-400" />
             <input
               type="text"
-              placeholder="Поиск..."
+              placeholder={t("common.search")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-9 pr-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 outline-none focus:border-blue-500 text-sm"
@@ -60,7 +64,7 @@ export function CurrencySelectModal({
         <div className="max-h-96 overflow-y-auto p-2">
           {filtered.length === 0 ? (
             <p className="text-center text-slate-500 dark:text-slate-400 py-8 text-sm">
-              Ничего не найдено
+              {t("common.notFound")}
             </p>
           ) : (
             filtered.map((coin) => (

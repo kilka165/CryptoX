@@ -5,6 +5,8 @@ import { TrendingUp, TrendingDown, Search, Star } from "lucide-react";
 import { CryptoIcon } from "@/components/CryptoIcon";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "react-i18next";
+import { intlLocale } from "@/lib/utils/locale";
 
 interface CryptoPrice {
   id: string;
@@ -18,6 +20,7 @@ interface CryptoPrice {
 }
 
 export default function PricesPage() {
+  const { t, i18n } = useTranslation();
   const [cryptos, setCryptos] = useState<CryptoPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -47,7 +50,7 @@ export default function PricesPage() {
   );
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("ru-RU", {
+    return new Intl.NumberFormat(intlLocale(i18n.language), {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 2,
@@ -68,9 +71,9 @@ export default function PricesPage() {
       {/* Hero секция */}
       <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Цены криптовалют</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">{t("footerPages.prices.title")}</h1>
           <p className="text-xl text-green-100">
-            Отслеживайте актуальные цены и рыночную капитализацию топ криптовалют в реальном времени
+            {t("footerPages.prices.subtitle")}
           </p>
         </div>
       </div>
@@ -82,7 +85,7 @@ export default function PricesPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input
               type="text"
-              placeholder="Поиск криптовалюты..."
+              placeholder={t("footerPages.prices.searchPlaceholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-slate-100 dark:bg-[#131416] border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
@@ -94,7 +97,7 @@ export default function PricesPage() {
         {loading ? (
           <div className="text-center py-20">
             <div className="inline-block w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-slate-600 dark:text-slate-400">Загрузка данных...</p>
+            <p className="mt-4 text-slate-600 dark:text-slate-400">{t("footerPages.prices.loadingData")}</p>
           </div>
         ) : (
           <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -106,19 +109,19 @@ export default function PricesPage() {
                       #
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                      Название
+                      {t("footerPages.prices.colName")}
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                      Цена
+                      {t("market.price")}
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                      24ч %
+                      {t("footerPages.prices.col24h")}
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                      Капитализация
+                      {t("market.marketCap")}
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                      Объем (24ч)
+                      {t("footerPages.prices.colVolume")}
                     </th>
                   </tr>
                 </thead>

@@ -6,9 +6,12 @@ import { Header } from "@/components/Header";
 import { CreditCard, ArrowLeft, ShieldCheck, CheckCircle, AlertCircle, Wallet } from "lucide-react";
 import axios from "axios";
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "react-i18next";
+import { intlLocale } from "@/lib/utils/locale";
 
 export default function WithdrawPage() {
   const router = useRouter();
+  const { t, i18n } = useTranslation();
   
   const [balance, setBalance] = useState(0); // Текущий баланс пользователя
   const [amount, setAmount] = useState("");
@@ -28,7 +31,7 @@ export default function WithdrawPage() {
             });
             setBalance(res.data.wallet?.balance || 0);
         } catch (e) {
-            console.error("Ошибка загрузки баланса", e);
+            console.error("Error loading balance", e);
         }
     };
     fetchBalance();
@@ -75,8 +78,8 @@ export default function WithdrawPage() {
       }, 3000);
 
     } catch (err: any) {
-      console.error("Ошибка вывода", err);
-      setError(err.response?.data?.message || "Ошибка при выводе средств");
+      console.error("Withdraw error", err);
+      setError(err.response?.data?.message || t("withdraw.withdrawError"));
     } finally {
       setLoading(false);
     }
@@ -87,12 +90,12 @@ export default function WithdrawPage() {
       <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] flex items-center justify-center">
         <div className="text-center animate-bounce-in p-6">
           <CheckCircle size={80} className="text-green-500 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Вывод одобрен!</h2>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{t("withdraw.successTitle")}</h2>
           <p className="text-slate-500 mt-2 text-lg">
-            Средства (${withdrawAmount}) отправлены на карту.
+            {t("withdraw.fundsSent", { amount: withdrawAmount })}
           </p>
           <p className="text-slate-400 text-sm mt-1">
-            Комиссия составила ${commission.toFixed(2)}
+            {t("withdraw.commissionWas", { amount: commission.toFixed(2) })}
           </p>
         </div>
       </div>
@@ -108,13 +111,13 @@ export default function WithdrawPage() {
           onClick={() => router.back()} 
           className="flex items-center gap-2 text-slate-500 hover:text-blue-600 mb-6 transition-colors"
         >
-          <ArrowLeft size={20} /> Назад
+          <ArrowLeft size={20} /> {t("common.back")}
         </button>
 
         <div className="bg-white dark:bg-[#131416] rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 p-6 md:p-10">
           <h1 className="text-2xl font-bold mb-6 flex items-center gap-2 text-red-600">
             <CreditCard />
-            Вывод средств
+            {t("withdraw.title")}
           </h1>
 
           {error && (
@@ -130,14 +133,14 @@ export default function WithdrawPage() {
             <div>
               <div className="flex justify-between items-center mb-2">
                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Сумма вывода (USD)
+                    {t("withdraw.amountLabel")}
                  </label>
                  {/* Баланс пользователя */}
                  <div className="flex items-center gap-1 text-sm text-slate-500">
                     <Wallet size={14} />
-                    <span>Доступно:</span>
+                    <span>{t("withdraw.available")}</span>
                     <span className="font-bold text-slate-900 dark:text-white">
-                        ${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        ${balance.toLocaleString(intlLocale(i18n.language), { minimumFractionDigits: 2 })}
                     </span>
                  </div>
               </div>
@@ -169,22 +172,22 @@ export default function WithdrawPage() {
             {/* Инфо о комиссии */}
             <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl space-y-2 border border-slate-100 dark:border-slate-700">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Сумма вывода:</span>
+                <span className="text-slate-500">{t("withdraw.withdrawAmount")}</span>
                 <span className="font-bold">${withdrawAmount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Комиссия (1%):</span>
+                <span className="text-slate-500">{t("withdraw.commission")}</span>
                 <span className="font-bold text-red-500">-${commission.toFixed(2)}</span>
               </div>
               <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between font-bold text-lg">
-                <span>Итого к списанию:</span>
+                <span>{t("withdraw.totalDeduct")}</span>
                 <span className={`${totalToDeduct > balance ? "text-red-500" : ""}`}>
                     ${totalToDeduct.toFixed(2)}
                 </span>
               </div>
               {totalToDeduct > balance && (
                   <div className="text-xs text-red-500 text-right mt-1 font-medium">
-                      Недостаточно средств
+                      {t("common.insufficientFunds")}
                   </div>
               )}
             </div>
@@ -194,7 +197,7 @@ export default function WithdrawPage() {
             {/* Номер карты */}
             <div>
               <label className="block text-xs uppercase font-bold text-slate-500 mb-1">
-                Номер карты получателя
+                {t("withdraw.recipientCard")}
               </label>
               <input
                 type="text"
@@ -212,17 +215,17 @@ export default function WithdrawPage() {
               className="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
             >
               {loading ? (
-                "Обработка..."
+                t("withdraw.processing")
               ) : (
                 <>
                   <ShieldCheck size={20} />
-                  Вывести ${withdrawAmount || "0"}
+                  {t("withdraw.withdraw", { amount: withdrawAmount || "0" })}
                 </>
               )}
             </button>
-            
+
             <p className="text-center text-xs text-slate-400">
-              Минимальная сумма вывода $10. Зачисление от 1 до 3 рабочих дней.
+              {t("withdraw.minInfo")}
             </p>
 
           </form>

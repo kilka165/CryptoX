@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { Send, MessageCircle, Bot, User as UserIcon, Paperclip } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "react-i18next";
+import { intlLocale } from "@/lib/utils/locale";
 
 interface Message {
   id: number;
@@ -13,10 +15,11 @@ interface Message {
 }
 
 export default function ChatPage() {
+  const { t, i18n } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Здравствуйте! Добро пожаловать в службу поддержки CryptoX. Чем могу помочь?",
+      text: t("footerPages.chat.greeting"),
       sender: "support",
       timestamp: new Date()
     }
@@ -37,11 +40,14 @@ export default function ChatPage() {
   }, [messages]);
 
   // Автоответы на частые вопросы
-  const autoResponses: Record<string, string> = {
-    "Как пополнить баланс?": "Для пополнения баланса:\n1. Перейдите в раздел 'Кошелек'\n2. Выберите криптовалюту или фиатную валюту\n3. Нажмите 'Пополнить'\n4. Следуйте инструкциям\n\nМы поддерживаем: банковские карты, банковские переводы и криптовалютные депозиты.",
-    "Как вывести средства?": "Для вывода средств:\n1. Перейдите в раздел 'Кошелек'\n2. Выберите криптовалюту\n3. Нажмите 'Вывести'\n4. Введите адрес кошелька и сумму\n5. Подтвердите операцию через 2FA\n\nОбработка занимает 10-30 минут для криптовалюты и 1-3 дня для фиата.",
-    "Вопрос по верификации": "Для прохождения верификации:\n1. Перейдите в 'Профиль' → 'Верификация'\n2. Заполните личные данные\n3. Загрузите фото документа (паспорт или ID)\n4. Загрузите селфи с документом\n\nПроверка занимает 1-24 часа. После верификации лимит вывода увеличится до $500,000/день."
-  };
+  const quickResponses = [
+    { q: t("footerPages.chat.q1"), a: t("footerPages.chat.a1") },
+    { q: t("footerPages.chat.q2"), a: t("footerPages.chat.a2") },
+    { q: t("footerPages.chat.q3"), a: t("footerPages.chat.a3") },
+  ];
+  const autoResponses: Record<string, string> = Object.fromEntries(
+    quickResponses.map((r) => [r.q, r.a])
+  );
 
   const handleSendMessage = (messageText?: string) => {
     const textToSend = messageText || inputMessage;
@@ -63,7 +69,7 @@ export default function ChatPage() {
     setTimeout(() => {
       const supportResponse: Message = {
         id: messages.length + 2,
-        text: autoResponse || "Спасибо за ваше сообщение! Наш специалист скоро ответит вам. Среднее время ответа: 2-5 минут.",
+        text: autoResponse || t("footerPages.chat.defaultReply"),
         sender: "support",
         timestamp: new Date()
       };
@@ -79,7 +85,7 @@ export default function ChatPage() {
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString(intlLocale(i18n.language), { hour: "2-digit", minute: "2-digit" });
   };
 
   return (
@@ -94,10 +100,10 @@ export default function ChatPage() {
                 <MessageCircle size={24} />
               </div>
               <div>
-                <h1 className="text-xl font-bold">Чат поддержки</h1>
+                <h1 className="text-xl font-bold">{t("footerPages.chat.headerTitle")}</h1>
                 <p className="text-sm text-blue-100 flex items-center gap-2">
                   <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                  Онлайн • Ответим в течение 2-5 минут
+                  {t("footerPages.chat.online")}
                 </p>
               </div>
             </div>
@@ -163,7 +169,7 @@ export default function ChatPage() {
                       handleSendMessage();
                     }
                   }}
-                  placeholder="Введите сообщение..."
+                  placeholder={t("footerPages.chat.inputPlaceholder")}
                   rows={1}
                   className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100 resize-none text-sm"
                 />
@@ -181,7 +187,7 @@ export default function ChatPage() {
               </button>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-500 mt-2 px-2">
-              Enter для отправки, Shift+Enter для новой строки
+              {t("footerPages.chat.enterHint")}
             </p>
           </div>
 
@@ -189,24 +195,24 @@ export default function ChatPage() {
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={(e) => handleQuickResponse(e, "Как пополнить баланс?")}
+              onClick={(e) => handleQuickResponse(e, quickResponses[0].q)}
               className="px-4 py-2 bg-white dark:bg-[#131416] border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 hover:border-blue-500 dark:hover:border-blue-500 transition-colors"
             >
-              Как пополнить баланс?
+              {quickResponses[0].q}
             </button>
             <button
               type="button"
-              onClick={(e) => handleQuickResponse(e, "Как вывести средства?")}
+              onClick={(e) => handleQuickResponse(e, quickResponses[1].q)}
               className="px-4 py-2 bg-white dark:bg-[#131416] border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 hover:border-blue-500 dark:hover:border-blue-500 transition-colors"
             >
-              Как вывести средства?
+              {quickResponses[1].q}
             </button>
             <button
               type="button"
-              onClick={(e) => handleQuickResponse(e, "Вопрос по верификации")}
+              onClick={(e) => handleQuickResponse(e, quickResponses[2].q)}
               className="px-4 py-2 bg-white dark:bg-[#131416] border border-slate-300 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 hover:border-blue-500 dark:hover:border-blue-500 transition-colors"
             >
-              Вопрос по верификации
+              {quickResponses[2].q}
             </button>
           </div>
         </div>

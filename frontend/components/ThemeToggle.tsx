@@ -3,9 +3,11 @@
 import * as React from "react"
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
+import { useTranslation } from "react-i18next"
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
+  const { t } = useTranslation()
   const [mounted, setMounted] = React.useState(false)
 
   // Ждем пока компонент смонтируется на клиенте
@@ -21,7 +23,7 @@ export function ThemeToggle() {
     <button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       className="p-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors relative"
-      aria-label="Переключить тему"
+      aria-label={t("common.toggleTheme")}
     >
       {theme === 'dark' ? (
         <Moon size={20} className="text-blue-400" />

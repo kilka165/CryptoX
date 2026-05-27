@@ -1,8 +1,12 @@
+"use client";
+
 import { Scale, FileText, Shield, AlertCircle } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "react-i18next";
 
 export default function LegalPage() {
+  const { t } = useTranslation();
   return (
     <>
       <Header />
@@ -11,9 +15,9 @@ export default function LegalPage() {
         <div className="bg-gradient-to-r from-slate-700 to-slate-900 text-white py-12">
           <div className="container mx-auto px-4 text-center" style={{ maxWidth: '900px' }}>
             <Scale size={40} className="mx-auto mb-3" />
-            <h1 className="text-3xl md:text-4xl font-bold mb-3">Правовая информация</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-3">{t("footerPages.legal.title")}</h1>
             <p className="text-lg text-slate-300">
-              Юридические документы и условия использования
+              {t("footerPages.legal.subtitle")}
             </p>
           </div>
         </div>
@@ -22,7 +26,7 @@ export default function LegalPage() {
           {/* Основные документы */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              Основные документы
+              {t("footerPages.legal.mainDocs")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <a
@@ -32,10 +36,10 @@ export default function LegalPage() {
                 <FileText className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1 group-hover:scale-110 transition-transform" size={28} />
                 <div>
                   <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-1">
-                    Пользовательское соглашение
+                    {t("footerPages.legal.doc1Title")}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Условия использования платформы CryptoX
+                    {t("footerPages.legal.doc1Desc")}
                   </p>
                 </div>
               </a>
@@ -47,10 +51,10 @@ export default function LegalPage() {
                 <Shield className="text-green-600 dark:text-green-400 flex-shrink-0 mt-1 group-hover:scale-110 transition-transform" size={28} />
                 <div>
                   <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-1">
-                    Политика конфиденциальности
+                    {t("footerPages.legal.doc2Title")}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Как мы собираем и защищаем ваши данные
+                    {t("footerPages.legal.doc2Desc")}
                   </p>
                 </div>
               </a>
@@ -62,10 +66,10 @@ export default function LegalPage() {
                 <AlertCircle className="text-orange-600 dark:text-orange-400 flex-shrink-0 mt-1 group-hover:scale-110 transition-transform" size={28} />
                 <div>
                   <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-1">
-                    AML/KYC политика
+                    {t("footerPages.legal.doc3Title")}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Противодействие отмыванию денег
+                    {t("footerPages.legal.doc3Desc")}
                   </p>
                 </div>
               </a>
@@ -77,10 +81,10 @@ export default function LegalPage() {
                 <Scale className="text-red-600 dark:text-red-400 flex-shrink-0 mt-1 group-hover:scale-110 transition-transform" size={28} />
                 <div>
                   <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-1">
-                    Предупреждение о рисках
+                    {t("footerPages.legal.doc4Title")}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Риски торговли криптовалютой
+                    {t("footerPages.legal.doc4Desc")}
                   </p>
                 </div>
               </a>
@@ -90,24 +94,24 @@ export default function LegalPage() {
           {/* Компания */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              О компании
+              {t("footerPages.legal.companyTitle")}
             </h2>
             <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-6">
               <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
                 <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">Юридическое название</h3>
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">{t("footerPages.legal.legalName")}</h3>
                   <p>CryptoX</p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">Регистрационный номер</h3>
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">{t("footerPages.legal.regNumber")}</h3>
                   <p>88005353535</p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">Юридический адрес</h3>
-                  <p>010000, Республика Казахстан, г. Астана, пр. Абая 76, д. 1</p>
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">{t("footerPages.legal.legalAddress")}</h3>
+                  <p>{t("footerPages.legal.legalAddressValue")}</p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">Email для юридических вопросов</h3>
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">{t("footerPages.legal.legalEmail")}</h3>
                   <p>Crypto.x.kilka@gmail.com</p>
                 </div>
               </div>
@@ -117,28 +121,28 @@ export default function LegalPage() {
           {/* Лицензии */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              Лицензии и регулирование
+              {t("footerPages.legal.licensesTitle")}
             </h2>
             <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 rounded-xl border border-blue-200 dark:border-slate-700 p-6">
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                CryptoX работает в соответствии с международными стандартами финансового регулирования:
+                {t("footerPages.legal.licensesIntro")}
               </p>
               <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
-                  <span>Лицензия на осуществление деятельности с виртуальными активами (№ VA-2024-001)</span>
+                  <span>{t("footerPages.legal.license1")}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
-                  <span>Соответствие требованиям FATF по противодействию отмыванию денег</span>
+                  <span>{t("footerPages.legal.license2")}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
-                  <span>Регулярные аудиты безопасности от независимых компаний</span>
+                  <span>{t("footerPages.legal.license3")}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
-                  <span>Страхование активов пользователей на сумму $1 млрд</span>
+                  <span>{t("footerPages.legal.license4")}</span>
                 </li>
               </ul>
             </div>
@@ -147,15 +151,13 @@ export default function LegalPage() {
           {/* Важная информация */}
           <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-900 dark:to-slate-800 rounded-xl p-6 border border-amber-200 dark:border-slate-700">
             <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">
-              Важная информация
+              {t("footerPages.legal.importantTitle")}
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-              Торговля криптовалютами связана с высоким уровнем риска и может не подходить для всех инвесторов. 
-              Прежде чем начать торговлю, убедитесь, что вы полностью понимаете связанные с этим риски.
+              {t("footerPages.legal.importantP1")}
             </p>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              CryptoX не предоставляет инвестиционных советов. Все решения о торговле принимаются пользователями 
-              самостоятельно на свой страх и риск.
+              {t("footerPages.legal.importantP2")}
             </p>
           </div>
         </div>

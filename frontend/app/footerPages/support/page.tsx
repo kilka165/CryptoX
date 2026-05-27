@@ -5,6 +5,7 @@ import { Search, HelpCircle, MessageCircle, Mail, Phone, ChevronDown, ChevronUp 
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "react-i18next";
 
 interface FAQItem {
   question: string;
@@ -13,120 +14,50 @@ interface FAQItem {
 }
 
 export default function SupportPage() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Все");
+  const allCat = t("footerPages.support.catAll");
+  const [selectedCategory, setSelectedCategory] = useState(allCat);
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
+  const cat = {
+    account: t("footerPages.support.catAccount"),
+    deposit: t("footerPages.support.catDeposit"),
+    trading: t("footerPages.support.catTrading"),
+    security: t("footerPages.support.catSecurity"),
+    verification: t("footerPages.support.catVerification"),
+    fees: t("footerPages.support.catFees"),
+  };
+
   const faqItems: FAQItem[] = [
-    {
-        question: "Как создать аккаунт на CryptoX?",
-        answer: "Для создания аккаунта нажмите кнопку 'Регистрация' в правом верхнем углу, заполните форму с вашим email и паролем, подтвердите email и пройдите базовую верификацию.",
-        category: "Аккаунт"
-    },
-    {
-        question: "Как пополнить баланс?",
-        answer: "Перейдите в раздел 'Кошелек', выберите криптовалюту или фиатную валюту, нажмите 'Пополнить' и следуйте инструкциям. Мы поддерживаем банковские карты, банковские переводы и криптовалютные депозиты.",
-        category: "Пополнение и вывод"
-    },
-    {
-        question: "Какие комиссии взимает CryptoX?",
-        answer: "Торговые комиссии начинаются от 0.1% за сделку. Комиссии за вывод зависят от выбранной криптовалюты и метода вывода. Подробнее на странице 'Комиссии'.",
-        category: "Комиссии"
-    },
-    {
-        question: "Как долго обрабатывается вывод средств?",
-        answer: "Криптовалютные выводы обрабатываются в течение 10-30 минут. Фиатные выводы на банковскую карту занимают 1-3 рабочих дня.",
-        category: "Пополнение и вывод"
-    },
-    {
-        question: "Что такое двухфакторная аутентификация (2FA)?",
-        answer: "2FA — это дополнительный уровень защиты вашего аккаунта. После ввода пароля потребуется код из приложения Google Authenticator или SMS. Настоятельно рекомендуем включить 2FA в настройках безопасности.",
-        category: "Безопасность"
-    },
-    {
-        question: "Как пройти верификацию?",
-        answer: "Перейдите в 'Профиль' → 'Верификация', загрузите документ, удостоверяющий личность (паспорт или ID карта), и селфи с документом. Проверка обычно занимает 1-24 часа.",
-        category: "Верификация"
-    },
-    {
-        question: "Что делать, если я забыл пароль?",
-        answer: "Нажмите 'Забыли пароль?' на странице входа, введите email, и мы отправим вам ссылку для сброса пароля.",
-        category: "Аккаунт"
-    },
-    {
-        question: "Поддерживает ли CryptoX P2P торговлю?",
-        answer: "Да! Вы можете покупать и продавать криптовалюту напрямую с другими пользователями через наш P2P маркетплейс с защитой сделок эскроу.",
-        category: "Торговля"
-    },
-    {
-        question: "Как вывести криптовалюту?",
-        answer: "Перейдите в 'Кошелек', выберите криптовалюту, нажмите 'Вывести', укажите адрес кошелька и сумму, подтвердите через 2FA. Проверьте сеть (ERC20, TRC20 и т.д.) перед отправкой.",
-        category: "Пополнение и вывод"
-    },
-    {
-        question: "Какие документы нужны для верификации?",
-        answer: "Для верификации принимаются: паспорт (внутренний или заграничный), национальная ID карта. Документ должен быть действительным, все данные четко видны.",
-        category: "Верификация"
-    },
-    {
-        question: "Как включить 2FA?",
-        answer: "Перейдите в 'Настройки' → 'Безопасность' → 'Двухфакторная аутентификация'. Скачайте Google Authenticator, отсканируйте QR-код и введите код подтверждения.",
-        category: "Безопасность"
-    },
-    {
-        question: "Что такое Maker и Taker комиссии?",
-        answer: "Maker — комиссия за создание лимитного ордера (добавление ликвидности). Taker — комиссия за исполнение рыночного ордера (забор ликвидности). Maker комиссии обычно ниже.",
-        category: "Комиссии"
-    },
-    {
-        question: "Как торговать на споте?",
-        answer: "Перейдите в раздел 'Торговля', выберите торговую пару (например BTC/USDT), укажите цену и количество, выберите тип ордера (лимитный или рыночный) и нажмите 'Купить' или 'Продать'.",
-        category: "Торговля"
-    },
-    {
-        question: "Какие лимиты на вывод без верификации?",
-        answer: "Без верификации вывод невозможен. С базовой верификацией (Email + документы) — до $50,000/день. С полной верификацией — до $500,000/день.",
-        category: "Верификация"
-    },
-    {
-        question: "Как изменить email или номер телефона?",
-        answer: "Перейдите в 'Настройки' → 'Безопасность', нажмите 'Изменить email/телефон', подтвердите через старый email/телефон и 2FA код, затем укажите новые данные.",
-        category: "Аккаунт"
-    },
-    {
-        question: "Есть ли минимальная сумма для торговли?",
-        answer: "Минимальная сумма сделки зависит от торговой пары и обычно составляет от 10 USDT. Точные лимиты указаны на странице каждой торговой пары.",
-        category: "Торговля"
-    },
-    {
-        question: "Как защитить аккаунт от взлома?",
-        answer: "Включите 2FA, используйте сложный уникальный пароль, добавьте whitelist адресов для вывода, включите email/SMS уведомления для всех операций, не переходите по подозрительным ссылкам.",
-        category: "Безопасность"
-    },
-    {
-        question: "Взимается ли комиссия за пополнение?",
-        answer: "Нет, пополнение счета (криптовалютой, картой или банковским переводом) полностью бесплатно. Комиссии взимаются только при выводе средств и торговле.",
-        category: "Комиссии"
-    },
-    {
-        question: "Что делать если перевел на неправильный адрес?",
-        answer: "К сожалению, криптовалютные транзакции необратимы. Если вы отправили средства на неправильный адрес, мы не сможем их вернуть. Всегда тщательно проверяйте адрес перед отправкой.",
-        category: "Пополнение и вывод"
-    },
-    {
-        question: "Как работает стейкинг на CryptoX?",
-        answer: "Перейдите в 'Стейкинг', выберите криптовалюту и срок (гибкий или фиксированный), укажите сумму. Вознаграждения начисляются ежедневно. Гибкий стейкинг позволяет вывести средства в любой момент.",
-        category: "Торговля"
-    }
-    ];
+    { question: t("footerPages.support.q1"), answer: t("footerPages.support.a1"), category: cat.account },
+    { question: t("footerPages.support.q2"), answer: t("footerPages.support.a2"), category: cat.deposit },
+    { question: t("footerPages.support.q3"), answer: t("footerPages.support.a3"), category: cat.fees },
+    { question: t("footerPages.support.q4"), answer: t("footerPages.support.a4"), category: cat.deposit },
+    { question: t("footerPages.support.q5"), answer: t("footerPages.support.a5"), category: cat.security },
+    { question: t("footerPages.support.q6"), answer: t("footerPages.support.a6"), category: cat.verification },
+    { question: t("footerPages.support.q7"), answer: t("footerPages.support.a7"), category: cat.account },
+    { question: t("footerPages.support.q8"), answer: t("footerPages.support.a8"), category: cat.trading },
+    { question: t("footerPages.support.q9"), answer: t("footerPages.support.a9"), category: cat.deposit },
+    { question: t("footerPages.support.q10"), answer: t("footerPages.support.a10"), category: cat.verification },
+    { question: t("footerPages.support.q11"), answer: t("footerPages.support.a11"), category: cat.security },
+    { question: t("footerPages.support.q12"), answer: t("footerPages.support.a12"), category: cat.fees },
+    { question: t("footerPages.support.q13"), answer: t("footerPages.support.a13"), category: cat.trading },
+    { question: t("footerPages.support.q14"), answer: t("footerPages.support.a14"), category: cat.verification },
+    { question: t("footerPages.support.q15"), answer: t("footerPages.support.a15"), category: cat.account },
+    { question: t("footerPages.support.q16"), answer: t("footerPages.support.a16"), category: cat.trading },
+    { question: t("footerPages.support.q17"), answer: t("footerPages.support.a17"), category: cat.security },
+    { question: t("footerPages.support.q18"), answer: t("footerPages.support.a18"), category: cat.fees },
+    { question: t("footerPages.support.q19"), answer: t("footerPages.support.a19"), category: cat.deposit },
+    { question: t("footerPages.support.q20"), answer: t("footerPages.support.a20"), category: cat.trading }
+  ];
 
-
-  const categories = ["Все", "Аккаунт", "Пополнение и вывод", "Торговля", "Безопасность", "Верификация", "Комиссии"];
+  const categories = [allCat, cat.account, cat.deposit, cat.trading, cat.security, cat.verification, cat.fees];
 
   const filteredFAQ = faqItems.filter((item) => {
     const matchesSearch = item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.answer.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "Все" || item.category === selectedCategory;
+    const matchesCategory = selectedCategory === allCat || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -138,9 +69,9 @@ export default function SupportPage() {
         <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-12">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <HelpCircle size={40} className="mx-auto mb-3" />
-            <h1 className="text-3xl md:text-4xl font-bold mb-3">Центр помощи</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-3">{t("footerPages.support.title")}</h1>
             <p className="text-lg text-blue-100">
-              Найдите ответы на часто задаваемые вопросы
+              {t("footerPages.support.subtitle")}
             </p>
           </div>
         </div>
@@ -152,7 +83,7 @@ export default function SupportPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
               <input
                 type="text"
-                placeholder="Поиск по вопросам..."
+                placeholder={t("footerPages.support.searchPlaceholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-slate-100 dark:bg-[#131416] border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
@@ -168,8 +99,8 @@ export default function SupportPage() {
             >
               <MessageCircle className="text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" size={28} />
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">Чат поддержки</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400">Онлайн 24/7</p>
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">{t("footerPages.support.chatTitle")}</h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400">{t("footerPages.support.chatSubtitle")}</p>
               </div>
             </Link>
 
@@ -179,7 +110,7 @@ export default function SupportPage() {
             >
               <Mail className="text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform" size={28} />
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">Email поддержка</h3>
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">{t("footerPages.support.emailTitle")}</h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400">crypto.x.kilka@gmail.com</p>
               </div>
             </a>
@@ -190,7 +121,7 @@ export default function SupportPage() {
             >
               <Phone className="text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform" size={28} />
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">Телефон</h3>
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">{t("footerPages.support.phoneTitle")}</h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400">+7 (7172) 00-00-00</p>
               </div>
             </a>
@@ -263,7 +194,7 @@ export default function SupportPage() {
             <div className="text-center py-12">
               <HelpCircle className="mx-auto mb-3 text-slate-400" size={48} />
               <p className="text-slate-600 dark:text-slate-400">
-                Вопросы не найдены. Попробуйте изменить параметры поиска.
+                {t("footerPages.support.notFound")}
               </p>
             </div>
           )}
@@ -271,10 +202,10 @@ export default function SupportPage() {
           {/* Не нашли ответ */}
           <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 rounded-xl p-8 border border-blue-200 dark:border-slate-700 text-center">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3">
-              Не нашли ответ на свой вопрос?
+              {t("footerPages.support.ctaTitle")}
             </h2>
             <p className="text-slate-600 dark:text-slate-400 mb-6">
-              Наша команда поддержки готова помочь вам 24/7
+              {t("footerPages.support.ctaSubtitle")}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
@@ -282,14 +213,14 @@ export default function SupportPage() {
                 className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors text-base"
               >
                 <MessageCircle size={22} />
-                Открыть чат
+                {t("footerPages.support.openChat")}
               </Link>
               <a
                 href="mailto:crypto.x.kilka@gmail.com"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-2 border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-lg font-semibold transition-colors text-base"
               >
                 <Mail size={22} />
-                Написать email
+                {t("footerPages.support.writeEmail")}
               </a>
             </div>
           </div>

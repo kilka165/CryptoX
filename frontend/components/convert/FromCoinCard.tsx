@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import { X, ChevronDown, AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface FromCoinCardProps {
   coin: { symbol: string };
@@ -22,6 +25,7 @@ export function FromCoinCard({
   onOpenPicker,
   canRemove,
 }: FromCoinCardProps) {
+  const { t } = useTranslation();
   const inputAmount = parseFloat(amount.replace(",", ".")) || 0;
 
   return (
@@ -46,7 +50,7 @@ export function FromCoinCard({
               {coin.symbol.toUpperCase()}
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400">
-              Баланс: {balance.toFixed(8)}
+              {t("convert.balance", { amount: balance.toFixed(8) })}
             </span>
           </div>
           <ChevronDown size={14} className="text-slate-500" />
@@ -74,7 +78,7 @@ export function FromCoinCard({
       {hasError && inputAmount > 0 && (
         <div className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400 px-3">
           <AlertTriangle size={12} />
-          <span>Недостаточно средств. Доступно: {balance.toFixed(8)}</span>
+          <span>{t("convert.insufficientAvailable", { amount: balance.toFixed(8) })}</span>
         </div>
       )}
     </div>

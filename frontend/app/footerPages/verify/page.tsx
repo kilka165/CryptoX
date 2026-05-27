@@ -4,33 +4,23 @@ import { useState } from "react";
 import { Shield, CheckCircle, Upload, ArrowRight } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "react-i18next";
 
 export default function VerifyPage() {
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
 
   const benefits = [
-    "Увеличение лимитов на вывод до $500,000/день",
-    "Доступ к P2P торговле",
-    "Пониженные торговые комиссии",
-    "Приоритетная поддержка 24/7"
+    t("footerPages.verify.b1"),
+    t("footerPages.verify.b2"),
+    t("footerPages.verify.b3"),
+    t("footerPages.verify.b4")
   ];
 
   const verificationLevels = [
-    {
-      level: "Уровень 1",
-      requirement: "Email верификация",
-      withdrawalLimit: "$1,000/день"
-    },
-    {
-      level: "Уровень 2",
-      requirement: "Паспорт или ID карта",
-      withdrawalLimit: "$50,000/день"
-    },
-    {
-      level: "Уровень 3",
-      requirement: "Полная верификация + селфи",
-      withdrawalLimit: "$500,000/день"
-    }
+    { level: t("footerPages.verify.lvl1Name"), requirement: t("footerPages.verify.lvl1Req"), withdrawalLimit: t("footerPages.verify.lvl1Limit") },
+    { level: t("footerPages.verify.lvl2Name"), requirement: t("footerPages.verify.lvl2Req"), withdrawalLimit: t("footerPages.verify.lvl2Limit") },
+    { level: t("footerPages.verify.lvl3Name"), requirement: t("footerPages.verify.lvl3Req"), withdrawalLimit: t("footerPages.verify.lvl3Limit") }
   ];
 
   return (
@@ -41,9 +31,9 @@ export default function VerifyPage() {
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-16">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <Shield size={48} className="mx-auto mb-4" />
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Верификация аккаунта</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t("footerPages.verify.title")}</h1>
             <p className="text-xl text-purple-100">
-              Пройдите верификацию для получения полного доступа к платформе
+              {t("footerPages.verify.subtitle")}
             </p>
           </div>
         </div>
@@ -52,7 +42,7 @@ export default function VerifyPage() {
           {/* Преимущества */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              Преимущества верификации
+              {t("footerPages.verify.benefitsTitle")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {benefits.map((benefit, index) => (
@@ -70,7 +60,7 @@ export default function VerifyPage() {
           {/* Уровни верификации */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              Уровни верификации
+              {t("footerPages.verify.levelsTitle")}
             </h2>
             <div className="space-y-4">
               {verificationLevels.map((level, index) => (
@@ -87,7 +77,7 @@ export default function VerifyPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm text-slate-500 dark:text-slate-500 mb-1">Лимит вывода</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-500 mb-1">{t("footerPages.verify.withdrawLimit")}</div>
                     <div className="text-lg font-bold text-green-600 dark:text-green-400">
                       {level.withdrawalLimit}
                     </div>
@@ -100,29 +90,29 @@ export default function VerifyPage() {
           {/* Процесс верификации */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              Как пройти верификацию
+              {t("footerPages.verify.processTitle")}
             </h2>
-            
+
             <div className="bg-slate-50 dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-8">
               {/* Шаг 1: Личные данные */}
               {step === 1 && (
                 <div className="space-y-4">
                   <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-                    Шаг 1: Личные данные
+                    {t("footerPages.verify.step1Title")}
                   </h3>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                      Имя и Фамилия
+                      {t("footerPages.verify.fullName")}
                     </label>
                     <input
                       type="text"
-                      placeholder="Введите полное имя"
+                      placeholder={t("footerPages.verify.fullNamePlaceholder")}
                       className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-900 dark:text-slate-100"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                      Дата рождения
+                      {t("footerPages.verify.birthDate")}
                     </label>
                     <input
                       type="date"
@@ -131,14 +121,14 @@ export default function VerifyPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                      Страна
+                      {t("footerPages.verify.country")}
                     </label>
                     <select className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-900 dark:text-slate-100">
-                      <option>Выберите страну</option>
-                      <option>Казахстан</option>
-                      <option>Россия</option>
-                      <option>США</option>
-                      <option>Другая</option>
+                      <option>{t("footerPages.verify.selectCountry")}</option>
+                      <option>{t("footerPages.verify.countryKZ")}</option>
+                      <option>{t("footerPages.verify.countryRU")}</option>
+                      <option>{t("footerPages.verify.countryUS")}</option>
+                      <option>{t("footerPages.verify.countryOther")}</option>
                     </select>
                   </div>
                 </div>
@@ -148,20 +138,20 @@ export default function VerifyPage() {
               {step === 2 && (
                 <div className="space-y-6">
                   <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-                    Шаг 2: Загрузите документ
+                    {t("footerPages.verify.step2Title")}
                   </h3>
                   <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg p-12 text-center hover:border-purple-500 dark:hover:border-purple-500 transition-colors cursor-pointer">
                     <Upload className="mx-auto mb-4 text-slate-400" size={48} />
                     <p className="text-slate-700 dark:text-slate-300 font-semibold mb-2">
-                      Загрузите фото документа
+                      {t("footerPages.verify.uploadDoc")}
                     </p>
                     <p className="text-sm text-slate-500 dark:text-slate-500">
-                      Паспорт или ID карта • JPG, PNG • Максимум 10MB
+                      {t("footerPages.verify.uploadDocHint")}
                     </p>
                   </div>
                   <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                     <p className="text-sm text-slate-600 dark:text-slate-400">
-                      <strong>Требования:</strong> Документ должен быть четко виден, все данные читаемы, без бликов
+                      <strong>{t("footerPages.verify.reqLabel")}</strong>{t("footerPages.verify.reqText")}
                     </p>
                   </div>
                 </div>
@@ -171,20 +161,20 @@ export default function VerifyPage() {
               {step === 3 && (
                 <div className="space-y-6">
                   <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-                    Шаг 3: Селфи с документом
+                    {t("footerPages.verify.step3Title")}
                   </h3>
                   <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg p-12 text-center hover:border-purple-500 dark:hover:border-purple-500 transition-colors cursor-pointer">
                     <Upload className="mx-auto mb-4 text-slate-400" size={48} />
                     <p className="text-slate-700 dark:text-slate-300 font-semibold mb-2">
-                      Загрузите селфи с документом
+                      {t("footerPages.verify.uploadSelfie")}
                     </p>
                     <p className="text-sm text-slate-500 dark:text-slate-500">
-                      Держите документ рядом с лицом • JPG, PNG • Максимум 10MB
+                      {t("footerPages.verify.uploadSelfieHint")}
                     </p>
                   </div>
                   <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                     <p className="text-sm text-slate-600 dark:text-slate-400">
-                      <strong>Важно:</strong> Лицо и документ должны быть четко видны на одном фото
+                      <strong>{t("footerPages.verify.importantLabel")}</strong>{t("footerPages.verify.importantText")}
                     </p>
                   </div>
                 </div>
@@ -197,14 +187,14 @@ export default function VerifyPage() {
                     onClick={() => setStep(step - 1)}
                     className="px-6 py-3 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
                   >
-                    Назад
+                    {t("common.back")}
                   </button>
                 )}
                 <button
                   onClick={() => step < 3 ? setStep(step + 1) : null}
                   className="ml-auto flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors"
                 >
-                  {step === 3 ? "Отправить на проверку" : "Далее"}
+                  {step === 3 ? t("footerPages.verify.submitReview") : t("common.next")}
                   <ArrowRight size={20} />
                 </button>
               </div>
@@ -230,31 +220,31 @@ export default function VerifyPage() {
           {/* FAQ */}
           <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 rounded-2xl p-8 border border-purple-200 dark:border-slate-700">
             <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              Часто задаваемые вопросы
+              {t("footerPages.verify.faqTitle")}
             </h3>
             <div className="space-y-4">
               <div>
                 <h4 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                  Сколько времени занимает верификация?
+                  {t("footerPages.verify.faq1Q")}
                 </h4>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Обычно от 1 до 24 часов. В редких случаях до 3 рабочих дней.
+                  {t("footerPages.verify.faq1A")}
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                  Безопасно ли загружать документы?
+                  {t("footerPages.verify.faq2Q")}
                 </h4>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Да, все данные шифруются и защищены. Мы не передаем данные третьим лицам.
+                  {t("footerPages.verify.faq2A")}
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                  Какие документы принимаются?
+                  {t("footerPages.verify.faq3Q")}
                 </h4>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Паспорт (внутренний или заграничный) или национальное удостоверение личности (ID карта).
+                  {t("footerPages.verify.faq3A")}
                 </p>
               </div>
             </div>

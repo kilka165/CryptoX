@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from "react";
 import { Search, ArrowUpDown } from "lucide-react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 interface P2PFiltersProps {
   tradeType: "buy" | "sell";
@@ -47,6 +48,7 @@ export function P2PFilters({
   onSortChange,
   onCryptoOptionsLoaded,
 }: P2PFiltersProps) {
+  const { t } = useTranslation();
   const [availableCryptos, setAvailableCryptos] = useState<string[]>([]);
 
   useEffect(() => {
@@ -92,7 +94,7 @@ export function P2PFilters({
                 : "text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
             }`}
           >
-            Купить
+            {t("p2p.filters.buy")}
           </button>
           <button
             onClick={() => onTradeTypeChange("sell")}
@@ -102,19 +104,19 @@ export function P2PFilters({
                 : "text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
             }`}
           >
-            Продать
+            {t("p2p.filters.sell")}
           </button>
         </div>
 
         {/* Фильтр по криптовалюте */}
         <div>
-          <label className="block text-xs text-slate-500 mb-1">Монета:</label>
+          <label className="block text-xs text-slate-500 mb-1">{t("p2p.filters.coin")}</label>
           <select
             value={selectedCrypto}
             onChange={(e) => onCryptoChange(e.target.value)}
             className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">Все монеты</option>
+            <option value="">{t("p2p.filters.allCoins")}</option>
             {availableCryptos.map((crypto) => (
               <option key={crypto} value={crypto}>
                 {crypto}
@@ -125,13 +127,13 @@ export function P2PFilters({
 
         {/* Фильтр по валюте */}
         <div>
-          <label className="block text-xs text-slate-500 mb-1">Валюта:</label>
+          <label className="block text-xs text-slate-500 mb-1">{t("p2p.filters.currency")}</label>
           <select
             value={selectedCurrency}
             onChange={(e) => onCurrencyChange(e.target.value)}
             className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">Все валюты</option>
+            <option value="">{t("p2p.filters.allCurrencies")}</option>
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
             <option value="RUB">RUB</option>
@@ -142,7 +144,7 @@ export function P2PFilters({
         {/* Поиск по продавцу */}
         <div>
           <label className="block text-xs text-slate-500 mb-1">
-            Поиск продавца:
+            {t("p2p.filters.searchSeller")}
           </label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -150,7 +152,7 @@ export function P2PFilters({
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Имя продавца..."
+              placeholder={t("p2p.filters.sellerPlaceholder")}
               className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -159,7 +161,7 @@ export function P2PFilters({
         {/* Сортировка */}
         <div>
           <label className="block text-xs text-slate-500 mb-1">
-            Сортировать:
+            {t("p2p.filters.sortBy")}
           </label>
           <div className="relative">
             <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -168,8 +170,8 @@ export function P2PFilters({
               onChange={(e) => onSortChange(e.target.value as "price" | "rate")}
               className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="price">Цена</option>
-              <option value="rate">Рейтинг</option>
+              <option value="price">{t("p2p.filters.price")}</option>
+              <option value="rate">{t("p2p.filters.rating")}</option>
             </select>
           </div>
         </div>

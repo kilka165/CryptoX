@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import { Coin } from "@/types/coin";
+import { useTranslation } from "react-i18next";
 
 interface CoinRowProps {
   coin: Coin;
@@ -11,6 +14,7 @@ interface CoinRowProps {
 }
 
 export function CoinRow({ coin, index, userCurrency, exchangeRate, onBuy, formatNumber }: CoinRowProps) {
+  const { t } = useTranslation();
   const priceChange = coin.price_change_percentage_24h ?? 0;
   const isPositive = priceChange >= 0;
   
@@ -62,7 +66,7 @@ export function CoinRow({ coin, index, userCurrency, exchangeRate, onBuy, format
           onClick={() => onBuy(coin)}
           className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
         >
-          Купить
+          {t("market.buy")}
         </button>
       </td>
     </tr>

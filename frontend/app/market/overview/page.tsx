@@ -10,6 +10,7 @@ import { BinanceAPI } from "@/lib/api/binance";
 import type { Coin } from "@/types/coin";
 import { MarketCard } from "@/components/market/MarketCard";
 import { CoinRow } from "@/components/market/CoinRow";
+import { useTranslation } from "react-i18next";
 
 const formatNumber = (num: number) => {
   if (num >= 1.0e12) return (num / 1.0e12).toFixed(2) + "T";
@@ -20,6 +21,7 @@ const formatNumber = (num: number) => {
 };
 
 export default function MarketOverviewPage() {
+  const { t } = useTranslation();
   const [coins, setCoins] = useState<Coin[]>([]);
   const [loading, setLoading] = useState(true);
   const [userCurrency, setUserCurrency] = useState<string>("USD");
@@ -123,10 +125,10 @@ export default function MarketOverviewPage() {
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-10 space-y-8">
         <header className="space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold">
-            Обзор крипто‑рынка
+            {t("market.overview.title")}
           </h1>
           <p className="text-sm md:text-base text-slate-500">
-            Краткая сводка по капитализации, объёму и динамике рынка за 24 часа.
+            {t("market.overview.subtitle")}
           </p>
         </header>
 
@@ -134,7 +136,7 @@ export default function MarketOverviewPage() {
           <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-500">
-                Общая капитализация
+                {t("market.overview.totalMarketCap")}
               </span>
               <BarChart3 className="w-4 h-4 text-slate-400" />
             </div>
@@ -142,14 +144,14 @@ export default function MarketOverviewPage() {
               {formatNumber(totalMarketCap * exchangeRate)} {userCurrency}
             </p>
             <p className="text-xs text-slate-500 mt-1">
-              На основе топ‑монет по капитализации.
+              {t("market.overview.basedOnTop")}
             </p>
           </div>
 
           <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-500">
-                Объём за 24 часа
+                {t("market.overview.volume24h")}
               </span>
               <Flame className="w-4 h-4 text-orange-400" />
             </div>
@@ -157,14 +159,14 @@ export default function MarketOverviewPage() {
               {formatNumber(totalVolume * exchangeRate)} {userCurrency}
             </p>
             <p className="text-xs text-slate-500 mt-1">
-              Совокупный объём торгов всех монет.
+              {t("market.overview.totalTradingVolume")}
             </p>
           </div>
 
           <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-500">
-                Монет в плюсе за 24ч
+                {t("market.overview.coinsUp24h")}
               </span>
               <TrendingUp className="w-4 h-4 text-emerald-400" />
             </div>
@@ -172,14 +174,14 @@ export default function MarketOverviewPage() {
               {positiveCount} / {coins.length}
             </p>
             <p className="text-xs text-slate-500 mt-1">
-              Количество активов с положительной динамикой.
+              {t("market.overview.positiveCount")}
             </p>
           </div>
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <MarketCard
-            title="Топ по капитализации"
+            title={t("market.overview.topByMarketCap")}
             icon={BarChart3}
             coins={topByMarketCap}
             onBuy={() => {}}
@@ -187,7 +189,7 @@ export default function MarketOverviewPage() {
             exchangeRate={exchangeRate}
           />
           <MarketCard
-            title="Лидеры роста 24ч"
+            title={t("market.overview.topGainers24h")}
             icon={TrendingUp}
             coins={topGainers}
             onBuy={() => {}}
@@ -195,7 +197,7 @@ export default function MarketOverviewPage() {
             exchangeRate={exchangeRate}
           />
           <MarketCard
-            title="Топ по объёму"
+            title={t("market.overview.topByVolume")}
             icon={Flame}
             coins={topVolume}
             onBuy={() => {}}
@@ -207,10 +209,10 @@ export default function MarketOverviewPage() {
         <section className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <h2 className="text-sm md:text-base font-semibold">
-              Топ‑20 монет по капитализации
+              {t("market.overview.top20")}
             </h2>
             <span className="text-xs text-slate-500">
-              Цены отображаются в {userCurrency}
+              {t("market.overview.pricesIn", { currency: userCurrency })}
             </span>
           </div>
 
@@ -219,16 +221,16 @@ export default function MarketOverviewPage() {
               <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs uppercase text-slate-500">
                 <tr>
                   <th className="px-6 py-3">#</th>
-                  <th className="px-6 py-3">Монета</th>
-                  <th className="px-6 py-3 text-right">Цена ({userCurrency})</th>
-                  <th className="px-6 py-3 text-right">24ч</th>
+                  <th className="px-6 py-3">{t("market.coin")}</th>
+                  <th className="px-6 py-3 text-right">{t("market.priceCur", { currency: userCurrency })}</th>
+                  <th className="px-6 py-3 text-right">{t("market.change24h")}</th>
                   <th className="px-6 py-3 text-right hidden md:table-cell">
-                    Объём
+                    {t("market.volume")}
                   </th>
                   <th className="px-6 py-3 text-right hidden lg:table-cell">
-                    Капитализация
+                    {t("market.marketCap")}
                   </th>
-                  <th className="px-6 py-3 text-right">Действия</th>
+                  <th className="px-6 py-3 text-right">{t("market.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800">

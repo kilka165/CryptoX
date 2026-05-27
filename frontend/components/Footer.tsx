@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import {
   Facebook,
   Twitter,
@@ -19,6 +20,7 @@ import {
 } from "lucide-react";
 
 export const Footer = () => {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -37,8 +39,7 @@ export const Footer = () => {
                 </span>
               </div>
               <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Ведущая криптовалютная биржа с передовыми технологиями безопасности 
-                и низкими комиссиями. Торгуйте, стейкайте и зарабатывайте с CryptoX.
+                {t("footer.description")}
               </p>
             </div>
 
@@ -47,25 +48,25 @@ export const Footer = () => {
                 {/* Преимущества */}
                 <div>
                   <h4 className="text-slate-900 dark:text-slate-100 font-semibold mb-4 text-sm">
-                    Наши преимущества
+                    {t("footer.advantages")}
                   </h4>
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm">
                       <Shield className="text-green-500" size={16} />
                       <span className="text-slate-600 dark:text-slate-400">
-                        Защита активов на $1 млрд
+                        {t("footer.adv1")}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Award className="text-blue-500" size={16} />
                       <span className="text-slate-600 dark:text-slate-400">
-                        Лицензирована в 50+ странах
+                        {t("footer.adv2")}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Globe className="text-purple-500" size={16} />
                       <span className="text-slate-600 dark:text-slate-400">
-                        10М+ активных пользователей
+                        {t("footer.adv3")}
                       </span>
                     </div>
                   </div>
@@ -74,7 +75,7 @@ export const Footer = () => {
                 {/* Контакты */}
                 <div>
                   <h4 className="text-slate-900 dark:text-slate-100 font-semibold mb-4 text-sm">
-                    Связаться с нами
+                    {t("footer.contactUs")}
                   </h4>
                   <div className="space-y-3 text-sm">
                     <div className="flex items-start gap-2">
@@ -98,7 +99,7 @@ export const Footer = () => {
                     <div className="flex items-start gap-2">
                       <MapPin className="text-red-500 mt-0.5 flex-shrink-0" size={16} />
                       <span className="text-slate-600 dark:text-slate-400">
-                        Астана, Казахстан
+                        {t("footer.location")}
                       </span>
                     </div>
                   </div>
@@ -113,10 +114,10 @@ export const Footer = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
               <h4 className="text-slate-900 dark:text-slate-100 font-semibold mb-3 text-sm">
-                Присоединяйтесь к сообществу
+                {t("footer.joinCommunity")}
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-400">
-                Следите за новостями и обновлениями в наших социальных сетях
+                {t("footer.followUs")}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -173,58 +174,58 @@ export const Footer = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 mb-10 text-sm">
           <div>
             <h4 className="text-slate-900 dark:text-slate-100 font-semibold mb-4">
-              О компании
+              {t("footer.companyTitle")}
             </h4>
             <nav className="space-y-2.5">
-              <FooterLink href="/footerPages/about">О нас</FooterLink>
-              <FooterLink href="/footerPages/legal">Правовая информация</FooterLink>
+              <FooterLink href="/footerPages/about">{t("footer.about")}</FooterLink>
+              <FooterLink href="/footerPages/legal">{t("footer.legal")}</FooterLink>
             </nav>
           </div>
 
           <div>
             <h4 className="text-slate-900 dark:text-slate-100 font-semibold mb-4">
-              Продукты
+              {t("footer.productsTitle")}
             </h4>
             <nav className="space-y-2.5">
-              <FooterLink href="/market">Спотовая торговля</FooterLink>
-              <FooterLink href="/staking">Стейкинг</FooterLink>
-              <FooterLink href="/p2p">P2P торговля</FooterLink>
-              <FooterLink href="/convert">Конвертация</FooterLink>
+              <FooterLink href="/market">{t("footer.spotTrading")}</FooterLink>
+              <FooterLink href="/staking">{t("footer.staking")}</FooterLink>
+              <FooterLink href="/p2p">{t("footer.p2pTrading")}</FooterLink>
+              <FooterLink href="/convert">{t("footer.convert")}</FooterLink>
             </nav>
           </div>
 
           <div>
             <h4 className="text-slate-900 dark:text-slate-100 font-semibold mb-4">
-              Сервисы
+              {t("footer.servicesTitle")}
             </h4>
             <nav className="space-y-2.5">
-              <FooterLink href="/market">Купить крипту</FooterLink>
-              <FooterLink href="/profile">Кошелек</FooterLink>
+              <FooterLink href="/market">{t("footer.buyCrypto")}</FooterLink>
+              <FooterLink href="/profile">{t("footer.wallet")}</FooterLink>
             </nav>
           </div>
 
           <div>
             <h4 className="text-slate-900 dark:text-slate-100 font-semibold mb-4">
-              Обучение
+              {t("footer.educationTitle")}
             </h4>
             <nav className="space-y-2.5">
-              <FooterLink href="/footerPages/guides">Гайды</FooterLink>
-              <FooterLink href="/footerPages/prices">Цены криптовалют</FooterLink>
-              <FooterLink href="/footerPages/glossary">Глоссарий</FooterLink>
+              <FooterLink href="/footerPages/guides">{t("footer.guides")}</FooterLink>
+              <FooterLink href="/footerPages/prices">{t("footer.prices")}</FooterLink>
+              <FooterLink href="/footerPages/glossary">{t("footer.glossary")}</FooterLink>
             </nav>
           </div>
 
           <div>
             <h4 className="text-slate-900 dark:text-slate-100 font-semibold mb-4">
-              Поддержка
+              {t("footer.supportTitle")}
             </h4>
             <nav className="space-y-2.5">
-              <FooterLink href="/footerPages/support">Центр помощи</FooterLink>
-              <FooterLink href="/footerPages/chat">Чат поддержки 24/7</FooterLink>
-              <FooterLink href="/footerPages/fees">Комиссии</FooterLink>
-              <FooterLink href="/footerPages/security">Безопасность</FooterLink>
-              <FooterLink href="/footerPages/verify">Верификация</FooterLink>
-              <FooterLink href="/footerPages/bug-bounty">Bug Bounty</FooterLink>
+              <FooterLink href="/footerPages/support">{t("footer.helpCenter")}</FooterLink>
+              <FooterLink href="/footerPages/chat">{t("footer.chat")}</FooterLink>
+              <FooterLink href="/footerPages/fees">{t("footer.fees")}</FooterLink>
+              <FooterLink href="/footerPages/security">{t("footer.security")}</FooterLink>
+              <FooterLink href="/footerPages/verify">{t("footer.verify")}</FooterLink>
+              <FooterLink href="/footerPages/bug-bounty">{t("footer.bugBounty")}</FooterLink>
             </nav>
           </div>
         </div>
@@ -235,14 +236,10 @@ export const Footer = () => {
             <Shield className="text-blue-500 mt-0.5 flex-shrink-0" size={20} />
             <div className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               <p className="font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                Важная информация о рисках
+                {t("footer.riskTitle")}
               </p>
               <p>
-                Торговля криптовалютами сопряжена с высоким уровнем риска и может не подходить 
-                для всех инвесторов. Прежде чем начать торговлю, убедитесь, что вы полностью 
-                понимаете связанные с этим риски и примите во внимание свой уровень опыта. 
-                Рыночная волатильность может привести к значительным убыткам. Инвестируйте 
-                только те средства, потерю которых вы можете себе позволить.
+                {t("footer.riskText")}
               </p>
             </div>
           </div>
@@ -253,32 +250,32 @@ export const Footer = () => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-xs text-slate-500 dark:text-slate-500">
               <span className="font-medium">
-                © {currentYear} CryptoX Exchange. Все права защищены.
+                {t("footer.copyright", { year: currentYear })}
               </span>
               <div className="flex flex-wrap items-center gap-4">
-                <Link 
-                  href="/footerPages/terms" 
+                <Link
+                  href="/footerPages/terms"
                   className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
                 >
-                  Условия использования
+                  {t("footer.terms")}
                 </Link>
-                <Link 
-                  href="/footerPages/privacy" 
+                <Link
+                  href="/footerPages/privacy"
                   className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
                 >
-                  Политика конфиденциальности
+                  {t("footer.privacy")}
                 </Link>
-                <Link 
-                  href="/footerPages/cookies" 
+                <Link
+                  href="/footerPages/cookies"
                   className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
                 >
-                  Cookies
+                  {t("footer.cookies")}
                 </Link>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
-              <span>Данные предоставлены</span>
+              <span>{t("footer.dataProvidedBy")}</span>
               <a 
                 href="https://www.binance.com" 
                 target="_blank" 
@@ -293,7 +290,7 @@ export const Footer = () => {
           {/* Версия */}
           <div className="mt-6 pt-6 border-t border-slate-300 dark:border-slate-800 flex justify-center">
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
-              <span>Версия:</span>
+              <span>{t("footer.version")}</span>
               <span className="font-mono font-semibold text-slate-600 dark:text-slate-400">v2.4.1</span>
             </div>
           </div>
@@ -304,7 +301,7 @@ export const Footer = () => {
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className="fixed bottom-8 right-8 p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 z-50"
-        aria-label="Наверх"
+        aria-label={t("common.toTop")}
       >
         <svg 
           xmlns="http://www.w3.org/2000/svg" 

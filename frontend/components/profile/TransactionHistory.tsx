@@ -3,6 +3,8 @@
 import { CryptoIcon } from "@/components/CryptoIcon";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
+import { intlLocale } from "@/lib/utils/locale";
 import { 
   ArrowUpRight, 
   ArrowDownLeft, 
@@ -63,6 +65,7 @@ const getExchangeRate = (currency: string): number => {
 };
 
 export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryProps) {
+  const { t, i18n } = useTranslation();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "buy" | "sell" | "deposit" | "withdraw">("all");
@@ -103,7 +106,7 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
       }
       
     } catch (error) {
-      console.error("Ошибка загрузки истории", error);
+      console.error("Error loading history", error);
     } finally {
       setLoading(false);
     }
@@ -111,10 +114,10 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
 
   const getTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
-      buy: "Покупка",
-      sell: "Продажа",
-      deposit: "Пополнение",
-      withdraw: "Вывод",
+      buy: t("profile.history.typeBuy"),
+      sell: t("profile.history.typeSell"),
+      deposit: t("profile.history.typeDeposit"),
+      withdraw: t("profile.history.typeWithdraw"),
     };
     return labels[type] || type;
   };
@@ -150,7 +153,7 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
   };
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("ru-RU", {
+    return new Date(date).toLocaleDateString(intlLocale(i18n.language), {
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -165,13 +168,13 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
   return (
     <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-bold mb-4">История операций</h3>
+        <h3 className="text-lg font-bold mb-4">{t("profile.history.title")}</h3>
 
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <input
               type="text"
-              placeholder="Поиск по описанию..."
+              placeholder={t("profile.history.searchPlaceholder")}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -190,11 +193,11 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
               }}
               className="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all cursor-pointer"
             >
-              <option value="all">Все операции</option>
-              <option value="buy">Покупки</option>
-              <option value="sell">Продажи</option>
-              <option value="deposit">Пополнения</option>
-              <option value="withdraw">Выводы</option>
+              <option value="all">{t("profile.history.allOps")}</option>
+              <option value="buy">{t("profile.history.buys")}</option>
+              <option value="sell">{t("profile.history.sells")}</option>
+              <option value="deposit">{t("profile.history.deposits")}</option>
+              <option value="withdraw">{t("profile.history.withdrawals")}</option>
             </select>
           </div>
         </div>
@@ -210,12 +213,12 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-xs text-slate-500 border-b border-slate-100 dark:border-slate-800 text-left">
-                  <th className="pb-3 pl-2">Тип</th>
-                  <th className="pb-3">Актив</th>
-                  <th className="pb-3 text-right">Количество</th>
-                  <th className="pb-3 text-right">Цена</th>
-                  <th className="pb-3 text-right">Итого ({userCurrency})</th>
-                  <th className="pb-3 text-right pr-2">Дата</th>
+                  <th className="pb-3 pl-2">{t("profile.history.colType")}</th>
+                  <th className="pb-3">{t("profile.history.colAsset")}</th>
+                  <th className="pb-3 text-right">{t("profile.history.colAmount")}</th>
+                  <th className="pb-3 text-right">{t("profile.history.colPrice")}</th>
+                  <th className="pb-3 text-right">{t("profile.history.colTotal", { currency: userCurrency })}</th>
+                  <th className="pb-3 text-right pr-2">{t("profile.history.colDate")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -289,7 +292,7 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
           {totalPages > 1 && (
             <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
               <div className="text-sm text-slate-500">
-                Страница {currentPage} из {totalPages}
+                {t("market.pageOf", { page: currentPage, total: totalPages })}
               </div>
 
               <div className="flex gap-2">
@@ -298,7 +301,7 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
                   disabled={currentPage === 1}
                   className="flex items-center gap-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
                 >
-                  <ChevronLeft size={16} /> Назад
+                  <ChevronLeft size={16} /> {t("common.back")}
                 </button>
 
                 <button
@@ -306,7 +309,7 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
                   disabled={currentPage === totalPages}
                   className="flex items-center gap-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
                 >
-                  Далее <ChevronRight size={16} />
+                  {t("common.next")} <ChevronRight size={16} />
                 </button>
               </div>
             </div>
@@ -317,7 +320,7 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
           <div className="bg-slate-50 dark:bg-slate-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
             <Filter className="opacity-50" size={32} />
           </div>
-          <p className="font-medium">История транзакций пуста</p>
+          <p className="font-medium">{t("profile.history.empty")}</p>
         </div>
       )}
     </div>

@@ -6,9 +6,11 @@ import { Header } from "@/components/Header";
 import { CreditCard, ArrowLeft, ShieldCheck, CheckCircle } from "lucide-react";
 import axios from "axios";
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "react-i18next";
 
 export default function DepositPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   
   // Состояние формы
   const [amount, setAmount] = useState("");
@@ -57,7 +59,7 @@ export default function DepositPage() {
       const depositAmount = parseFloat(amount);
 
       if (isNaN(depositAmount) || depositAmount <= 0) {
-          alert("Пожалуйста, введите корректную сумму");
+          alert(t("deposit.invalidAmount"));
           setLoading(false);
           return;
       }
@@ -77,9 +79,9 @@ export default function DepositPage() {
       }, 2000);
 
     } catch (error: any) {
-      console.error("Ошибка пополнения", error);
+      console.error("Deposit error", error);
       // Выводим сообщение от сервера, если оно есть
-      const message = error.response?.data?.message || "Ошибка при пополнении баланса";
+      const message = error.response?.data?.message || t("deposit.depositError");
       alert(message);
     } finally {
       setLoading(false);
@@ -92,8 +94,8 @@ export default function DepositPage() {
       <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] flex items-center justify-center">
         <div className="text-center animate-bounce-in">
           <CheckCircle size={80} className="text-green-500 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Успешно!</h2>
-          <p className="text-slate-500 mt-2">Баланс пополнен на ${amount}</p>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{t("common.success")}</h2>
+          <p className="text-slate-500 mt-2">{t("deposit.balanceToppedUp", { amount })}</p>
         </div>
       </div>
     );
@@ -108,13 +110,13 @@ export default function DepositPage() {
           onClick={() => router.back()} 
           className="flex items-center gap-2 text-slate-500 hover:text-blue-600 mb-6 transition-colors"
         >
-          <ArrowLeft size={20} /> Назад
+          <ArrowLeft size={20} /> {t("common.back")}
         </button>
 
         <div className="bg-white dark:bg-[#131416] rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 p-6 md:p-10">
           <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
             <CreditCard className="text-blue-600" />
-            Пополнение баланса
+            {t("deposit.title")}
           </h1>
 
           <form onSubmit={handleDeposit} className="space-y-8">
@@ -122,7 +124,7 @@ export default function DepositPage() {
             {/* Сумма пополнения */}
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Сумма пополнения (USD)
+                {t("deposit.amountLabel")}
               </label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
@@ -174,7 +176,7 @@ export default function DepositPage() {
             {/* Поля ввода карты */}
             <div className="grid gap-6">
               <div>
-                <label className="block text-xs uppercase font-bold text-slate-500 mb-1">Номер карты</label>
+                <label className="block text-xs uppercase font-bold text-slate-500 mb-1">{t("deposit.cardNumber")}</label>
                 <input
                   type="text"
                   required
@@ -187,7 +189,7 @@ export default function DepositPage() {
               
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs uppercase font-bold text-slate-500 mb-1">Срок действия</label>
+                  <label className="block text-xs uppercase font-bold text-slate-500 mb-1">{t("deposit.expiry")}</label>
                   <input
                     type="text"
                     required
@@ -219,17 +221,17 @@ export default function DepositPage() {
               className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
             >
               {loading ? (
-                "Обработка..."
+                t("deposit.processing")
               ) : (
                 <>
                   <ShieldCheck size={20} />
-                  Оплатить ${amount || "0"}
+                  {t("deposit.pay", { amount: amount || "0" })}
                 </>
               )}
             </button>
-            
+
             <p className="text-center text-xs text-slate-400">
-              Это тестовый платеж. Деньги списываться не будут.
+              {t("deposit.testPayment")}
             </p>
 
           </form>

@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import { ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface CurrencyFieldProps {
   label: string;
@@ -20,13 +23,14 @@ export function CurrencyField({
   onAmountChange,
   onOpenPicker,
 }: CurrencyFieldProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <span className="text-xs text-slate-600 dark:text-slate-400">{label}</span>
         {balance !== undefined && (
           <span className="text-xs text-slate-500 dark:text-slate-400">
-            Баланс: {balance.toFixed(8)}
+            {t("convert.balance", { amount: balance.toFixed(8) })}
           </span>
         )}
       </div>
@@ -43,7 +47,7 @@ export function CurrencyField({
           </div>
           <div className="flex flex-col text-left">
             <span className="text-xs font-semibold">
-              {coin ? coin.symbol.toUpperCase() : "Выберите"}
+              {coin ? coin.symbol.toUpperCase() : t("convert.select")}
             </span>
             {coin?.name && (
               <span className="text-[10px] text-slate-500 dark:text-slate-400">

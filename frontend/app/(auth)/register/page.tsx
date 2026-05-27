@@ -13,11 +13,13 @@ import {
   AlertCircle,
   ArrowLeft,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type Errors = Record<string, string>;
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -43,26 +45,26 @@ export default function RegisterPage() {
     const { name, email, password, confirmPassword } = formData;
 
     if (name.length < 3) {
-      newErrors.name = "Имя должно быть не короче 3 символов";
+      newErrors.name = t("auth.register.errNameShort");
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      newErrors.email = "Введите корректный Email адрес";
+      newErrors.email = t("auth.register.errEmail");
     }
 
     if (password.length < 8) {
-      newErrors.password = "Пароль должен быть не менее 8 символов";
+      newErrors.password = t("auth.register.errPassShort");
     } else if (!/[A-Z]/.test(password)) {
-      newErrors.password = "Нужна хотя бы одна заглавная буква (A-Z)";
+      newErrors.password = t("auth.register.errPassUpper");
     } else if (!/[a-z]/.test(password)) {
-      newErrors.password = "Нужна хотя бы одна строчная буква (a-z)";
+      newErrors.password = t("auth.register.errPassLower");
     } else if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) {
-      newErrors.password = "Нужен хотя бы один спецсимвол (!@#$...)";
+      newErrors.password = t("auth.register.errPassSpecial");
     }
 
     if (password !== confirmPassword) {
-      newErrors.confirmPassword = "Пароли не совпадают";
+      newErrors.confirmPassword = t("auth.register.errPassMismatch");
     }
 
     setErrors(newErrors);
@@ -100,7 +102,7 @@ export default function RegisterPage() {
         if (serverErrors.name) newErrors.name = serverErrors.name[0];
         setErrors(newErrors);
       } else {
-        alert("Произошла ошибка сервера. Попробуйте позже.");
+        alert(t("auth.register.serverError"));
       }
     } finally {
       setIsLoading(false);
@@ -118,7 +120,7 @@ export default function RegisterPage() {
             className="mb-6 inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 transition-colors"
           >
             <ArrowLeft size={18} />
-            На главную
+            {t("auth.backToHome")}
           </button>
 
           <div className="flex items-center gap-3 mb-2">
@@ -126,9 +128,9 @@ export default function RegisterPage() {
               <UserPlus className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Создать аккаунт</h1>
+              <h1 className="text-2xl font-bold">{t("auth.register.title")}</h1>
               <p className="text-slate-400 text-sm">
-                Начните торговать криптовалютой сегодня
+                {t("auth.register.subtitle")}
               </p>
             </div>
           </div>
@@ -138,7 +140,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-5 mt-4">
             {/* Имя */}
             <div className="space-y-1">
-              <label className="text-sm text-slate-300">Имя пользователя</label>
+              <label className="text-sm text-slate-300">{t("auth.register.nameLabel")}</label>
               <div className="relative">
                 <User className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -147,7 +149,7 @@ export default function RegisterPage() {
                   value={formData.name}
                   onChange={handleChange}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  placeholder="Ваш никнейм"
+                  placeholder={t("auth.register.namePlaceholder")}
                 />
               </div>
               {errors.name && (
@@ -160,7 +162,7 @@ export default function RegisterPage() {
 
             {/* Email */}
             <div className="space-y-1">
-              <label className="text-sm text-slate-300">Email адрес</label>
+              <label className="text-sm text-slate-300">{t("auth.emailLabel")}</label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -169,7 +171,7 @@ export default function RegisterPage() {
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  placeholder="you@example.com"
+                  placeholder={t("common.emailPlaceholder")}
                 />
               </div>
               {errors.email && (
@@ -182,7 +184,7 @@ export default function RegisterPage() {
 
             {/* Пароль */}
             <div className="space-y-1">
-              <label className="text-sm text-slate-300">Пароль</label>
+              <label className="text-sm text-slate-300">{t("auth.passwordLabel")}</label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -191,7 +193,7 @@ export default function RegisterPage() {
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  placeholder="Минимум 8 символов"
+                  placeholder={t("auth.register.passwordPlaceholder")}
                 />
               </div>
               {errors.password ? (
@@ -201,7 +203,7 @@ export default function RegisterPage() {
                 </p>
               ) : (
                 <p className="text-xs text-slate-500 mt-1">
-                  Мин. 8 символов, A-Z, a-z, спецсимвол.
+                  {t("auth.register.passwordHint")}
                 </p>
               )}
             </div>
@@ -209,7 +211,7 @@ export default function RegisterPage() {
             {/* Подтверждение пароля */}
             <div className="space-y-1">
               <label className="text-sm text-slate-300">
-                Подтвердите пароль
+                {t("auth.register.confirmLabel")}
               </label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -219,7 +221,7 @@ export default function RegisterPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  placeholder="Повторите пароль"
+                  placeholder={t("auth.register.confirmPlaceholder")}
                 />
               </div>
               {errors.confirmPassword && (
@@ -235,17 +237,17 @@ export default function RegisterPage() {
               disabled={isLoading}
               className="w-full mt-2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
             >
-              {isLoading ? "Создаём аккаунт..." : "Зарегистрироваться"}
+              {isLoading ? t("auth.register.submitting") : t("auth.register.submit")}
             </button>
           </form>
 
           <p className="mt-6 text-center text-sm text-slate-400">
-            Уже есть аккаунт?{" "}
+            {t("auth.register.haveAccount")}{" "}
             <Link
               href="/login"
               className="text-blue-400 hover:text-blue-300 font-medium"
             >
-              Войти
+              {t("auth.register.loginLink")}
             </Link>
           </p>
         </div>

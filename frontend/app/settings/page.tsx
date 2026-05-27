@@ -4,12 +4,15 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Header } from "@/components/Header";
-import { Save, User, Globe, ArrowLeft, CheckCircle, Search, ChevronDown, X } from "lucide-react";
+import { Save, User, Globe, Languages, ArrowLeft, CheckCircle, Search, ChevronDown, X } from "lucide-react";
 import { currencies } from "@/lib/currencies"; // Импортируем наш список
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "react-i18next";
+import { SUPPORTED_LANGUAGES } from "@/lib/i18n";
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -60,7 +63,7 @@ export default function SettingsPage() {
       setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
       console.error(error);
-      alert("Ошибка сохранения");
+      alert(t("settings.saveError"));
     } finally {
       setSaving(false);
     }
@@ -74,7 +77,7 @@ export default function SettingsPage() {
 
   const selectedCurrencyInfo = currencies.find(c => c.code === currency) || { code: currency, name: "Unknown", symbol: "" };
 
-  if (loading) return <div className="flex h-screen items-center justify-center bg-slate-950 text-white">Loading...</div>;
+  if (loading) return <div className="flex h-screen items-center justify-center bg-slate-950 text-white">{t("common.loading")}</div>;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white">
@@ -82,10 +85,10 @@ export default function SettingsPage() {
 
       <main className="max-w-3xl mx-auto px-4 py-8">
         <button onClick={() => router.back()} className="flex items-center gap-2 text-slate-500 hover:text-blue-600 mb-6">
-          <ArrowLeft size={20} /> Назад
+          <ArrowLeft size={20} /> {t("common.back")}
         </button>
 
-        <h1 className="text-3xl font-bold mb-8">Настройки профиля</h1>
+        <h1 className="text-3xl font-bold mb-8">{t("settings.title")}</h1>
 
         <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8">
           <form onSubmit={handleSave} className="space-y-6">
@@ -93,7 +96,7 @@ export default function SettingsPage() {
             {/* Имя */}
             <div>
               <label className="block text-sm font-medium mb-2 flex items-center gap-2">
-                <User size={16} /> Имя отображения
+                <User size={16} /> {t("settings.displayName")}
               </label>
               <input
                 type="text"
@@ -103,13 +106,39 @@ export default function SettingsPage() {
               />
             </div>
 
+            {/* Выбор языка интерфейса */}
+            <div>
+              <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                <Languages size={16} /> {t("settings.language")}
+              </label>
+              <p className="text-xs text-slate-500 mb-3">
+                {t("settings.languageHint")}
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    onClick={() => i18n.changeLanguage(lang.code)}
+                    className={`px-4 py-3 rounded-xl border text-sm font-medium transition-colors ${
+                      i18n.resolvedLanguage === lang.code
+                        ? "bg-blue-50 dark:bg-blue-900/20 border-blue-500 text-blue-600 dark:text-blue-400"
+                        : "bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/50"
+                    }`}
+                  >
+                    {lang.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Выбор валюты (Кастомный) */}
             <div>
               <label className="block text-sm font-medium mb-2 flex items-center gap-2">
-                <Globe size={16} /> Валюта отображения
+                <Globe size={16} /> {t("settings.displayCurrency")}
               </label>
               <p className="text-xs text-slate-500 mb-3">
-                Все цены будут конвертироваться в эту валюту.
+                {t("settings.currencyHint")}
               </p>
               
               {/* Кнопка открытия модалки */}
@@ -137,11 +166,11 @@ export default function SettingsPage() {
                 disabled={saving}
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition-colors disabled:opacity-50"
               >
-                {saving ? "Сохранение..." : <><Save size={20} /> Сохранить изменения</>}
+                {saving ? t("settings.saving") : <><Save size={20} /> {t("settings.save")}</>}
               </button>
               {success && (
                 <span className="flex items-center gap-2 text-green-600 font-medium">
-                  <CheckCircle size={20} /> Сохранено!
+                  <CheckCircle size={20} /> {t("settings.saved")}
                 </span>
               )}
             </div>
@@ -157,16 +186,16 @@ export default function SettingsPage() {
             {/* Заголовок и поиск */}
             <div className="p-4 border-b border-slate-100 dark:border-slate-800">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold">Выберите валюту</h3>
+                <h3 className="text-lg font-bold">{t("settings.selectCurrency")}</h3>
                 <button onClick={() => setIsCurrencyModalOpen(false)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
                   <X size={20} />
                 </button>
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input 
-                  type="text" 
-                  placeholder="Поиск (RUB, Евро...)" 
+                <input
+                  type="text"
+                  placeholder={t("settings.searchCurrency")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
@@ -206,7 +235,7 @@ export default function SettingsPage() {
                 ))
               ) : (
                 <div className="p-8 text-center text-slate-500">
-                  Ничего не найдено
+                  {t("common.notFound")}
                 </div>
               )}
             </div>

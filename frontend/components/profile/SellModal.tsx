@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { X, TrendingUp, AlertCircle } from "lucide-react";
 import { BinanceAPI } from "@/lib/api/binance";
+import { useTranslation } from "react-i18next";
 
 interface Asset {
   id: number;
@@ -47,6 +48,7 @@ export function SellModal({
   userCurrency,
   onSellSuccess,
 }: SellModalProps) {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState("");
   const [isSelling, setIsSelling] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,13 +77,13 @@ export function SellModal({
 
   const handleSell = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      setError("Введите корректную сумму");
+      setError(t("profile.sellModal.errInvalidAmount"));
       return;
     }
 
     const sellAmount = parseFloat(amount);
     if (sellAmount > selectedAsset.amount) {
-      setError("Недостаточно средств");
+      setError(t("common.insufficientFunds"));
       return;
     }
 
@@ -91,7 +93,7 @@ export function SellModal({
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        setError("Необходима авторизация");
+        setError(t("common.authRequired"));
         return;
       }
 
@@ -112,7 +114,7 @@ export function SellModal({
       setAmount("");
     } catch (err: any) {
       setError(
-        err.response?.data?.message || "Ошибка продажи. Попробуйте позже."
+        err.response?.data?.message || t("profile.sellModal.errSellFailed")
       );
     } finally {
       setIsSelling(false);
@@ -125,7 +127,7 @@ export function SellModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-2xl w-full max-w-md border border-slate-300 dark:border-slate-800">
         <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
-          <h3 className="text-xl font-bold">Продать {selectedAsset.symbol.toUpperCase()}</h3>
+          <h3 className="text-xl font-bold">{t("profile.sellModal.title", { symbol: selectedAsset.symbol.toUpperCase() })}</h3>
           <button
             onClick={onClose}
             className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
@@ -137,13 +139,13 @@ export function SellModal({
         <div className="p-6 space-y-4">
           <div className="bg-slate-100 dark:bg-slate-800 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-slate-600 dark:text-slate-400">Текущая цена</span>
+              <span className="text-sm text-slate-600 dark:text-slate-400">{t("profile.sellModal.currentPrice")}</span>
               <span className="text-lg font-bold">
                 ${currentPrice.toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-600 dark:text-slate-400">Доступно</span>
+              <span className="text-sm text-slate-600 dark:text-slate-400">{t("profile.sellModal.available")}</span>
               <span className="text-sm font-semibold">
                 {selectedAsset.amount.toFixed(8)} {selectedAsset.symbol.toUpperCase()}
               </span>
@@ -159,7 +161,7 @@ export function SellModal({
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Количество для продажи
+              {t("profile.sellModal.amountToSell")}
             </label>
             <input
               type="number"
@@ -201,7 +203,7 @@ export function SellModal({
 
           <div className="bg-slate-100 dark:bg-slate-800 rounded-xl p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-600 dark:text-slate-400">Итого получите</span>
+              <span className="text-sm text-slate-600 dark:text-slate-400">{t("profile.sellModal.totalReceive")}</span>
               <span className="text-xl font-bold text-green-600">
                 ${totalValue.toFixed(2)}
               </span>
@@ -213,7 +215,7 @@ export function SellModal({
             disabled={isSelling || !amount || parseFloat(amount) <= 0}
             className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
           >
-            {isSelling ? "Продаём..." : "Продать"}
+            {isSelling ? t("profile.sellModal.selling") : t("profile.sellModal.sell")}
           </button>
         </div>
       </div>

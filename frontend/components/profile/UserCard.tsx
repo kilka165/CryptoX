@@ -1,6 +1,7 @@
 "use client";
 
 import { ShieldCheck, UserIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface UserCardProps {
   name: string;
@@ -8,6 +9,7 @@ interface UserCardProps {
 }
 
 export function UserCard({ name, email }: UserCardProps) {
+  const { t } = useTranslation();
   return (
     <div className="bg-white dark:bg-[#131416] p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 text-center">
       <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400">
@@ -16,7 +18,7 @@ export function UserCard({ name, email }: UserCardProps) {
       <h2 className="text-xl font-bold truncate">{name}</h2>
       <p className="text-sm text-slate-500 truncate">{email}</p>
       <div className="mt-4 inline-flex items-center gap-1 text-xs text-green-600 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">
-        <ShieldCheck size={12} /> Верифицирован
+        <ShieldCheck size={12} /> {t("profile.verified")}
       </div>
     </div>
   );

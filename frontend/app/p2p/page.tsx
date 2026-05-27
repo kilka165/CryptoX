@@ -12,8 +12,10 @@ import { P2PCreateOfferModal } from "@/components/p2p/P2PCreateOfferModal";
 import { p2pApi, P2POffer } from "@/lib/api/p2pApi";
 import { Plus } from "lucide-react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 export default function P2PPage() {
+  const { t } = useTranslation();
   const [offers, setOffers] = useState<P2POffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCrypto, setSelectedCrypto] = useState("");
@@ -112,7 +114,7 @@ export default function P2PPage() {
   const handleConfirmBuy = async (amount: number, cryptoAmount: number) => {
     const token = localStorage.getItem("auth_token");
     if (!token) {
-      alert("Необходима авторизация");
+      alert(t("common.authRequired"));
       window.location.href = "/login";
       return;
     }
@@ -129,7 +131,7 @@ export default function P2PPage() {
       fetchOffers();
     } catch (error) {
       console.error("Error creating trade:", error);
-      alert("Ошибка создания сделки");
+      alert(t("p2p.tradeCreateError"));
     }
   };
 
@@ -149,9 +151,9 @@ export default function P2PPage() {
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">P2P Торговля</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">{t("p2p.title")}</h1>
             <p className="text-sm text-slate-500 mt-1">
-              Покупайте и продавайте криптовалюту напрямую
+              {t("p2p.subtitle")}
             </p>
           </div>
           <button
@@ -159,7 +161,7 @@ export default function P2PPage() {
             className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
           >
             <Plus className="w-5 h-5" />
-            <span className="hidden sm:inline">Создать заявку</span>
+            <span className="hidden sm:inline">{t("p2p.createOffer")}</span>
           </button>
         </div>
 
@@ -203,11 +205,11 @@ export default function P2PPage() {
           </div>
         ) : (
           <div className="text-center py-12 text-slate-500">
-            <p className="text-lg font-medium mb-2">Предложений не найдено</p>
+            <p className="text-lg font-medium mb-2">{t("p2p.noOffers")}</p>
             <p className="text-sm">
-              {tradeType === "buy" 
-                ? "Попробуйте создать своё предложение на продажу" 
-                : "Попробуйте создать своё предложение на покупку"}
+              {tradeType === "buy"
+                ? t("p2p.tryCreateSell")
+                : t("p2p.tryCreateBuy")}
             </p>
           </div>
         )}
@@ -234,40 +236,40 @@ export default function P2PPage() {
       {isDetailsModalOpen && selectedOffer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg p-6">
-            <h3 className="text-xl font-bold mb-4">Детали заявки</h3>
+            <h3 className="text-xl font-bold mb-4">{t("p2p.details")}</h3>
             <div className="space-y-3">
               <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
-                <span className="text-slate-500">ID заявки:</span>
+                <span className="text-slate-500">{t("p2p.offerId")}</span>
                 <span className="font-medium">#{selectedOffer.id}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
-                <span className="text-slate-500">Криптовалюта:</span>
+                <span className="text-slate-500">{t("p2p.crypto")}</span>
                 <span className="font-medium">{selectedOffer.crypto_currency}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
-                <span className="text-slate-500">Валюта:</span>
+                <span className="text-slate-500">{t("p2p.currency")}</span>
                 <span className="font-medium">{selectedOffer.currency}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
-                <span className="text-slate-500">Цена:</span>
+                <span className="text-slate-500">{t("p2p.price")}</span>
                 <span className="font-medium text-lg">{selectedOffer.price.toLocaleString()} {selectedOffer.currency}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
-                <span className="text-slate-500">Доступно:</span>
+                <span className="text-slate-500">{t("p2p.available")}</span>
                 <span className="font-medium">{selectedOffer.available_amount.toLocaleString()} {selectedOffer.crypto_currency}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
-                <span className="text-slate-500">Мин. лимит:</span>
+                <span className="text-slate-500">{t("p2p.minLimit")}</span>
                 <span className="font-medium">{selectedOffer.min_limit.toLocaleString()} {selectedOffer.currency}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
-                <span className="text-slate-500">Макс. лимит:</span>
+                <span className="text-slate-500">{t("p2p.maxLimit")}</span>
                 <span className="font-medium">{selectedOffer.max_limit.toLocaleString()} {selectedOffer.currency}</span>
               </div>
               <div className="flex justify-between py-2">
-                <span className="text-slate-500">Тип:</span>
+                <span className="text-slate-500">{t("p2p.type")}</span>
                 <span className={`font-medium ${selectedOffer.type === 'sell' ? 'text-emerald-600' : 'text-blue-600'}`}>
-                  {selectedOffer.type === 'sell' ? 'Продажа' : 'Покупка'}
+                  {selectedOffer.type === 'sell' ? t("p2p.sell") : t("p2p.buy")}
                 </span>
               </div>
             </div>
@@ -275,7 +277,7 @@ export default function P2PPage() {
               onClick={() => setIsDetailsModalOpen(false)}
               className="mt-6 w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
             >
-              Закрыть
+              {t("common.close")}
             </button>
           </div>
         </div>

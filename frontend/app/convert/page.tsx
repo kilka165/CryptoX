@@ -9,6 +9,8 @@ import { ArrowLeft, ArrowUpDown, CheckCircle, X, ChevronDown, AlertTriangle } fr
 import { CurrencySelectModal, CurrencyItem } from "@/components/convert/CurrencySelectModal";
 import { BinanceAPI } from "@/lib/api/binance";
 import { Coin } from "@/types/coin";
+import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 
 interface UserAsset {
   id: number;
@@ -57,13 +59,14 @@ const getBinancePrice = async (symbol: string): Promise<number> => {
     );
     return parseFloat(response.data.price);
   } catch (error) {
-    console.error(`Не удалось получить цену для ${symbol}:`, error);
-    throw new Error(`Не удалось получить цену для ${symbol}`);
+    console.error(`Failed to get price for ${symbol}:`, error);
+    throw new Error(i18n.t("convert.priceError", { symbol }));
   }
 };
 
 export default function ConvertPage() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [coins, setCoins] = useState<Coin[]>([]);
   const [userAssets, setUserAssets] = useState<UserAsset[]>([]);
@@ -134,7 +137,7 @@ export default function ConvertPage() {
         }
       } catch (e) {
         console.error(e);
-        setError("Не удалось загрузить данные");
+        setError(t("convert.loadError"));
       } finally {
         setLoading(false);
       }
@@ -243,7 +246,7 @@ export default function ConvertPage() {
 
   const handleSwapSubmit = async () => {
     if (fromCoins.length === 0 || !toCoin) {
-      alert("Выберите монеты для обмена");
+      alert(t("convert.selectCoinsToSwap"));
       return;
     }
 
@@ -253,7 +256,7 @@ export default function ConvertPage() {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        alert("Необходима авторизация");
+        alert(t("common.authRequired"));
         router.push("/login");
         return;
       }
@@ -265,18 +268,18 @@ export default function ConvertPage() {
             
             const asset = userAssets.find((a) => a.name === fc.coin.id);
             if (!asset || asset.amount < amount) {
-              throw new Error(`Недостаточно ${fc.coin.symbol.toUpperCase()}`);
+              throw new Error(t("convert.insufficientCoin", { symbol: fc.coin.symbol.toUpperCase() }));
             }
 
             const price = await getBinancePrice(fc.coin.symbol);
-            
+
             return {
               coin_id: fc.coin.id,
               amount: amount,
               price_usd: price,
             };
           } catch (error: any) {
-            throw new Error(`Ошибка для ${fc.coin.symbol}: ${error.message}`);
+            throw new Error(t("convert.errorForCoin", { symbol: fc.coin.symbol, message: error.message }));
           }
         })
       );
@@ -319,10 +322,10 @@ export default function ConvertPage() {
       console.error("Ответ сервера:", err.response?.data);
       
       setError(
-        err.message || 
-        err.response?.data?.message || 
+        err.message ||
+        err.response?.data?.message ||
         JSON.stringify(err.response?.data) ||
-        "Ошибка обмена. Попробуйте позже."
+        t("convert.swapError")
       );
     } finally {
       setIsSwapping(false);
@@ -340,15 +343,15 @@ export default function ConvertPage() {
           className="mb-4 inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
         >
           <ArrowLeft size={18} />
-          <span>Назад</span>
+          <span>{t("common.back")}</span>
         </button>
 
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            Конвертация валют
+            {t("convert.title")}
           </h1>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Обменивайте несколько монет одновременно в одну целевую валюту
+            {t("convert.subtitle")}
           </p>
         </div>
 
@@ -360,7 +363,7 @@ export default function ConvertPage() {
                 onClick={() => window.location.reload()}
                 className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
               >
-                Обновить страницу
+                {t("convert.refreshPage")}
               </button>
             </div>
           )}
@@ -372,14 +375,14 @@ export default function ConvertPage() {
               <>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-600 dark:text-slate-400">Из (макс. 5)</span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400">{t("convert.fromMax")}</span>
                     {fromCoins.length < 5 && availableFromCoins.length > 0 && (
                       <button
                         type="button"
                         onClick={openAddFromPicker}
                         className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                       >
-                        + Добавить монету
+                        {t("convert.addCoin")}
                       </button>
                     )}
                   </div>
@@ -412,7 +415,7 @@ export default function ConvertPage() {
                                 {fc.coin.symbol.toUpperCase()}
                               </span>
                               <span className="text-xs text-slate-500 dark:text-slate-400">
-                                Баланс: {balance.toFixed(8)}
+                                {t("convert.balance", { amount: balance.toFixed(8) })}
                               </span>
                             </div>
                             <ChevronDown size={14} className="text-slate-500" />
@@ -441,7 +444,7 @@ export default function ConvertPage() {
                           <div className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400 px-3">
                             <AlertTriangle size={12} />
                             <span>
-                              Недостаточно средств. Доступно: {balance.toFixed(8)}
+                              {t("convert.insufficientAvailable", { amount: balance.toFixed(8) })}
                             </span>
                           </div>
                         )}
@@ -458,9 +461,9 @@ export default function ConvertPage() {
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-600 dark:text-slate-400">В</span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400">{t("convert.to")}</span>
                     <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">
-                      Баланс: {toBalance.toFixed(8)} {toCoin?.symbol.toUpperCase() || ""}
+                      {t("convert.balanceWithSymbol", { amount: toBalance.toFixed(8), symbol: toCoin?.symbol.toUpperCase() || "" })}
                     </span>
                   </div>
 
@@ -477,7 +480,7 @@ export default function ConvertPage() {
                       </div>
                       <div className="flex flex-col text-left">
                         <span className="text-xs font-semibold">
-                          {toCoin ? toCoin.symbol.toUpperCase() : "Выберите"}
+                          {toCoin ? toCoin.symbol.toUpperCase() : t("convert.select")}
                         </span>
                         <span className="text-[10px] text-slate-500">
                           {toCoin?.name || ""}
@@ -493,7 +496,7 @@ export default function ConvertPage() {
                 </div>
 
                 <div className="text-sm text-slate-600 dark:text-slate-400 text-center">
-                  Общая сумма обмена: ≈{" "}
+                  {t("convert.totalSwap")}{" "}
                   <span className="text-slate-900 dark:text-slate-200 font-semibold">
                     {totalInUserCurrency.toFixed(2)} {userCurrency}
                   </span>
@@ -533,12 +536,12 @@ export default function ConvertPage() {
                   {swapSuccess ? (
                     <>
                       <CheckCircle size={18} />
-                      Обмен успешен!
+                      {t("convert.swapSuccess")}
                     </>
                   ) : isSwapping ? (
-                    "Обмениваем..."
+                    t("convert.swapping")
                   ) : (
-                    "Обменять"
+                    t("convert.swap")
                   )}
                 </button>
               </>

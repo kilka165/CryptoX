@@ -3,6 +3,7 @@
 
 import React from "react";
 import { AlertTriangle, Info, CheckCircle, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -21,16 +22,21 @@ interface ConfirmDialogProps {
 
 export function ConfirmDialog({
   isOpen,
-  title = "Подтвердите действие",
+  title,
   message,
-  confirmText = "Подтвердить",
-  cancelText = "Отмена",
+  confirmText,
+  cancelText,
   type = "info",
   onConfirm,
   onCancel,
   result,
 }: ConfirmDialogProps) {
+  const { t } = useTranslation();
   if (!isOpen) return null;
+
+  const resolvedTitle = title ?? t("staking.confirmTitle");
+  const resolvedConfirm = confirmText ?? t("staking.confirmDefault");
+  const resolvedCancel = cancelText ?? t("common.cancel");
 
   const getIcon = () => {
     if (result) {
@@ -72,7 +78,7 @@ export function ConfirmDialog({
               <div className={`w-12 h-12 ${getIconBgColor()} rounded-full flex items-center justify-center`}>
                 {getIcon()}
               </div>
-              <h3 className="text-lg font-bold text-white">{title}</h3>
+              <h3 className="text-lg font-bold text-white">{resolvedTitle}</h3>
             </div>
             <button
               onClick={onCancel}
@@ -119,7 +125,7 @@ export function ConfirmDialog({
               onClick={onCancel}
               className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors"
             >
-              ОК
+              {t("staking.ok")}
             </button>
           ) : (
             <>
@@ -127,7 +133,7 @@ export function ConfirmDialog({
                 onClick={onCancel}
                 className="flex-1 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-medium transition-colors"
               >
-                {cancelText}
+                {resolvedCancel}
               </button>
               <button
                 onClick={onConfirm}
@@ -137,7 +143,7 @@ export function ConfirmDialog({
                     : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
-                {confirmText}
+                {resolvedConfirm}
               </button>
             </>
           )}

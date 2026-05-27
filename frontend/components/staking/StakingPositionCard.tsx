@@ -1,7 +1,11 @@
 // frontend/components/staking/StakingPositionCard.tsx
+"use client";
+
 import React from "react";
 import { TrendingUp, Clock, CheckCircle, XCircle } from "lucide-react";
 import { StakingPosition } from "@/lib/api/stakingApi";
+import { useTranslation } from "react-i18next";
+import { intlLocale } from "@/lib/utils/locale";
 
 interface StakingPositionCardProps {
   position: StakingPosition;
@@ -14,13 +18,14 @@ export function StakingPositionCard({
   onUnstake,
   onCancel,
 }: StakingPositionCardProps) {
+  const { t, i18n } = useTranslation();
   const isFlexible = position.lock_period_days === 0;
   const isCompleted = position.status === "completed";
   const isCancelled = position.status === "cancelled";
 
   const formatDate = (date: string | null) => {
-    if (!date) return "Нет даты";
-    return new Date(date).toLocaleDateString("ru-RU", {
+    if (!date) return t("staking.noDate");
+    return new Date(date).toLocaleDateString(intlLocale(i18n.language), {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -37,20 +42,20 @@ export function StakingPositionCard({
             {isCompleted ? (
               <span className="text-xs bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded flex items-center gap-1">
                 <CheckCircle className="w-3 h-3" />
-                Завершён
+                {t("staking.completed")}
               </span>
             ) : isCancelled ? (
               <span className="text-xs bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-2 py-1 rounded flex items-center gap-1">
                 <XCircle className="w-3 h-3" />
-                Отменён
+                {t("staking.cancelled")}
               </span>
             ) : (
               <span className="text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded">
-                Активен
+                {t("staking.active")}
               </span>
             )}
             <span className="text-xs text-slate-500">
-              {isFlexible ? "Гибкий" : `${position.lock_period_days} дней`}
+              {isFlexible ? t("staking.flexible") : t("staking.daysCount", { n: position.lock_period_days })}
             </span>
           </div>
         </div>
@@ -66,7 +71,7 @@ export function StakingPositionCard({
       {!isCompleted && !isCancelled && (
         <div className="mb-4">
           <div className="flex justify-between text-sm mb-2">
-            <span className="text-slate-500">Прогресс</span>
+            <span className="text-slate-500">{t("staking.progress")}</span>
             <span className="font-medium">{position.progress}%</span>
           </div>
           <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2">
@@ -81,25 +86,25 @@ export function StakingPositionCard({
       {/* Информация */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <div className="text-xs text-slate-500 mb-1">Застейкано</div>
+          <div className="text-xs text-slate-500 mb-1">{t("staking.staked")}</div>
           <div className="font-bold">{position.amount.toFixed(8)}</div>
         </div>
         <div>
-          <div className="text-xs text-slate-500 mb-1">Заработано</div>
+          <div className="text-xs text-slate-500 mb-1">{t("staking.earned")}</div>
           <div className="font-bold text-emerald-600 dark:text-emerald-400">
             +{position.earned_rewards.toFixed(8)}
           </div>
         </div>
         <div>
-          <div className="text-xs text-slate-500 mb-1">Начало</div>
+          <div className="text-xs text-slate-500 mb-1">{t("staking.start")}</div>
           <div className="text-sm">{formatDate(position.started_at)}</div>
         </div>
         <div>
           <div className="text-xs text-slate-500 mb-1">
-            {isFlexible ? "Доступно" : "Окончание"}
+            {isFlexible ? t("staking.available") : t("staking.endDate")}
           </div>
           <div className="text-sm">
-            {isFlexible ? "Всегда" : formatDate(position.ends_at)}
+            {isFlexible ? t("staking.always") : formatDate(position.ends_at)}
           </div>
         </div>
       </div>
@@ -113,14 +118,14 @@ export function StakingPositionCard({
               className="flex-1 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
             >
               <TrendingUp className="w-4 h-4" />
-              Вывести средства
+              {t("staking.withdraw")}
             </button>
           ) : isFlexible ? (
             <button
               onClick={() => onCancel(position.id)}
               className="flex-1 px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-medium transition-colors"
             >
-              Отменить
+              {t("staking.cancel")}
             </button>
           ) : (
             <button
@@ -128,7 +133,7 @@ export function StakingPositionCard({
               className="flex-1 px-6 py-3 bg-slate-200 dark:bg-slate-800 text-slate-400 rounded-lg font-medium cursor-not-allowed flex items-center justify-center gap-2"
             >
               <Clock className="w-4 h-4" />
-              Период блокировки
+              {t("staking.lockPeriod")}
             </button>
           )}
         </div>

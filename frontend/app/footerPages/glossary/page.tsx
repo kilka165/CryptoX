@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BookText, Search } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { useTranslation } from "react-i18next";
 
 interface GlossaryTerm {
   term: string;
@@ -12,138 +13,52 @@ interface GlossaryTerm {
 }
 
 export default function GlossaryPage() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Все");
+  const [selectedCategory, setSelectedCategory] = useState(t("footerPages.glossary.catAll"));
+
+  const cat = {
+    basics: t("footerPages.glossary.catBasics"),
+    tech: t("footerPages.glossary.catTech"),
+    trading: t("footerPages.glossary.catTrading"),
+    security: t("footerPages.glossary.catSecurity"),
+    cryptos: t("footerPages.glossary.catCryptos"),
+  };
 
   const terms: GlossaryTerm[] = [
-    {
-      term: "Blockchain (Блокчейн)",
-      definition: "Распределенная база данных, которая хранит информацию о транзакциях в виде последовательных блоков, связанных криптографически.",
-      category: "Технология"
-    },
-    {
-      term: "Bitcoin (Биткоин)",
-      definition: "Первая и самая популярная криптовалюта, созданная в 2009 году псевдонимным Сатоши Накамото как децентрализованная цифровая валюта.",
-      category: "Криптовалюты"
-    },
-    {
-      term: "Altcoin (Альткоин)",
-      definition: "Любая криптовалюта, которая не является Bitcoin. Примеры: Ethereum, Ripple, Litecoin.",
-      category: "Криптовалюты"
-    },
-    {
-      term: "Wallet (Кошелек)",
-      definition: "Программное или аппаратное устройство для хранения приватных ключей и управления криптовалютными активами.",
-      category: "Основы"
-    },
-    {
-      term: "Private Key (Приватный ключ)",
-      definition: "Секретный криптографический код, который дает доступ к вашим криптоактивам. Потеря приватного ключа означает потерю доступа к средствам.",
-      category: "Безопасность"
-    },
-    {
-      term: "Public Key (Публичный ключ)",
-      definition: "Криптографический адрес, который можно безопасно делиться с другими для получения платежей.",
-      category: "Безопасность"
-    },
-    {
-      term: "Mining (Майнинг)",
-      definition: "Процесс подтверждения транзакций и добавления новых блоков в блокчейн с использованием вычислительной мощности. Майнеры получают вознаграждение в криптовалюте.",
-      category: "Технология"
-    },
-    {
-      term: "Staking (Стейкинг)",
-      definition: "Процесс блокировки криптовалюты для поддержки работы блокчейн-сети и получения вознаграждений.",
-      category: "Торговля"
-    },
-    {
-      term: "Smart Contract (Смарт-контракт)",
-      definition: "Самовыполняющийся контракт, условия которого записаны в коде блокчейна и автоматически исполняются при выполнении условий.",
-      category: "Технология"
-    },
-    {
-      term: "DeFi",
-      definition: "Децентрализованные финансы - финансовые услуги на основе блокчейна без традиционных посредников.",
-      category: "Технология"
-    },
-    {
-      term: "NFT",
-      definition: "Невзаимозаменяемый токен - уникальный цифровой актив, представляющий право собственности на конкретный предмет или контент.",
-      category: "Технология"
-    },
-    {
-      term: "FOMO",
-      definition: "Fear Of Missing Out - страх упустить выгоду, психологический эффект, заставляющий инвесторов покупать на пике цены.",
-      category: "Торговля"
-    },
-    {
-      term: "FUD",
-      definition: "Fear, Uncertainty and Doubt - распространение негативной информации для манипулирования рынком.",
-      category: "Торговля"
-    },
-    {
-      term: "HODL",
-      definition: "Стратегия долгосрочного хранения криптовалюты независимо от колебаний цены. Происходит от опечатки слова 'hold'.",
-      category: "Торговля"
-    },
-    {
-      term: "Exchange (Биржа)",
-      definition: "Платформа для покупки, продажи и обмена криптовалют.",
-      category: "Основы"
-    },
-    {
-      term: "Market Cap (Капитализация)",
-      definition: "Общая рыночная стоимость криптовалюты, вычисляемая как цена одной монеты умноженная на количество монет в обращении.",
-      category: "Торговля"
-    },
-    {
-      term: "Volatility (Волатильность)",
-      definition: "Степень изменчивости цены актива. Криптовалюты известны высокой волатильностью.",
-      category: "Торговля"
-    },
-    {
-      term: "Cold Storage (Холодное хранение)",
-      definition: "Хранение криптовалюты в офлайн-кошельке, не подключенном к интернету, для максимальной безопасности.",
-      category: "Безопасность"
-    },
-    {
-      term: "Hot Wallet (Горячий кошелек)",
-      definition: "Криптокошелек, подключенный к интернету, удобный для частых транзакций, но менее безопасный.",
-      category: "Безопасность"
-    },
-    {
-      term: "Gas Fee (Комиссия газа)",
-      definition: "Комиссия за выполнение транзакций в блокчейне Ethereum и других сетях.",
-      category: "Основы"
-    },
-    {
-      term: "Proof of Work (PoW)",
-      definition: "Алгоритм консенсуса, требующий решения сложных математических задач для подтверждения транзакций.",
-      category: "Технология"
-    },
-    {
-      term: "Proof of Stake (PoS)",
-      definition: "Алгоритм консенсуса, где валидаторы выбираются на основе количества удерживаемых монет.",
-      category: "Технология"
-    },
-    {
-      term: "Pump and Dump",
-      definition: "Манипулятивная схема искусственного повышения цены актива с последующей массовой продажей.",
-      category: "Торговля"
-    },
-    {
-      term: "Whitepaper",
-      definition: "Технический документ, описывающий концепцию, технологию и план развития криптопроекта.",
-      category: "Основы"
-    }
+    { term: t("footerPages.glossary.t1Term"), definition: t("footerPages.glossary.t1Def"), category: cat.tech },
+    { term: t("footerPages.glossary.t2Term"), definition: t("footerPages.glossary.t2Def"), category: cat.cryptos },
+    { term: t("footerPages.glossary.t3Term"), definition: t("footerPages.glossary.t3Def"), category: cat.cryptos },
+    { term: t("footerPages.glossary.t4Term"), definition: t("footerPages.glossary.t4Def"), category: cat.basics },
+    { term: t("footerPages.glossary.t5Term"), definition: t("footerPages.glossary.t5Def"), category: cat.security },
+    { term: t("footerPages.glossary.t6Term"), definition: t("footerPages.glossary.t6Def"), category: cat.security },
+    { term: t("footerPages.glossary.t7Term"), definition: t("footerPages.glossary.t7Def"), category: cat.tech },
+    { term: t("footerPages.glossary.t8Term"), definition: t("footerPages.glossary.t8Def"), category: cat.trading },
+    { term: t("footerPages.glossary.t9Term"), definition: t("footerPages.glossary.t9Def"), category: cat.tech },
+    { term: t("footerPages.glossary.t10Term"), definition: t("footerPages.glossary.t10Def"), category: cat.tech },
+    { term: t("footerPages.glossary.t11Term"), definition: t("footerPages.glossary.t11Def"), category: cat.tech },
+    { term: t("footerPages.glossary.t12Term"), definition: t("footerPages.glossary.t12Def"), category: cat.trading },
+    { term: t("footerPages.glossary.t13Term"), definition: t("footerPages.glossary.t13Def"), category: cat.trading },
+    { term: t("footerPages.glossary.t14Term"), definition: t("footerPages.glossary.t14Def"), category: cat.trading },
+    { term: t("footerPages.glossary.t15Term"), definition: t("footerPages.glossary.t15Def"), category: cat.basics },
+    { term: t("footerPages.glossary.t16Term"), definition: t("footerPages.glossary.t16Def"), category: cat.trading },
+    { term: t("footerPages.glossary.t17Term"), definition: t("footerPages.glossary.t17Def"), category: cat.trading },
+    { term: t("footerPages.glossary.t18Term"), definition: t("footerPages.glossary.t18Def"), category: cat.security },
+    { term: t("footerPages.glossary.t19Term"), definition: t("footerPages.glossary.t19Def"), category: cat.security },
+    { term: t("footerPages.glossary.t20Term"), definition: t("footerPages.glossary.t20Def"), category: cat.basics },
+    { term: t("footerPages.glossary.t21Term"), definition: t("footerPages.glossary.t21Def"), category: cat.tech },
+    { term: t("footerPages.glossary.t22Term"), definition: t("footerPages.glossary.t22Def"), category: cat.tech },
+    { term: t("footerPages.glossary.t23Term"), definition: t("footerPages.glossary.t23Def"), category: cat.trading },
+    { term: t("footerPages.glossary.t24Term"), definition: t("footerPages.glossary.t24Def"), category: cat.basics }
   ];
 
-  const categories = ["Все", "Основы", "Технология", "Торговля", "Безопасность", "Криптовалюты"];
+  const allCat = t("footerPages.glossary.catAll");
+  const categories = [allCat, cat.basics, cat.tech, cat.trading, cat.security, cat.cryptos];
 
   const filteredTerms = terms.filter((item) => {
     const matchesSearch = item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.definition.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "Все" || item.category === selectedCategory;
+    const matchesCategory = selectedCategory === allCat || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -164,10 +79,10 @@ export default function GlossaryPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <BookText size={40} />
-            <h1 className="text-4xl md:text-5xl font-bold">Криптовалютный глоссарий</h1>
+            <h1 className="text-4xl md:text-5xl font-bold">{t("footerPages.glossary.title")}</h1>
           </div>
           <p className="text-xl text-purple-100">
-            Полный справочник терминов и понятий мира криптовалют
+            {t("footerPages.glossary.subtitle")}
           </p>
         </div>
       </div>
@@ -180,7 +95,7 @@ export default function GlossaryPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input
               type="text"
-              placeholder="Поиск термина..."
+              placeholder={t("footerPages.glossary.searchPlaceholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-slate-100 dark:bg-[#131416] border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-900 dark:text-slate-100"
@@ -239,7 +154,7 @@ export default function GlossaryPage() {
         {filteredTerms.length === 0 && (
           <div className="text-center py-20">
             <p className="text-slate-600 dark:text-slate-400 text-lg">
-              Термины не найдены. Попробуйте изменить параметры поиска.
+              {t("footerPages.glossary.notFound")}
             </p>
           </div>
         )}
@@ -247,5 +162,5 @@ export default function GlossaryPage() {
       <Footer />
     </div>
   );
-  
+
 }

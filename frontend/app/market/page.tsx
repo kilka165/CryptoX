@@ -10,6 +10,7 @@ import { BuyModal } from "@/components/market/BuyModal";
 import { Footer } from "@/components/Footer";
 import { BinanceAPI } from "@/lib/api/binance";
 import { Coin } from "@/types/coin";
+import { useTranslation } from "react-i18next";
 
 const formatNumber = (num: number) => {
   if (num >= 1.0e12) return (num / 1.0e12).toFixed(2) + "T";
@@ -29,6 +30,7 @@ const formatInputAmount = (value: string) => {
 const cleanInputAmount = (value: string) => value.replace(/,/g, "");
 
 export default function MarketPage() {
+  const { t } = useTranslation();
   const [coins, setCoins] = useState<Coin[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -120,7 +122,7 @@ export default function MarketPage() {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        alert("Необходима авторизация");
+        alert(t("common.authRequired"));
         window.location.href = "/login";
         return;
       }
@@ -164,9 +166,9 @@ export default function MarketPage() {
       console.error("Ответ сервера:", error.response?.data);
       
       alert(
-        error.response?.data?.message || 
+        error.response?.data?.message ||
         JSON.stringify(error.response?.data) ||
-        "Ошибка при покупке"
+        t("market.buyError")
       );
     } finally {
       setIsBuying(false);
@@ -218,12 +220,12 @@ export default function MarketPage() {
       <div className="p-4 md:p-8">
         <div className="max-w-7xl mx-auto mb-8">
           <div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-6">
-            <h2 className="text-2xl font-bold">Рынок криптовалют</h2>
+            <h2 className="text-2xl font-bold">{t("market.title")}</h2>
             <div className="relative w-full md:w-80">
               <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
               <input
                 type="text"
-                placeholder="Поиск монет..."
+                placeholder={t("market.searchCoins")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-[#131416] outline-none focus:border-blue-500 transition-all"
@@ -235,7 +237,7 @@ export default function MarketPage() {
             {loading ? null : (
               <>
                 <MarketCard
-                  title="Популярные"
+                  title={t("market.popular")}
                   icon={Flame}
                   coins={coins}
                   onBuy={setSelectedCoin}
@@ -244,7 +246,7 @@ export default function MarketPage() {
                   href="/market/overview"
                 />
                 <MarketCard
-                  title="Топ роста"
+                  title={t("market.topGainers")}
                   icon={TrendingUp}
                   coins={topGainers}
                   onBuy={setSelectedCoin}
@@ -253,7 +255,7 @@ export default function MarketPage() {
                   href="/market/overview"
                 />
                 <MarketCard
-                  title="По объёму"
+                  title={t("market.byVolume")}
                   icon={BarChart3}
                   coins={topVolume}
                   onBuy={setSelectedCoin}
@@ -262,7 +264,7 @@ export default function MarketPage() {
                   href="/market/overview"
                 />
                 <MarketCard
-                  title="Новые"
+                  title={t("market.new")}
                   icon={Zap}
                   coins={newGems}
                   onBuy={setSelectedCoin}
@@ -281,12 +283,12 @@ export default function MarketPage() {
               <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs uppercase text-slate-500">
                 <tr>
                   <th className="px-6 py-4">#</th>
-                  <th className="px-6 py-4">Монета</th>
-                  <th className="px-6 py-4 text-right">Цена ({userCurrency})</th>
-                  <th className="px-6 py-4 text-right">24ч</th>
-                  <th className="px-6 py-4 text-right hidden md:table-cell">Объём</th>
-                  <th className="px-6 py-4 text-right hidden lg:table-cell">Капитализация</th>
-                  <th className="px-6 py-4 text-right">Действия</th>
+                  <th className="px-6 py-4">{t("market.coin")}</th>
+                  <th className="px-6 py-4 text-right">{t("market.priceCur", { currency: userCurrency })}</th>
+                  <th className="px-6 py-4 text-right">{t("market.change24h")}</th>
+                  <th className="px-6 py-4 text-right hidden md:table-cell">{t("market.volume")}</th>
+                  <th className="px-6 py-4 text-right hidden lg:table-cell">{t("market.marketCap")}</th>
+                  <th className="px-6 py-4 text-right">{t("market.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -313,7 +315,7 @@ export default function MarketPage() {
 
           <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 dark:border-slate-800">
             <span className="text-sm text-slate-500">
-              Страница {currentPage} из {totalPages}
+              {t("market.pageOf", { page: currentPage, total: totalPages })}
             </span>
             <div className="flex items-center gap-2">
               <button
@@ -321,14 +323,14 @@ export default function MarketPage() {
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 className="px-3 py-1 rounded-lg text-sm border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800"
               >
-                Назад
+                {t("common.back")}
               </button>
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 className="px-3 py-1 rounded-lg text-sm border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800"
               >
-                Вперёд
+                {t("common.next")}
               </button>
             </div>
           </div>

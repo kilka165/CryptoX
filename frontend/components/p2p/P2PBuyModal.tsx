@@ -1,9 +1,13 @@
 // frontend/components/p2p/P2PBuyModal.tsx
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { X, TrendingUp, TrendingDown, AlertCircle, Wallet, BarChart3 } from "lucide-react";
 import { P2POffer } from "@/lib/api/p2pApi";
 import { BinanceAPI } from "@/lib/api/binance";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
+import { intlLocale } from "@/lib/utils/locale";
 
 interface P2PBuyModalProps {
   isOpen: boolean;
@@ -18,6 +22,7 @@ export function P2PBuyModal({
   onClose,
   onConfirm,
 }: P2PBuyModalProps) {
+  const { t, i18n } = useTranslation();
   const [cryptoAmount, setCryptoAmount] = useState("");
   const [fiatAmount, setFiatAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -163,7 +168,7 @@ export function P2PBuyModal({
 
   const handleConfirm = async () => {
     if (!cryptoAmount || !fiatAmount) {
-      setError("Введите количество");
+      setError(t("p2p.buyModal.errEnterAmount"));
       return;
     }
 
@@ -171,27 +176,27 @@ export function P2PBuyModal({
     const fiatNum = parseFloat(fiatAmount);
 
     if (cryptoNum <= 0 || fiatNum <= 0) {
-      setError("Значения должны быть больше нуля");
+      setError(t("p2p.buyModal.errPositive"));
       return;
     }
 
     if (cryptoNum < minCryptoAmount) {
-      setError(`Минимальное количество: ${minCryptoAmount} ${offer.crypto_currency} (≈${minFiatAmount.toFixed(2)} ${offer.currency})`);
+      setError(t("p2p.buyModal.errMinAmount", { amount: minCryptoAmount, crypto: offer.crypto_currency, fiat: minFiatAmount.toFixed(2), currency: offer.currency }));
       return;
     }
 
     if (cryptoNum > offer.available_amount) {
-      setError(`Максимум доступно: ${offer.available_amount} ${offer.crypto_currency}`);
+      setError(t("p2p.buyModal.errMaxAvailable", { amount: offer.available_amount, crypto: offer.crypto_currency }));
       return;
     }
 
     if (fiatNum < offer.min_limit) {
-      setError(`Минимальная сумма: ${offer.min_limit} ${offer.currency}`);
+      setError(t("p2p.buyModal.errMinSum", { amount: offer.min_limit, currency: offer.currency }));
       return;
     }
 
     if (fiatNum > offer.max_limit) {
-      setError(`Максимальная сумма: ${offer.max_limit} ${offer.currency}`);
+      setError(t("p2p.buyModal.errMaxSum", { amount: offer.max_limit, currency: offer.currency }));
       return;
     }
 
@@ -200,7 +205,7 @@ export function P2PBuyModal({
       await onConfirm(fiatNum, cryptoNum);
       onClose();
     } catch (err) {
-      setError("Ошибка при создании сделки");
+      setError(t("p2p.buyModal.errTrade"));
     } finally {
       setIsProcessing(false);
     }
@@ -220,12 +225,12 @@ export function P2PBuyModal({
             {isBuying ? (
               <>
                 <TrendingUp className="w-6 h-6 text-emerald-600" />
-                <h3 className="text-xl font-bold">Купить {offer.crypto_currency}</h3>
+                <h3 className="text-xl font-bold">{t("p2p.buyModal.buyCrypto", { crypto: offer.crypto_currency })}</h3>
               </>
             ) : (
               <>
                 <TrendingDown className="w-6 h-6 text-blue-600" />
-                <h3 className="text-xl font-bold">Продать {offer.crypto_currency}</h3>
+                <h3 className="text-xl font-bold">{t("p2p.buyModal.sellCrypto", { crypto: offer.crypto_currency })}</h3>
               </>
             )}
           </div>
@@ -246,7 +251,7 @@ export function P2PBuyModal({
             <div>
               <div className="font-medium">{offer.seller_name}</div>
               <div className="text-sm text-slate-500">
-                {offer.orders_count} сделок | {offer.completion_rate}% выполнено
+                {t("p2p.buyModal.tradesAndCompletion", { orders: offer.orders_count, rate: offer.completion_rate })}
               </div>
             </div>
           </div>
@@ -254,7 +259,7 @@ export function P2PBuyModal({
           {/* Цена с рыночным сравнением */}
           <div className="space-y-2">
             <div className="flex justify-between items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-              <span className="text-sm text-slate-600 dark:text-slate-400">Цена заявки</span>
+              <span className="text-sm text-slate-600 dark:text-slate-400">{t("p2p.buyModal.offerPrice")}</span>
               <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
                 {offer.price.toLocaleString()} {offer.currency}
               </span>
@@ -264,14 +269,14 @@ export function P2PBuyModal({
             {loadingMarketPrice ? (
               <div className="flex items-center justify-center gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                 <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
-                <span className="text-xs text-slate-500">Загрузка рыночной цены...</span>
+                <span className="text-xs text-slate-500">{t("p2p.buyModal.loadingMarketPrice")}</span>
               </div>
             ) : marketPrice && priceDifference !== null ? (
               <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                 <div className="flex items-center gap-2">
                   <BarChart3 className="w-4 h-4 text-slate-500" />
                   <span className="text-xs text-slate-600 dark:text-slate-400">
-                    Рыночная цена: <strong>{marketPrice.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {offer.currency}</strong>
+                    {t("p2p.buyModal.marketPrice")}: <strong>{marketPrice.toLocaleString(intlLocale(i18n.language), { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {offer.currency}</strong>
                   </span>
                 </div>
                 <span className={`text-xs font-medium px-2 py-1 rounded ${
@@ -289,7 +294,7 @@ export function P2PBuyModal({
 
           {/* Доступно */}
           <div className="flex justify-between items-center">
-            <span className="text-sm text-slate-500">Доступно</span>
+            <span className="text-sm text-slate-500">{t("p2p.buyModal.available")}</span>
             <div className="flex items-center gap-2 text-sm font-medium">
               <Wallet className="w-4 h-4 text-slate-400" />
               {offer.available_amount.toLocaleString()} {offer.crypto_currency}
@@ -300,7 +305,7 @@ export function P2PBuyModal({
             <>
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Я получу ({offer.crypto_currency})
+                  {t("p2p.buyModal.iReceive", { unit: offer.crypto_currency })}
                 </label>
                 <div className="relative">
                   <input
@@ -308,7 +313,7 @@ export function P2PBuyModal({
                     inputMode="decimal"
                     value={cryptoAmount}
                     onChange={(e) => handleCryptoChange(e.target.value)}
-                    placeholder={`Мин: ${minCryptoAmount}`}
+                    placeholder={t("p2p.buyModal.minPlaceholder", { amount: minCryptoAmount })}
                     className="w-full px-4 py-3 pr-20 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:border-blue-500 transition-colors text-lg font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">
@@ -316,7 +321,7 @@ export function P2PBuyModal({
                   </span>
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
-                  Минимум: {minCryptoAmount} {offer.crypto_currency} (≈{minFiatAmount.toFixed(2)} {offer.currency})
+                  {t("p2p.buyModal.minimumHint", { amount: minCryptoAmount, crypto: offer.crypto_currency, fiat: minFiatAmount.toFixed(2), currency: offer.currency })}
                 </div>
                 <div className="flex gap-2 mt-2">
                   {[25, 50, 75, 100].map((percent) => (
@@ -334,7 +339,7 @@ export function P2PBuyModal({
 
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Я плачу ({offer.currency})
+                  {t("p2p.buyModal.iPay", { unit: offer.currency })}
                 </label>
                 <div className="relative">
                   <input
@@ -350,7 +355,7 @@ export function P2PBuyModal({
                   </span>
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
-                  Лимит: {offer.min_limit.toLocaleString()} - {offer.max_limit.toLocaleString()} {offer.currency}
+                  {t("p2p.buyModal.limit", { min: offer.min_limit.toLocaleString(intlLocale(i18n.language)), max: offer.max_limit.toLocaleString(intlLocale(i18n.language)), currency: offer.currency })}
                 </div>
               </div>
             </>
@@ -358,7 +363,7 @@ export function P2PBuyModal({
             <>
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Я отдаю ({offer.crypto_currency})
+                  {t("p2p.buyModal.iGive", { unit: offer.crypto_currency })}
                 </label>
                 <div className="relative">
                   <input
@@ -366,7 +371,7 @@ export function P2PBuyModal({
                     inputMode="decimal"
                     value={cryptoAmount}
                     onChange={(e) => handleCryptoChange(e.target.value)}
-                    placeholder={`Мин: ${minCryptoAmount}`}
+                    placeholder={t("p2p.buyModal.minPlaceholder", { amount: minCryptoAmount })}
                     className="w-full px-4 py-3 pr-20 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:border-blue-500 transition-colors text-lg font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">
@@ -374,7 +379,7 @@ export function P2PBuyModal({
                   </span>
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
-                  Минимум: {minCryptoAmount} {offer.crypto_currency} (≈{minFiatAmount.toFixed(2)} {offer.currency})
+                  {t("p2p.buyModal.minimumHint", { amount: minCryptoAmount, crypto: offer.crypto_currency, fiat: minFiatAmount.toFixed(2), currency: offer.currency })}
                 </div>
                 <div className="flex gap-2 mt-2">
                   {[25, 50, 75, 100].map((percent) => (
@@ -392,7 +397,7 @@ export function P2PBuyModal({
 
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Я получу ({offer.currency})
+                  {t("p2p.buyModal.iReceive", { unit: offer.currency })}
                 </label>
                 <div className="relative">
                   <input
@@ -408,7 +413,7 @@ export function P2PBuyModal({
                   </span>
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
-                  Лимит: {offer.min_limit.toLocaleString()} - {offer.max_limit.toLocaleString()} {offer.currency}
+                  {t("p2p.buyModal.limit", { min: offer.min_limit.toLocaleString(intlLocale(i18n.language)), max: offer.max_limit.toLocaleString(intlLocale(i18n.language)), currency: offer.currency })}
                 </div>
               </div>
             </>
@@ -428,7 +433,7 @@ export function P2PBuyModal({
               onClick={onClose}
               className="flex-1 px-6 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg font-medium transition-colors"
             >
-              Отмена
+              {t("common.cancel")}
             </button>
             <button
               onClick={handleConfirm}
@@ -442,10 +447,10 @@ export function P2PBuyModal({
               {isProcessing ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Обработка...
+                  {t("p2p.buyModal.processing")}
                 </>
               ) : (
-                <>{isBuying ? 'Купить' : 'Продать'}</>
+                <>{isBuying ? t("p2p.filters.buy") : t("p2p.filters.sell")}</>
               )}
             </button>
           </div>

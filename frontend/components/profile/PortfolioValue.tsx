@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { TrendingUp } from "lucide-react";
 import { BinanceAPI } from "@/lib/api/binance";
+import { useTranslation } from "react-i18next";
 
 interface Asset {
   id: number;
@@ -61,6 +62,7 @@ const getExchangeRate = (currency: string): number => {
 };
 
 export function PortfolioValue({ assets = [], userCurrency = "USD" }: PortfolioValueProps) {
+  const { t } = useTranslation();
   const [totalValue, setTotalValue] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -124,7 +126,7 @@ export function PortfolioValue({ assets = [], userCurrency = "USD" }: PortfolioV
   return (
     <div className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-2xl shadow-xl p-6 text-white">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm opacity-90">Стоимость портфеля</span>
+        <span className="text-sm opacity-90">{t("profile.portfolio.value")}</span>
         <TrendingUp size={20} className="opacity-80" />
       </div>
       <div className="text-3xl font-bold mb-1">
@@ -135,7 +137,7 @@ export function PortfolioValue({ assets = [], userCurrency = "USD" }: PortfolioV
         {currencySymbol}
       </div>
       <div className="text-sm opacity-75">
-        В USD: ${totalValue.toFixed(2)}
+        {t("profile.portfolio.inUsd", { amount: totalValue.toFixed(2) })}
       </div>
     </div>
   );

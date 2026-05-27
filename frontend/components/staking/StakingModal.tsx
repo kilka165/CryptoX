@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Lock, AlertCircle, CheckCircle } from "lucide-react";
 import { StakingPlan, Asset, stakingApi } from "@/lib/api/stakingApi";
+import { useTranslation } from "react-i18next";
 
 interface StakingModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ export function StakingModal({
   onClose,
   onSuccess,
 }: StakingModalProps) {
+  const { t } = useTranslation();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [selectedCrypto, setSelectedCrypto] = useState("");
   const [amount, setAmount] = useState("");
@@ -46,7 +48,7 @@ export function StakingModal({
       }
     } catch (error) {
       console.error("Error fetching assets:", error);
-      setError("Ошибка загрузки активов");
+      setError(t("staking.loadAssetsError"));
     }
   };
 
@@ -58,13 +60,13 @@ export function StakingModal({
 
     const amountNum = parseFloat(amount);
     if (isNaN(amountNum) || amountNum < plan.min_amount) {
-      setError(`Минимальная сумма: ${plan.min_amount}`);
+      setError(t("staking.minAmount", { amount: plan.min_amount }));
       return;
     }
 
     const selectedAsset = assets.find((a) => a.name === selectedCrypto);
     if (!selectedAsset || selectedAsset.amount < amountNum) {
-      setError("Недостаточно средств на балансе");
+      setError(t("staking.insufficientBalance"));
       return;
     }
 
@@ -72,7 +74,7 @@ export function StakingModal({
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        setError("Необходима авторизация");
+        setError(t("staking.authRequired"));
         setTimeout(() => {
           window.location.href = "/login";
         }, 2000);
@@ -97,7 +99,7 @@ export function StakingModal({
     } catch (error: any) {
       console.error("Error creating staking:", error);
       setError(
-        error.response?.data?.message || "Ошибка при создании стейкинга"
+        error.response?.data?.message || t("staking.createError")
       );
     } finally {
       setLoading(false);
@@ -116,9 +118,9 @@ export function StakingModal({
         {/* Заголовок */}
         <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
           <div>
-            <h2 className="text-xl font-bold">Застейкать криптовалюту</h2>
+            <h2 className="text-xl font-bold">{t("staking.modalTitle")}</h2>
             <p className="text-sm text-slate-500 mt-1">
-              План: {plan.name} ({plan.rate}% годовых)
+              {t("staking.planLabel", { name: plan.days === 0 ? t("staking.flexible") : t("staking.daysCount", { n: plan.days }), rate: plan.rate })}
             </p>
           </div>
           <button
@@ -140,7 +142,7 @@ export function StakingModal({
         {success && (
           <div className="mx-6 mt-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
             <CheckCircle className="w-5 h-5 flex-shrink-0" />
-            <span className="text-sm">Стейкинг успешно создан!</span>
+            <span className="text-sm">{t("staking.successCreated")}</span>
           </div>
         )}
 
@@ -149,7 +151,7 @@ export function StakingModal({
           {/* Выбор криптовалюты */}
           <div>
             <label className="block text-sm font-medium mb-2">
-              Криптовалюта
+              {t("staking.crypto")}
             </label>
             <select
               value={selectedCrypto}
@@ -159,7 +161,7 @@ export function StakingModal({
             >
               {assets.map((asset) => (
                 <option key={asset.id} value={asset.name}>
-                  {asset.name} (Доступно: {asset.amount.toFixed(8)})
+                  {t("staking.assetOption", { name: asset.name, amount: asset.amount.toFixed(8) })}
                 </option>
               ))}
             </select>
@@ -168,7 +170,7 @@ export function StakingModal({
           {/* Сумма */}
           <div>
             <label className="block text-sm font-medium mb-2">
-              Сумма для стейкинга
+              {t("staking.amountToStake")}
             </label>
             <div className="relative">
               <input
@@ -186,7 +188,7 @@ export function StakingModal({
                     setAmount(value);
                   }
                 }}
-                placeholder={`Минимум ${plan.min_amount}`}
+                placeholder={t("staking.minPlaceholder", { amount: plan.min_amount })}
                 className="w-full px-4 py-3 pr-16 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 required
               />
@@ -197,12 +199,12 @@ export function StakingModal({
                 }
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium"
               >
-                Макс
+                {t("common.max")}
               </button>
             </div>
             {selectedAsset && (
               <p className="text-xs text-slate-500 mt-1">
-                Доступно: {selectedAsset.amount.toFixed(8)} {selectedAsset.name}
+                {t("staking.availableAsset", { amount: selectedAsset.amount.toFixed(8), name: selectedAsset.name })}
               </p>
             )}
           </div>
@@ -210,20 +212,20 @@ export function StakingModal({
           {/* Информация */}
           <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Период блокировки:</span>
+              <span className="text-slate-500">{t("staking.lockPeriodLabel")}</span>
               <span className="font-medium">
-                {plan.days === 0 ? "Гибкий" : `${plan.days} дней`}
+                {plan.days === 0 ? t("staking.flexible") : t("staking.daysCount", { n: plan.days })}
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Годовая ставка:</span>
+              <span className="text-slate-500">{t("staking.annualRate")}</span>
               <span className="font-medium text-emerald-600 dark:text-emerald-400">
                 {plan.rate}%
               </span>
             </div>
             {amountNum > 0 && (
               <div className="flex justify-between text-sm pt-2 border-t border-slate-200 dark:border-slate-700">
-                <span className="text-slate-500">Ожидаемый доход (год):</span>
+                <span className="text-slate-500">{t("staking.expectedYield")}</span>
                 <span className="font-bold text-emerald-600 dark:text-emerald-400">
                   ~{estimatedReward.toFixed(8)} {selectedCrypto}
                 </span>
@@ -238,7 +240,7 @@ export function StakingModal({
               onClick={onClose}
               className="flex-1 px-6 py-3 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-colors"
             >
-              Отмена
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
@@ -253,17 +255,17 @@ export function StakingModal({
               {loading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Создание...
+                  {t("staking.creating")}
                 </>
               ) : success ? (
                 <>
                   <CheckCircle className="w-5 h-5" />
-                  Готово
+                  {t("staking.done")}
                 </>
               ) : (
                 <>
                   <Lock className="w-5 h-5" />
-                  Застейкать
+                  {t("staking.stake")}
                 </>
               )}
             </button>
