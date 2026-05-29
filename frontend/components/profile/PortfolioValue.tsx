@@ -1,43 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { TrendingUp } from "lucide-react";
-import { BinanceAPI } from "@/lib/api/binance";
 import { useTranslation } from "react-i18next";
-
-interface Asset {
-  id: number;
-  name: string;
-  symbol: string;
-  amount: number;
-}
+import { useRates } from "@/components/RatesProvider";
 
 interface PortfolioValueProps {
-  assets?: Asset[];
+  // Суммарная стоимость портфеля в USD (считается родителем из единого источника цен)
+  totalValueUSD?: number;
   userCurrency?: string;
+  loading?: boolean;
 }
-
-// Маппинг названий монет на символы
-const getCoinSymbol = (name: string): string => {
-  const symbolMap: Record<string, string> = {
-    'bitcoin': 'BTC',
-    'ethereum': 'ETH',
-    'ripple': 'XRP',  // ✅ Исправлено
-    'binancecoin': 'BNB',
-    'cardano': 'ADA',
-    'solana': 'SOL',
-    'polkadot': 'DOT',
-    'dogecoin': 'DOGE',
-    'polygon': 'MATIC',
-    'avalanche': 'AVAX',
-    'chainlink': 'LINK',
-    'litecoin': 'LTC',
-    'uniswap': 'UNI',
-        'usd-coin': 'USDC',
-  };
-  
-  return symbolMap[name.toLowerCase()] || name.toUpperCase();
-};
 
 // Функция конвертации валюты в символ
 const getCurrencySymbol = (currency: string): string => {
@@ -50,63 +23,13 @@ const getCurrencySymbol = (currency: string): string => {
   return symbols[currency] || currency;
 };
 
-// Функция конвертации из USD
-const getExchangeRate = (currency: string): number => {
-  const rates: Record<string, number> = {
-    USD: 1,
-    RUB: 90,
-    EUR: 0.92,
-    KZT: 450,
-  };
-  return rates[currency] || 1;
-};
-
-export function PortfolioValue({ assets = [], userCurrency = "USD" }: PortfolioValueProps) {
+export function PortfolioValue({
+  totalValueUSD = 0,
+  userCurrency = "USD",
+  loading = false,
+}: PortfolioValueProps) {
   const { t } = useTranslation();
-  const [totalValue, setTotalValue] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const calculateTotal = async () => {
-      if (!assets || assets.length === 0) {
-        setTotalValue(0);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        let total = 0;
-
-        await Promise.all(
-          assets.map(async (asset) => {
-            try {
-              const binanceSymbol = getCoinSymbol(asset.name);
-              const price = await BinanceAPI.getPrice(binanceSymbol);
-              const assetValue = asset.amount * price;
-              
-              total += assetValue;
-              
-              console.log(`${asset.name}: ${asset.amount} × $${price} = $${assetValue}`);
-            } catch (err) {
-              console.error(`Ошибка для ${asset.name}:`, err);
-            }
-          })
-        );
-
-        console.log(`Общая стоимость портфеля: $${total}`);
-        setTotalValue(total);
-      } catch (error) {
-        console.error("Ошибка расчёта портфеля:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    calculateTotal();
-    
-    const interval = setInterval(calculateTotal, 10000);
-    return () => clearInterval(interval);
-  }, [assets]);
+  const { getRate } = useRates();
 
   if (loading) {
     return (
@@ -119,8 +42,8 @@ export function PortfolioValue({ assets = [], userCurrency = "USD" }: PortfolioV
     );
   }
 
-  const exchangeRate = getExchangeRate(userCurrency);
-  const valueInUserCurrency = totalValue * exchangeRate;
+  const exchangeRate = getRate(userCurrency);
+  const valueInUserCurrency = totalValueUSD * exchangeRate;
   const currencySymbol = getCurrencySymbol(userCurrency);
 
   return (
@@ -137,7 +60,7 @@ export function PortfolioValue({ assets = [], userCurrency = "USD" }: PortfolioV
         {currencySymbol}
       </div>
       <div className="text-sm opacity-75">
-        {t("profile.portfolio.inUsd", { amount: totalValue.toFixed(2) })}
+        {t("profile.portfolio.inUsd", { amount: totalValueUSD.toFixed(2) })}
       </div>
     </div>
   );

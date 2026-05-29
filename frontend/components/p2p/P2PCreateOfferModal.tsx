@@ -6,6 +6,7 @@ import { currencies } from "@/lib/currencies";
 import { BinanceAPI } from "@/lib/api/binance";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import { useRates } from "@/components/RatesProvider";
 import { intlLocale } from "@/lib/utils/locale";
 
 interface P2PCreateOfferModalProps {
@@ -33,6 +34,7 @@ export function P2PCreateOfferModal({
   cryptoOptions,
 }: P2PCreateOfferModalProps) {
   const { t, i18n } = useTranslation();
+  const { convert } = useRates();
   const [type, setType] = useState<"buy" | "sell">("sell");
   const [cryptoCurrency, setCryptoCurrency] = useState("Bitcoin");
   const [displayCurrency, setDisplayCurrency] = useState("RUB");
@@ -40,11 +42,10 @@ export function P2PCreateOfferModal({
   const [cryptoAmount, setCryptoAmount] = useState("");
   const [marketPrice, setMarketPrice] = useState<number | null>(null);
   const [loadingMarketPrice, setLoadingMarketPrice] = useState(false);
-  
+
   const [userAssets, setUserAssets] = useState<UserAsset[]>([]);
   const [walletBalance, setWalletBalance] = useState<WalletBalance | null>(null);
-  const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({});
-  
+
   const [loadingData, setLoadingData] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
@@ -52,36 +53,11 @@ export function P2PCreateOfferModal({
 
   const hasFetchedData = useRef(false);
 
-  // Получаем курсы валют
-  const fetchExchangeRates = async () => {
-    try {
-      const response = await axios.get("https://api.exchangerate-api.com/v4/latest/USD");
-      setExchangeRates(response.data.rates || {});
-    } catch (error) {
-      console.error("Failed to fetch exchange rates:", error);
-      setExchangeRates({
-        USD: 1,
-        KZT: 450,
-        RUB: 90,
-        EUR: 0.85,
-        GBP: 0.73,
-      });
-    }
-  };
-
-  // Конвертация USD в выбранную валюту
-  const convertFromUSD = (amountUSD: number, toCurrency: string): number => {
-    if (toCurrency === "USD") return amountUSD;
-    const rate = exchangeRates[toCurrency] || 1;
-    return amountUSD * rate;
-  };
-
-  // Конвертация из выбранной валюты в USD
-  const convertToUSD = (amount: number, fromCurrency: string): number => {
-    if (fromCurrency === "USD") return amount;
-    const rate = exchangeRates[fromCurrency] || 1;
-    return amount / rate;
-  };
+  // Конвертации курсов идут через единый RatesProvider (бэкенд /api/currency/rates).
+  const convertFromUSD = (amountUSD: number, toCurrency: string): number =>
+    convert(amountUSD, "USD", toCurrency);
+  const convertToUSD = (amount: number, fromCurrency: string): number =>
+    convert(amount, fromCurrency, "USD");
 
   // Получаем рыночную цену криптовалюты
   const fetchMarketPrice = async (cryptoName: string, currency: string) => {
@@ -128,7 +104,7 @@ export function P2PCreateOfferModal({
           return;
         }
 
-        // Параллельно загружаем активы, баланс кошелька и курсы валют
+        // Параллельно загружаем активы и баланс кошелька (курсы валют — из RatesProvider).
         const [assetsResponse, walletResponse] = await Promise.all([
           axios.get("http://localhost:8000/api/user/assets", {
             headers: { Authorization: `Bearer ${token}` },
@@ -136,7 +112,6 @@ export function P2PCreateOfferModal({
           axios.get("http://localhost:8000/api/wallet/balance", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetchExchangeRates(),
         ]);
 
         console.log("📦 Assets response:", assetsResponse.data);
@@ -173,10 +148,10 @@ export function P2PCreateOfferModal({
 
   // Загружаем рыночную цену при изменении криптовалюты или валюты
   useEffect(() => {
-    if (cryptoCurrency && displayCurrency && exchangeRates && Object.keys(exchangeRates).length > 0) {
+    if (cryptoCurrency && displayCurrency) {
       fetchMarketPrice(cryptoCurrency, displayCurrency);
     }
-  }, [cryptoCurrency, displayCurrency, exchangeRates]);
+  }, [cryptoCurrency, displayCurrency, convert]);
 
   useEffect(() => {
     if (!isOpen) {

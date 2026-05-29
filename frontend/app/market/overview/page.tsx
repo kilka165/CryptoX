@@ -11,6 +11,7 @@ import type { Coin } from "@/types/coin";
 import { MarketCard } from "@/components/market/MarketCard";
 import { CoinRow } from "@/components/market/CoinRow";
 import { useTranslation } from "react-i18next";
+import { useRates } from "@/components/RatesProvider";
 
 const formatNumber = (num: number) => {
   if (num >= 1.0e12) return (num / 1.0e12).toFixed(2) + "T";
@@ -22,10 +23,10 @@ const formatNumber = (num: number) => {
 
 export default function MarketOverviewPage() {
   const { t } = useTranslation();
+  const { getRate } = useRates();
   const [coins, setCoins] = useState<Coin[]>([]);
   const [loading, setLoading] = useState(true);
   const [userCurrency, setUserCurrency] = useState<string>("USD");
-  const [exchangeRate, setExchangeRate] = useState<number>(1);
 
   useEffect(() => {
     const fetchCoins = async () => {
@@ -69,20 +70,7 @@ export default function MarketOverviewPage() {
       .catch((e) => console.error(e));
   }, []);
 
-  useEffect(() => {
-    if (userCurrency === "USD") {
-      setExchangeRate(1);
-      return;
-    }
-
-    const rates: Record<string, number> = {
-      RUB: 90,
-      EUR: 0.92,
-      KZT: 450,
-    };
-
-    setExchangeRate(rates[userCurrency] ?? 1);
-  }, [userCurrency]);
+  const exchangeRate = getRate(userCurrency);
 
   const totalMarketCap = coins.reduce(
     (acc, c) => acc + (c.market_cap ?? 0),

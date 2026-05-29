@@ -15,7 +15,7 @@ class CoinsController extends Controller
     public function index()
 {
     try {
-        $coins = Cache::remember('binance_coins_list', 300, function () {
+        $coins = Cache::remember('binance_coins_list', 30, function () {
             $response = Http::withoutVerifying()
                 ->timeout(10)
                 ->get('https://api.binance.com/api/v3/ticker/24hr');
@@ -37,19 +37,23 @@ class CoinsController extends Controller
                 $symbol = str_replace('USDT', '', $ticker['symbol']);
                 $symbolLower = strtolower($symbol);
 
-                if (!isset($coinMapping[$symbolLower])) {
-                    continue;
-                }
-
-                $coinData = $coinMapping[$symbolLower];
                 $lastPrice = floatval($ticker['lastPrice']);
                 $quoteVolume = floatval($ticker['quoteVolume']);
 
+                if ($lastPrice <= 0) {
+                    continue;
+                }
+
+                // Маппинг — только для красивого имени/логотипа. Цена есть у любой пары.
+                $coinData = $coinMapping[$symbolLower] ?? null;
+
                 $result[] = [
-                    'id' => $coinData['id'],
+                    'id' => $coinData['id'] ?? $symbolLower,
                     'symbol' => $symbolLower,
-                    'name' => $coinData['name'],
-                    'image' => "https://cryptologos.cc/logos/{$coinData['slug']}-logo.png",
+                    'name' => $coinData['name'] ?? strtoupper($symbol),
+                    'image' => $coinData
+                        ? "https://cryptologos.cc/logos/{$coinData['slug']}-logo.png"
+                        : '',
                     'current_price' => $lastPrice,
                     'price_change_percentage_24h' => floatval($ticker['priceChangePercent']),
                     'market_cap' => $lastPrice * $quoteVolume * 0.01,
@@ -61,7 +65,7 @@ class CoinsController extends Controller
                 return $b['total_volume'] <=> $a['total_volume'];
             });
 
-            return $result;
+            return array_slice($result, 0, 300);
         });
 
         return response()->json($coins);

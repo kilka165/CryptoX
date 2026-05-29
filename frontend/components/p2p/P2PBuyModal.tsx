@@ -5,8 +5,8 @@ import React, { useState, useEffect } from "react";
 import { X, TrendingUp, TrendingDown, AlertCircle, Wallet, BarChart3 } from "lucide-react";
 import { P2POffer } from "@/lib/api/p2pApi";
 import { BinanceAPI } from "@/lib/api/binance";
-import axios from "axios";
 import { useTranslation } from "react-i18next";
+import { useRates } from "@/components/RatesProvider";
 import { intlLocale } from "@/lib/utils/locale";
 
 interface P2PBuyModalProps {
@@ -23,13 +23,13 @@ export function P2PBuyModal({
   onConfirm,
 }: P2PBuyModalProps) {
   const { t, i18n } = useTranslation();
+  const { convert } = useRates();
   const [cryptoAmount, setCryptoAmount] = useState("");
   const [fiatAmount, setFiatAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
   const [marketPrice, setMarketPrice] = useState<number | null>(null);
   const [loadingMarketPrice, setLoadingMarketPrice] = useState(false);
-  const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (!isOpen) {
@@ -37,84 +37,41 @@ export function P2PBuyModal({
       setFiatAmount("");
       setError("");
       setMarketPrice(null);
-      setExchangeRates({});
     }
   }, [isOpen]);
 
-  // Конвертация USD в выбранную валюту
-  const convertFromUSD = (amountUSD: number, toCurrency: string): number => {
-    if (toCurrency === "USD") return amountUSD;
-    const rate = exchangeRates[toCurrency] || 1;
-    return amountUSD * rate;
-  };
-
-  // Получаем рыночную цену
-  const fetchMarketPrice = async (cryptoName: string, currency: string, rates: Record<string, number>) => {
-    setLoadingMarketPrice(true);
-    try {
-      const coins = await BinanceAPI.get24hPrices();
-      const coin = coins.find(c => c.name.toLowerCase() === cryptoName.toLowerCase());
-      
-      if (coin && coin.current_price) {
-        const priceInUSD = coin.current_price;
-        // Используем переданные курсы вместо state
-        const rate = rates[currency] || 1;
-        const priceInCurrency = currency === "USD" ? priceInUSD : priceInUSD * rate;
-        
-        setMarketPrice(priceInCurrency);
-        console.log("💰 Market price loaded:", {
-          crypto: cryptoName,
-          priceUSD: priceInUSD,
-          currency,
-          rate,
-          priceInCurrency
-        });
-      }
-    } catch (error) {
-      console.error("Failed to fetch market price:", error);
-      setMarketPrice(null);
-    } finally {
-      setLoadingMarketPrice(false);
-    }
-  };
-
-  // Загружаем курсы и рыночную цену при открытии
+  // Загружаем рыночную цену при открытии (курсы валют — из единого RatesProvider).
   useEffect(() => {
-    if (isOpen && offer) {
-      const fetchData = async () => {
-        try {
-          // Сначала загружаем курсы
-          const response = await axios.get("https://api.exchangerate-api.com/v4/latest/USD");
-          const rates = response.data.rates || {
-            USD: 1,
-            KZT: 450,
-            RUB: 90,
-            EUR: 0.85,
-            GBP: 0.73,
-          };
-          
-          setExchangeRates(rates);
-          
-          // Затем загружаем рыночную цену с уже полученными курсами
-          await fetchMarketPrice(offer.crypto_currency, offer.currency, rates);
-        } catch (error) {
-          console.error("Failed to fetch exchange rates:", error);
-          // Fallback курсы
-          const fallbackRates = {
-            USD: 1,
-            KZT: 450,
-            RUB: 90,
-            EUR: 0.85,
-            GBP: 0.73,
-          };
-          setExchangeRates(fallbackRates);
-          await fetchMarketPrice(offer.crypto_currency, offer.currency, fallbackRates);
-        }
-      };
+    if (!isOpen || !offer) return;
 
-      fetchData();
-    }
-  }, [isOpen, offer]);
+    let active = true;
+    setLoadingMarketPrice(true);
+
+    BinanceAPI.get24hPrices()
+      .then((coins) => {
+        if (!active) return;
+        const coin = coins.find(
+          (c) => c.name.toLowerCase() === offer.crypto_currency.toLowerCase()
+        );
+        if (coin && coin.current_price) {
+          const priceInCurrency = convert(coin.current_price, "USD", offer.currency);
+          setMarketPrice(priceInCurrency);
+        } else {
+          setMarketPrice(null);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch market price:", err);
+        if (active) setMarketPrice(null);
+      })
+      .finally(() => {
+        if (active) setLoadingMarketPrice(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [isOpen, offer, convert]);
 
   // Рассчитываем минимальное количество криптовалюты на основе цены
   const getMinCryptoAmount = (price: number) => {

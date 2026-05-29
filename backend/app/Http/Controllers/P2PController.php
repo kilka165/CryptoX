@@ -7,57 +7,21 @@ use App\Models\P2PTrade;
 use App\Models\Asset;
 use App\Models\Wallet;
 use App\Models\Transaction;
+use App\Services\CurrencyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 
 class P2PController extends Controller
 {
-    /**
-     * Получить курс валюты к USD
-     */
-    private function getExchangeRate($currency)
-    {
-        if ($currency === 'USD') {
-            return 1;
-        }
-
-        try {
-            $response = Http::get("https://api.exchangerate-api.com/v4/latest/USD");
-            $rates = $response->json()['rates'] ?? [];
-            return $rates[$currency] ?? 1;
-        } catch (\Exception $e) {
-            Log::error('Exchange rate fetch failed', ['error' => $e->getMessage()]);
-
-            // Fallback курсы
-            $fallbackRates = [
-                'KZT' => 450,
-                'RUB' => 90,
-                'EUR' => 0.85,
-                'GBP' => 0.73,
-            ];
-
-            return $fallbackRates[$currency] ?? 1;
-        }
-    }
+    public function __construct(private CurrencyService $currency) {}
 
     /**
-     * Конвертировать сумму из одной валюты в другую через USD
+     * Конвертировать сумму из одной валюты в другую через единый кэшированный CurrencyService.
      */
     private function convertCurrency($amount, $fromCurrency, $toCurrency)
     {
-        if ($fromCurrency === $toCurrency) {
-            return $amount;
-        }
-
-        // Конвертируем в USD
-        $fromRate = $this->getExchangeRate($fromCurrency);
-        $amountInUSD = $amount / $fromRate;
-
-        // Конвертируем из USD в целевую валюту
-        $toRate = $this->getExchangeRate($toCurrency);
-        return $amountInUSD * $toRate;
+        return $this->currency->convert((float) $amount, (string) $fromCurrency, (string) $toCurrency);
     }
 
         /**

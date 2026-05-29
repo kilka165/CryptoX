@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { BinanceAPI } from "@/lib/api/binance";
 import { clearAuthToken } from "@/lib/auth";
 import { Header } from "@/components/Header";
 import { UserCard } from "@/components/profile/UserCard";
@@ -52,6 +53,7 @@ export default function ProfilePage() {
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [prices, setPrices] = useState<Record<string, BinanceTicker>>({});
+  const [pricesLoading, setPricesLoading] = useState(true);
   const [selectedAsset, setSelectedAsset] = useState<EnrichedAsset | null>(null);
 
   useEffect(() => {
@@ -63,10 +65,57 @@ export default function ProfilePage() {
     loadUserData(token);
   }, [router]);
 
+  // Единый источник цен: кэшированный бэкенд /api/coins.
+  // Грузим один раз при появлении активов и обновляем раз в 30с.
   useEffect(() => {
-    if (authUser?.assets && authUser.assets.length > 0) {
-      loadBinancePrices(authUser.assets);
+    const assets = authUser?.assets;
+    if (!assets || assets.length === 0) {
+      setPricesLoading(false);
+      return;
     }
+
+    let active = true;
+
+    const loadPrices = async () => {
+      try {
+        const coins = await BinanceAPI.get24hPrices();
+        if (!active) return;
+
+        const priceMap: Record<string, BinanceTicker> = {};
+        assets.forEach((asset) => {
+          const key = asset.symbol.toLowerCase();
+          const nameKey = asset.name.toLowerCase();
+          // Симвoлы у активов могут быть «битые» (BIT вместо BTC, USD вместо USDC) —
+          // подстраховываемся матчингом по id монеты, который равен name актива.
+          const coin = coins.find(
+            (c) =>
+              c.symbol.toLowerCase() === key ||
+              c.id.toLowerCase() === nameKey
+          );
+          if (coin) {
+            priceMap[key] = {
+              symbol: `${coin.symbol.toUpperCase()}USDT`,
+              lastPrice: String(coin.current_price),
+              priceChangePercent: String(coin.price_change_percentage_24h ?? 0),
+            };
+          }
+        });
+
+        setPrices(priceMap);
+      } catch (error) {
+        console.error("Ошибка загрузки цен:", error);
+      } finally {
+        if (active) setPricesLoading(false);
+      }
+    };
+
+    loadPrices();
+    const interval = setInterval(loadPrices, 30000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, [authUser]);
 
   const loadUserData = (token: string) => {
@@ -83,49 +132,6 @@ export default function ProfilePage() {
         clearAuthToken();
         router.push("/login");
       });
-  };
-
-  const loadBinancePrices = async (assets: Asset[]) => {
-    try {
-      const response = await axios.get<BinanceTicker[]>(
-        "https://api.binance.com/api/v3/ticker/24hr"
-      );
-
-      const priceMap: Record<string, BinanceTicker> = {};
-
-      assets.forEach((asset) => {
-        const ticker = response.data.find(
-          (t) => t.symbol === `${asset.symbol.toUpperCase()}USDT`
-        );
-
-        if (ticker) {
-          priceMap[asset.symbol.toLowerCase()] = ticker;
-        }
-      });
-
-      setPrices(priceMap);
-    } catch (error) {
-      console.error("Ошибка загрузки цен с Binance:", error);
-
-      try {
-        const priceMap: Record<string, BinanceTicker> = {};
-
-        for (const asset of assets) {
-          try {
-            const res = await axios.get<BinanceTicker>(
-              `https://api.binance.com/api/v3/ticker/24hr?symbol=${asset.symbol.toUpperCase()}USDT`
-            );
-            priceMap[asset.symbol.toLowerCase()] = res.data;
-          } catch (err) {
-            console.error(`Не удалось загрузить цену для ${asset.symbol}:`, err);
-          }
-        }
-
-        setPrices(priceMap);
-      } catch (fallbackError) {
-        console.error("Запасной метод загрузки цен тоже не сработал:", fallbackError);
-      }
-    }
   };
 
   const handleLogout = () => {
@@ -186,8 +192,9 @@ export default function ProfilePage() {
           <div className="lg:col-span-2 space-y-6">
             <BalanceCard balance={rawBalance} currency={userCurrency} />
             <PortfolioValue
-              assets={authUser?.assets || []}
+              totalValueUSD={totalPortfolioUSD}
               userCurrency={userCurrency}
+              loading={pricesLoading}
             />
             {assetsList.length > 0 && (
               <AssetsTable

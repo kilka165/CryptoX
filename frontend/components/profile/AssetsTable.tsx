@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { BinanceAPI } from "@/lib/api/binance";
 import { useTranslation } from "react-i18next";
+import { useRates } from "@/components/RatesProvider";
 
 interface Asset {
   id: number;
@@ -22,28 +22,6 @@ interface AssetsTableProps {
   onSellClick?: (asset: Asset) => void;
 }
 
-// Маппинг названий монет на их торговые символы в Binance
-const getCoinSymbol = (name: string): string => {
-  const symbolMap: Record<string, string> = {
-    'bitcoin': 'BTC',
-    'ethereum': 'ETH',
-    'ripple': 'XRP',
-    'binancecoin': 'BNB',
-    'cardano': 'ADA',
-    'solana': 'SOL',
-    'polkadot': 'DOT',
-    'dogecoin': 'DOGE',
-    'polygon': 'MATIC',
-    'avalanche': 'AVAX',
-    'chainlink': 'LINK',
-    'litecoin': 'LTC',
-    'uniswap': 'UNI',
-        'usd-coin': 'USDC',
-  };
-  
-  return symbolMap[name.toLowerCase()] || name.toUpperCase();
-};
-
 // Функция конвертации валюты в символ
 const getCurrencySymbol = (currency: string): string => {
   const symbols: Record<string, string> = {
@@ -55,61 +33,11 @@ const getCurrencySymbol = (currency: string): string => {
   return symbols[currency] || currency;
 };
 
-// Функция конвертации из USD
-const getExchangeRate = (currency: string): number => {
-  const rates: Record<string, number> = {
-    USD: 1,
-    RUB: 90,
-    EUR: 0.92,
-    KZT: 450,
-  };
-  return rates[currency] || 1;
-};
-
 export function AssetsTable({ assets, userCurrency = "USD", onSellClick }: AssetsTableProps) {
   const { t } = useTranslation();
-  const [prices, setPrices] = useState<Record<string, number>>({});
-  const [changes, setChanges] = useState<Record<string, number>>({});
+  const { getRate } = useRates();
 
-  useEffect(() => {
-    const fetchPrices = async () => {
-      const newPrices: Record<string, number> = {};
-      const newChanges: Record<string, number> = {};
-
-      for (const asset of assets) {
-        try {
-          if (asset.currentPriceUSD) {
-            newPrices[asset.name] = asset.currentPriceUSD;
-          } else {
-            const binanceSymbol = getCoinSymbol(asset.name);
-            const price = await BinanceAPI.getPrice(binanceSymbol);
-            newPrices[asset.name] = price;
-          }
-
-          if (asset.change24h !== undefined) {
-            newChanges[asset.name] = asset.change24h;
-          } else {
-            const binanceSymbol = getCoinSymbol(asset.name);
-            const change24h = await BinanceAPI.get24hChange(binanceSymbol);
-            newChanges[asset.name] = change24h;
-          }
-        } catch (error) {
-          console.error(`Ошибка для ${asset.name}:`, error);
-          newPrices[asset.name] = 0;
-          newChanges[asset.name] = 0;
-        }
-      }
-
-      setPrices(newPrices);
-      setChanges(newChanges);
-    };
-
-    fetchPrices();
-    const interval = setInterval(fetchPrices, 10000);
-    return () => clearInterval(interval);
-  }, [assets]);
-
-  const exchangeRate = getExchangeRate(userCurrency);
+  const exchangeRate = getRate(userCurrency);
   const currencySymbol = getCurrencySymbol(userCurrency);
 
   return (
@@ -132,9 +60,9 @@ export function AssetsTable({ assets, userCurrency = "USD", onSellClick }: Asset
           </thead>
           <tbody>
             {assets.map((asset) => {
-              const priceUSD = asset.currentPriceUSD || prices[asset.name] || 0;
+              const priceUSD = asset.currentPriceUSD || 0;
               const priceInUserCurrency = priceUSD * exchangeRate;
-              const change = asset.change24h !== undefined ? asset.change24h : (changes[asset.name] || 0);
+              const change = asset.change24h ?? 0;
               const totalValueUSD = asset.valueUSD || (asset.amount * priceUSD);
               const totalValueInUserCurrency = totalValueUSD * exchangeRate;
 

@@ -11,6 +11,7 @@ import { Footer } from "@/components/Footer";
 import { BinanceAPI } from "@/lib/api/binance";
 import { Coin } from "@/types/coin";
 import { useTranslation } from "react-i18next";
+import { useRates } from "@/components/RatesProvider";
 
 const formatNumber = (num: number) => {
   if (num >= 1.0e12) return (num / 1.0e12).toFixed(2) + "T";
@@ -31,12 +32,12 @@ const cleanInputAmount = (value: string) => value.replace(/,/g, "");
 
 export default function MarketPage() {
   const { t } = useTranslation();
+  const { getRate } = useRates();
   const [coins, setCoins] = useState<Coin[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [userCurrency, setUserCurrency] = useState<string>("USD");
   const [userBalance, setUserBalance] = useState<number>(0);
-  const [exchangeRate, setExchangeRate] = useState<number>(1);
 
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const [displayAmount, setDisplayAmount] = useState("");
@@ -90,20 +91,7 @@ export default function MarketPage() {
       .catch((e) => console.error(e));
   }, []);
 
-  useEffect(() => {
-    if (userCurrency === "USD") {
-      setExchangeRate(1);
-      return;
-    }
-
-    const rates: Record<string, number> = {
-      RUB: 90,
-      EUR: 0.92,
-      KZT: 450,
-    };
-
-    setExchangeRate(rates[userCurrency] ?? 1);
-  }, [userCurrency]);
+  const exchangeRate = getRate(userCurrency);
 
   const handleInputChange = (raw: string) => {
     let val = raw.replace(/[^0-9.]/g, "");

@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\CurrencyService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class UserSettingsController extends Controller
 {
+    public function __construct(private CurrencyService $currency) {}
+
     public function getSettings(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -34,23 +37,19 @@ class UserSettingsController extends Controller
         ]);
     }
 
+    /**
+     * Курс конвертации между двумя валютами через единый кэшированный CurrencyService.
+     */
     public function getExchangeRate(Request $request): JsonResponse
     {
-        $from = $request->query('from', 'USD');
-        $to = $request->query('to', 'USD');
+        $from = (string) $request->query('from', 'USD');
+        $to = (string) $request->query('to', 'USD');
 
-        $rates = [
-            'USD' => ['RUB' => 90, 'EUR' => 0.92, 'KZT' => 450, 'USD' => 1],
-            'RUB' => ['USD' => 0.011, 'EUR' => 0.010, 'KZT' => 5, 'RUB' => 1],
-            'EUR' => ['USD' => 1.09, 'RUB' => 100, 'KZT' => 490, 'EUR' => 1],
-            'KZT' => ['USD' => 0.0022, 'RUB' => 0.20, 'EUR' => 0.002, 'KZT' => 1],
-        ];
-
-        $rate = $rates[$from][$to] ?? 1.0;
+        $rate = $this->currency->convert(1.0, $from, $to);
 
         return response()->json([
-            'from' => $from,
-            'to' => $to,
+            'from' => strtoupper($from),
+            'to' => strtoupper($to),
             'rate' => $rate,
         ]);
     }

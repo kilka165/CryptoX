@@ -15,7 +15,6 @@ import {
   X,
   Shield,
   Award,
-  TrendingUp,
   Globe,
 } from "lucide-react";
 
@@ -30,13 +29,8 @@ export const Footer = () => {
         <div className="mb-12 pb-10 border-b border-slate-300 dark:border-slate-800">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="text-white" size={24} />
-                </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  CryptoX
-                </span>
+              <div className="flex items-center mb-4">
+                <img src="/logo.svg" alt="CryptoX" className="h-30 w-auto" />
               </div>
               <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 {t("footer.description")}

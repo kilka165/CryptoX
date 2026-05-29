@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { TrendingUp, User, Settings } from "lucide-react";
+import { User, Settings } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTranslation } from "react-i18next";
 
@@ -22,13 +22,12 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Логотип */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="bg-blue-600 p-2 rounded-lg group-hover:bg-blue-500 transition-colors">
-              <TrendingUp size={24} className="text-white" />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-transparent">
-              CryptoX
-            </span>
+          <Link href="/" className="flex items-center group">
+            <img
+              src="/logo.svg"
+              alt="CryptoX"
+              className="h-20 w-auto pb-1 transition-opacity group-hover:opacity-80"
+            />
           </Link>
           
           {/* Меню (скрыто на мобильных) */}
