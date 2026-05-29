@@ -12,14 +12,15 @@ interface BuyModalProps {
   userBalance: number;
   exchangeRate: number;
   displayAmount: string;
+  displayCryptoAmount: string;
   amountUserEntered: number;
   calculatedUSD: number;
-  cryptoAmount: number;
   maxBalanceInUserCurrency: number;
   isBuying: boolean;
   buySuccess: boolean;
   onClose: () => void;
   onChangeAmount: (value: string) => void;
+  onChangeCryptoAmount: (value: string) => void;
   onSetMax: () => void;
   onSubmit: (e: React.FormEvent) => void;
 }
@@ -41,14 +42,15 @@ export function BuyModal({
   userBalance,
   exchangeRate,
   displayAmount,
+  displayCryptoAmount,
   amountUserEntered,
   calculatedUSD,
-  cryptoAmount,
   maxBalanceInUserCurrency,
   isBuying,
   buySuccess,
   onClose,
   onChangeAmount,
+  onChangeCryptoAmount,
   onSetMax,
   onSubmit,
 }: BuyModalProps) {
@@ -101,16 +103,23 @@ export function BuyModal({
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              {t("market.buyModal.amountCrypto", { symbol: coin.symbol.toUpperCase() })}
+            </label>
+            <input
+              type="text"
+              value={displayCryptoAmount}
+              onChange={(e) => onChangeCryptoAmount(e.target.value)}
+              placeholder="0.00000000"
+              className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 outline-none focus:border-blue-500 text-lg font-semibold"
+            />
+          </div>
+
           <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-slate-600 dark:text-slate-400">{t("market.buyModal.amountUsd")}</span>
               <span className="font-semibold">${calculatedUSD.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-600 dark:text-slate-400">{t("market.buyModal.youReceive")}</span>
-              <span className="font-semibold">
-                {cryptoAmount.toFixed(8)} {coin.symbol.toUpperCase()}
-              </span>
             </div>
             <div className="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
               <span className="text-slate-600 dark:text-slate-400">{t("market.buyModal.availableBalance")}</span>

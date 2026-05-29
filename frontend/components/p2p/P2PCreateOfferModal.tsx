@@ -1,6 +1,6 @@
 // frontend/components/p2p/P2PCreateOfferModal.tsx
 import React, { useState, useEffect, useRef } from "react";
-import { X, AlertCircle, CheckCircle2, Plus, Wallet, TrendingUp } from "lucide-react";
+import { X, AlertCircle, CheckCircle2, Plus, Wallet, TrendingUp, BarChart3 } from "lucide-react";
 import { p2pApi } from "@/lib/api/p2pApi";
 import { currencies } from "@/lib/currencies";
 import { BinanceAPI } from "@/lib/api/binance";
@@ -462,6 +462,34 @@ export function P2PCreateOfferModal({
                 {displayCurrency}
               </span>
             </div>
+
+            {/* Блок отклонения от рыночной цены */}
+            {marketPrice && pricePerCrypto && !isNaN(parseFloat(pricePerCrypto)) && (() => {
+              const entered = parseFloat(pricePerCrypto);
+              const diffAbs = entered - marketPrice;
+              const diffPct = (diffAbs / marketPrice) * 100;
+              const isAbove = diffAbs > 0;
+              const isBelow = diffAbs < 0;
+              return (
+                <div className="mt-2 flex items-center gap-2 p-3 rounded-lg border bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700">
+                  <BarChart3 className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-sm font-medium">
+                    {t("p2p.createModal.deviation", {
+                      sign: isAbove ? "+" : isBelow ? "−" : "",
+                      pct: Math.abs(diffPct).toFixed(2),
+                      abs: Math.abs(diffAbs).toLocaleString(intlLocale(i18n.language), {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }),
+                      currency: displayCurrency,
+                      direction: isAbove
+                        ? t("p2p.createModal.aboveMarket")
+                        : t("p2p.createModal.belowMarket"),
+                    })}
+                  </span>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Количество криптовалюты */}

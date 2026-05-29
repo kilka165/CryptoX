@@ -27,7 +27,7 @@ export const convertApi = {
   },
 
   /**
-   * Получает список монет для маркета (вместо CoinGecko теперь через Binance API)
+   * Получает список монет для маркета через Binance API
    * @param _currency - игнорируется, т.к. все цены с бэкенда в USD
    */
   async getMarketCoins(_currency: string = "usd"): Promise<Coin[]> {

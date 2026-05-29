@@ -1,0 +1,333 @@
+================================================================
+                    ОПИСАНИЕ ПРОЕКТА CryptoX
+================================================================
+
+1. ОБЩЕЕ ОПИСАНИЕ
+----------------------------------------------------------------
+CryptoX — современная веб-платформа для обмена и управления
+криптовалютами. Приложение позволяет пользователям:
+  - регистрироваться и безопасно входить в систему;
+  - управлять фиатным и криптокошельком;
+  - просматривать актуальные курсы криптовалют;
+  - покупать и продавать криптоактивы;
+  - совершать прямой обмен (Convert / Swap);
+  - торговать между пользователями через P2P;
+  - размещать активы в стейкинге для получения дохода;
+  - вести историю всех транзакций.
+
+Интерфейс поддерживает три языка (русский, английский, казахский),
+светлую и тёмную темы, адаптивен под мобильные устройства.
+
+
+2. АРХИТЕКТУРА
+----------------------------------------------------------------
+Проект построен по схеме клиент-сервер с разделением на два
+независимых приложения:
+
+  +----------------------+        REST API         +----------------------+
+  |    FRONTEND          |  <------------------->  |     BACKEND          |
+  |    Next.js (React)   |       JSON / HTTP       |     Laravel 12       |
+  |    TypeScript        |                         |     PHP 8.2+         |
+  +----------------------+                         +----------------------+
+            |                                                 |
+            |                                                 v
+            |                                       +----------------------+
+            |                                       |   PostgreSQL DB      |
+            |                                       +----------------------+
+            v                                                 |
+  +----------------------+                                    v
+  |  Браузер пользователя|                          +----------------------+
+  +----------------------+                          | Binance              |
+                                                    | (внешний API)        |
+                                                    +----------------------+
+
+
+3. ТЕХНИЧЕСКИЙ СТЕК
+----------------------------------------------------------------
+
+BACKEND (папка backend/):
+  - PHP 8.2+
+  - Laravel 12
+  - Laravel Sanctum  — токенная аутентификация
+  - PostgreSQL       — основная база данных
+  - REST API
+  - Внешние интеграции: Binance API
+
+FRONTEND (папка frontend/):
+  - Next.js 16 (App Router)
+  - React 19
+  - TypeScript 5
+  - Tailwind CSS 4
+  - Axios            — HTTP-клиент
+  - react-i18next    — локализация (RU / EN / KK)
+  - next-themes      — переключение тёмной/светлой темы
+  - lucide-react     — иконки
+
+
+4. СТРУКТУРА ПРОЕКТА
+----------------------------------------------------------------
+CryptoX/
+├── README.md
+│
+├── backend/                         # Laravel API
+│   ├── app/
+│   │   ├── Http/Controllers/        # Контроллеры API
+│   │   │   ├── Api/                 # AuthController, WalletController, ...
+│   │   │   ├── TradeController      # Покупка / продажа / swap
+│   │   │   ├── P2PController        # P2P-обмен
+│   │   │   ├── StakingController    # Стейкинг
+│   │   │   ├── CoinsController      # Списки и цены монет
+│   │   │   ├── CurrencyController   # Фиатные валюты и курсы
+│   │   │   ├── TransactionController
+│   │   │   └── AssetController
+│   │   ├── Models/                  # Eloquent-модели
+│   │   │   ├── User
+│   │   │   ├── Wallet
+│   │   │   ├── Asset
+│   │   │   ├── Transaction
+│   │   │   ├── P2POffer
+│   │   │   ├── P2PTrade
+│   │   │   └── Staking
+│   │   └── Services/                # Бизнес-логика
+│   │       ├── ConvertService
+│   │       ├── CurrencyService
+│   │       └── UserSettingsService
+│   ├── database/migrations/         # Миграции БД
+│   ├── routes/api.php               # Маршруты REST API
+│   └── config/                      # Конфигурация Laravel
+│
+└── frontend/                        # Next.js приложение
+    ├── app/                         # App Router — страницы
+    │   ├── (auth)/                  # Login / Register
+    │   ├── market/                  # Рынок криптовалют
+    │   ├── p2p/                     # P2P-площадка
+    │   ├── staking/                 # Стейкинг
+    │   ├── convert/                 # Обмен валют
+    │   ├── deposit/                 # Пополнение
+    │   ├── withdraw/                # Вывод
+    │   ├── profile/                 # Профиль пользователя
+    │   ├── settings/                # Настройки
+    │   └── footerPages/             # Информационные страницы
+    ├── components/                  # React-компоненты
+    │   ├── market/                  # BuyModal, CoinList, ...
+    │   ├── p2p/                     # P2PCreateOfferModal, P2PFilters, ...
+    │   ├── staking/                 # StakingModal, StakingPlanCard, ...
+    │   ├── profile/                 # AssetsTable, SellModal, ...
+    │   ├── convert/                 # CurrencyField, ToCoinCard, ...
+    │   ├── Header, Footer, ThemeToggle, RatesProvider, I18nProvider
+    ├── locales/                     # Переводы (en / ru / kk)
+    ├── hooks/                       # Кастомные React-хуки
+    ├── lib/                         # Утилиты, axios-клиент
+    └── types/                       # TypeScript типы
+
+
+5. ОСНОВНЫЕ МОДУЛИ И ФУНКЦИОНАЛ
+----------------------------------------------------------------
+
+5.1. АУТЕНТИФИКАЦИЯ
+  - Регистрация и вход пользователей.
+  - Хранение токенов через Laravel Sanctum.
+  - Шифрование поля name пользователя (миграция 2026_05_26).
+  - Защищённые маршруты через middleware auth:sanctum.
+
+5.2. КОШЕЛЁК (Wallet)
+  - Один фиатный кошелёк на пользователя.
+  - Поддержка нескольких базовых валют (USD, EUR, RUB, KZT и др.).
+  - Операции: пополнение (deposit), вывод (withdraw),
+    проверка баланса.
+
+5.3. РЫНОК (Market)
+  - Просмотр всех доступных криптовалют.
+  - Получение цен из Binance API в реальном времени.
+  - Статистика за 24 часа.
+  - Покупка через модальное окно BuyModal.
+  - Иконки монет, конвертация цены в выбранную фиатную валюту.
+
+5.4. ТОРГОВЛЯ (Trade)
+  - Покупка криптовалюты по текущему курсу.
+  - Продажа активов с зачислением на фиатный баланс.
+  - Прямой обмен (swap) одной криптовалюты на другую.
+  - Мульти-обмен (multi-swap).
+  - Расчёт курсов перед совершением сделки.
+
+5.5. CONVERT (Обмен)
+  - Отдельный раздел для конвертации валют.
+  - Удобный UI с двумя карточками монет (From / To).
+  - Отображение текущих курсов.
+
+5.6. P2P (Peer-to-peer)
+  - Создание заявок на покупку или продажу криптовалюты.
+  - Указание цены, минимального и максимального лимита,
+    доступного количества.
+  - Просмотр и фильтрация заявок других пользователей.
+  - Создание сделки по заявке.
+  - Подтверждение и отмена сделок (статусы:
+    pending / completed / cancelled).
+
+5.7. СТЕЙКИНГ (Staking)
+  - Просмотр доступных планов стейкинга.
+  - Размещение криптоактивов под процент.
+  - Период блокировки в днях.
+  - Начисление наград (earned_rewards).
+  - Управление позициями: unstake, отмена flexible-стейкинга.
+
+5.8. ПРОФИЛЬ И ПОРТФОЛИО
+  - Карточка пользователя.
+  - Таблица всех активов с текущей стоимостью.
+  - Общая оценка портфолио.
+  - История транзакций.
+  - Модальное окно продажи актива.
+
+5.9. НАСТРОЙКИ
+  - Смена базовой фиатной валюты.
+  - Получение курса обмена для выбранной валюты.
+  - Обновление профиля.
+
+5.10. ЛОКАЛИЗАЦИЯ
+  - Поддержка трёх языков: ru, en, kk.
+  - Реализована через react-i18next.
+  - Словари в frontend/locales/{ru,en,kk}/translation.json.
+  - Соблюдается парность ключей между языками.
+
+
+6. СТРУКТУРА БАЗЫ ДАННЫХ
+----------------------------------------------------------------
+
+  users              — данные пользователей (имя зашифровано,
+                       email, password, currency)
+  wallets            — фиатный баланс (user_id, balance, currency)
+  assets             — криптоактивы пользователя
+                       (user_id, symbol, amount, logo_url)
+  transactions       — история операций
+                       (user_id, type, amount, symbol, price)
+  p2p_offers         — заявки P2P
+                       (seller_id, crypto_currency, currency,
+                        price, min_limit, max_limit, type, is_active)
+  p2p_trades         — сделки P2P
+                       (offer_id, buyer_id, crypto_amount,
+                        amount, status)
+  staking            — стейкинг-позиции
+                       (user_id, crypto_currency, amount,
+                        reward_rate, earned_rewards, status,
+                        lock_period_days, started_at, ends_at)
+  personal_access_tokens — токены Sanctum
+
+Связи:
+  users (1) ─── (1) wallets
+  users (1) ─── (*) assets
+  users (1) ─── (*) transactions
+  users (1) ─── (*) p2p_offers       (как продавец)
+  users (1) ─── (*) p2p_trades       (как покупатель)
+  users (1) ─── (*) staking
+  p2p_offers (1) ─── (*) p2p_trades
+
+
+7. КЛЮЧЕВЫЕ API-ЭНДПОИНТЫ
+----------------------------------------------------------------
+
+Публичные:
+  POST   /api/register                    Регистрация
+  POST   /api/login                       Вход
+  GET    /api/coins                       Список монет
+  GET    /api/coins/price/{symbol}        Цена монеты
+  GET    /api/coins/stats/{symbol}        24h-статистика
+  GET    /api/currencies                  Список фиатных валют
+  GET    /api/currency/rates              Курсы валют
+  GET    /api/assets                      Список активов (фильтры)
+  GET    /api/p2p/offers                  Список P2P-заявок
+  GET    /api/staking/plans               Планы стейкинга
+
+Защищённые (auth:sanctum):
+  GET    /api/user                        Профиль
+  POST   /api/logout                      Выход
+
+  GET    /api/wallet                      Баланс
+  POST   /api/wallet/deposit              Пополнение
+  POST   /api/wallet/withdraw             Вывод
+  GET    /api/user/assets                 Активы пользователя
+
+  POST   /api/trade/buy                   Покупка
+  POST   /api/trade/sell                  Продажа
+  POST   /api/trade/swap                  Обмен
+  POST   /api/trade/multi-swap            Мульти-обмен
+  POST   /api/trade/calculate-rates       Расчёт курсов
+
+  GET    /api/transactions                Транзакции
+  GET    /api/transactions/history        История
+  GET    /api/transactions/stats          Статистика
+
+  POST   /api/p2p/offers                  Создать заявку
+  DELETE /api/p2p/offers/{id}             Удалить заявку
+  POST   /api/p2p/trades                  Создать сделку
+  GET    /api/p2p/trades/my               Мои сделки
+  POST   /api/p2p/trades/{id}/confirm     Подтвердить
+  POST   /api/p2p/trades/{id}/cancel      Отменить
+
+  GET    /api/staking/assets              Активы для стейкинга
+  GET    /api/staking/my                  Мои позиции
+  POST   /api/staking/stake               Застейкать
+  POST   /api/staking/unstake/{id}        Вывести из стейкинга
+  POST   /api/staking/cancel/{id}         Отмена flexible
+
+  GET    /api/user/settings               Настройки
+  PUT    /api/user/settings/currency      Сменить валюту
+  GET    /api/exchange-rate               Курс обмена
+
+
+8. ЗАПУСК ПРОЕКТА
+----------------------------------------------------------------
+
+Требования:
+  - PHP >= 8.2
+  - Composer
+  - Node.js >= 18
+  - PostgreSQL
+  - Git
+
+Backend:
+  cd backend
+  composer install
+  cp .env.example .env
+  php artisan key:generate
+  # настроить БД в .env
+  php artisan migrate
+  php artisan serve
+  # доступен на http://127.0.0.1:8000
+
+Frontend:
+  cd frontend
+  npm install
+  # создать .env.local:
+  #   NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api
+  npm run dev
+  # доступен на http://localhost:3000
+
+
+9. ИСТОРИЯ РАЗВИТИЯ (по коммитам)
+----------------------------------------------------------------
+  - Базовая инициализация Laravel + Next.js
+  - Реализация аутентификации (Sanctum)
+  - Кошелёк, активы, транзакции
+  - Интеграция Binance
+  - P2P-модуль (заявки и сделки)
+  - Стейкинг
+  - Шифрование персональных данных
+  - Переход с MySQL на PostgreSQL
+  - Локализация интерфейса (RU / EN / KK)
+  - Оптимизация API-путей
+
+
+10. ПЛАНЫ РАЗВИТИЯ (Roadmap)
+----------------------------------------------------------------
+  - Двухфакторная аутентификация (2FA)
+  - Интеграция с биржами Kraken и Coinbase
+  - Обновление цен в реальном времени через WebSocket
+  - Расширенная аналитика портфолио
+  - Уведомления о изменении цен
+  - Мобильное приложение (React Native)
+
+
+================================================================
+              Лицензия: MIT
+              Репозиторий: github.com/kilka165/CryptoX
+================================================================

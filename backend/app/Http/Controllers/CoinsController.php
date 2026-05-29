@@ -15,59 +15,7 @@ class CoinsController extends Controller
     public function index()
 {
     try {
-        $coins = Cache::remember('binance_coins_list', 30, function () {
-            $response = Http::withoutVerifying()
-                ->timeout(10)
-                ->get('https://api.binance.com/api/v3/ticker/24hr');
-
-            if (!$response->successful()) {
-                throw new \Exception('Binance API error: ' . $response->status());
-            }
-
-            $allTickers = $response->json();
-            $result = [];
-
-            $coinMapping = $this->getCoinMapping();
-
-            foreach ($allTickers as $ticker) {
-                if (!str_ends_with($ticker['symbol'], 'USDT')) {
-                    continue;
-                }
-
-                $symbol = str_replace('USDT', '', $ticker['symbol']);
-                $symbolLower = strtolower($symbol);
-
-                $lastPrice = floatval($ticker['lastPrice']);
-                $quoteVolume = floatval($ticker['quoteVolume']);
-
-                if ($lastPrice <= 0) {
-                    continue;
-                }
-
-                // Маппинг — только для красивого имени/логотипа. Цена есть у любой пары.
-                $coinData = $coinMapping[$symbolLower] ?? null;
-
-                $result[] = [
-                    'id' => $coinData['id'] ?? $symbolLower,
-                    'symbol' => $symbolLower,
-                    'name' => $coinData['name'] ?? strtoupper($symbol),
-                    'image' => $coinData
-                        ? "https://cryptologos.cc/logos/{$coinData['slug']}-logo.png"
-                        : '',
-                    'current_price' => $lastPrice,
-                    'price_change_percentage_24h' => floatval($ticker['priceChangePercent']),
-                    'market_cap' => $lastPrice * $quoteVolume * 0.01,
-                    'total_volume' => $quoteVolume,
-                ];
-            }
-
-            usort($result, function($a, $b) {
-                return $b['total_volume'] <=> $a['total_volume'];
-            });
-
-            return array_slice($result, 0, 300);
-        });
-
+        $coins = Cache::remember('binance_coins_list', 30, fn() => $this->fetchBinanceCoinsList());
         return response()->json($coins);
     } catch (\Exception $e) {
         \Log::error('CoinsController error: ' . $e->getMessage());
@@ -76,6 +24,59 @@ class CoinsController extends Controller
             'message' => 'Failed to fetch coins from Binance'
         ], 500);
     }
+}
+
+/**
+ * Загрузить и нормализовать список монет Binance (24hr ticker, только USDT-пары).
+ */
+private function fetchBinanceCoinsList(): array
+{
+    $response = Http::withoutVerifying()
+        ->timeout(10)
+        ->get('https://api.binance.com/api/v3/ticker/24hr');
+
+    if (!$response->successful()) {
+        throw new \Exception('Binance API error: ' . $response->status());
+    }
+
+    $allTickers = $response->json();
+    $coinMapping = $this->getCoinMapping();
+    $result = [];
+
+    foreach ($allTickers as $ticker) {
+        if (!str_ends_with($ticker['symbol'], 'USDT')) {
+            continue;
+        }
+
+        $symbol = str_replace('USDT', '', $ticker['symbol']);
+        $symbolLower = strtolower($symbol);
+
+        $lastPrice = floatval($ticker['lastPrice']);
+        $quoteVolume = floatval($ticker['quoteVolume']);
+
+        if ($lastPrice <= 0) {
+            continue;
+        }
+
+        $coinData = $coinMapping[$symbolLower] ?? null;
+
+        $result[] = [
+            'id' => $coinData['id'] ?? $symbolLower,
+            'symbol' => $symbolLower,
+            'name' => $coinData['name'] ?? strtoupper($symbol),
+            'image' => $coinData
+                ? "https://cryptologos.cc/logos/{$coinData['slug']}-logo.png"
+                : '',
+            'current_price' => $lastPrice,
+            'price_change_percentage_24h' => floatval($ticker['priceChangePercent']),
+            'market_cap' => $lastPrice * $quoteVolume * 0.01,
+            'total_volume' => $quoteVolume,
+        ];
+    }
+
+    usort($result, fn($a, $b) => $b['total_volume'] <=> $a['total_volume']);
+
+    return array_slice($result, 0, 300);
 }
 
 /**
@@ -252,27 +253,32 @@ private function getCoinMapping()
 
 
     /**
-     * Получить монету с иконкой по ID (старый метод)
+     * Получить монету с иконкой по ID — данные из Binance.
      */
     public function show($coinId)
     {
         try {
-            $coin = Cache::remember("coin_{$coinId}", 3600, function () use ($coinId) {
-                $data = Http::withoutVerifying()
-                    ->get("https://api.coingecko.com/api/v3/coins/{$coinId}")
-                    ->json();
+            $needle = strtolower($coinId);
 
-                Asset::updateOrCreate(
-                    ['name' => $coinId],
-                    [
-                        'symbol' => strtoupper($data['symbol'] ?? ''),
-                        'icon_url' => $data['image']['small'] ?? null,
-                        'logo_url' => $data['image']['large'] ?? null,
-                    ]
-                );
+            $coins = Cache::remember('binance_coins_list', 30, fn() => $this->fetchBinanceCoinsList());
 
-                return $data;
-            });
+            $coin = collect($coins)->first(
+                fn($c) => ($c['id'] ?? null) === $needle
+                    || strtolower((string) ($c['symbol'] ?? '')) === $needle
+            );
+
+            if (!$coin) {
+                return response()->json(['error' => 'Coin not found'], 404);
+            }
+
+            Asset::updateOrCreate(
+                ['name' => $coin['id']],
+                [
+                    'symbol' => strtoupper($coin['symbol']),
+                    'icon_url' => $coin['image'] ?: null,
+                    'logo_url' => $coin['image'] ?: null,
+                ]
+            );
 
             return response()->json($coin);
         } catch (\Exception $e) {

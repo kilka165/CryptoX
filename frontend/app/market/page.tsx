@@ -41,6 +41,7 @@ export default function MarketPage() {
 
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const [displayAmount, setDisplayAmount] = useState("");
+  const [displayCryptoAmount, setDisplayCryptoAmount] = useState("");
   const [isBuying, setIsBuying] = useState(false);
   const [buySuccess, setBuySuccess] = useState(false);
 
@@ -93,10 +94,37 @@ export default function MarketPage() {
 
   const exchangeRate = getRate(userCurrency);
 
+  const trimZeros = (s: string) => {
+    if (!s.includes(".")) return s;
+    return s.replace(/0+$/, "").replace(/\.$/, "");
+  };
+
   const handleInputChange = (raw: string) => {
     let val = raw.replace(/[^0-9.]/g, "");
     if ((val.match(/\./g) || []).length > 1) return;
     setDisplayAmount(formatInputAmount(val));
+
+    const moneyNum = parseFloat(val || "0");
+    if (selectedCoin && selectedCoin.current_price > 0 && exchangeRate > 0 && moneyNum > 0) {
+      const cryptoNum = moneyNum / exchangeRate / selectedCoin.current_price;
+      setDisplayCryptoAmount(trimZeros(cryptoNum.toFixed(8)));
+    } else {
+      setDisplayCryptoAmount("");
+    }
+  };
+
+  const handleCryptoInputChange = (raw: string) => {
+    let val = raw.replace(/[^0-9.]/g, "");
+    if ((val.match(/\./g) || []).length > 1) return;
+    setDisplayCryptoAmount(val);
+
+    const cryptoNum = parseFloat(val || "0");
+    if (selectedCoin && selectedCoin.current_price > 0 && cryptoNum > 0) {
+      const moneyNum = cryptoNum * selectedCoin.current_price * exchangeRate;
+      setDisplayAmount(formatInputAmount(moneyNum.toFixed(2)));
+    } else {
+      setDisplayAmount("");
+    }
   };
 
   const handleBuySubmit = async (e: React.FormEvent) => {
@@ -147,6 +175,7 @@ export default function MarketPage() {
         setBuySuccess(false);
         setSelectedCoin(null);
         setDisplayAmount("");
+        setDisplayCryptoAmount("");
       }, 2000);
     } catch (error: any) {
       console.error("=== ОШИБКА ПОКУПКИ ===");
@@ -195,10 +224,6 @@ export default function MarketPage() {
 
   const amountUserEntered = parseFloat(cleanInputAmount(displayAmount) || "0") || 0;
   const calculatedUSD = amountUserEntered / exchangeRate;
-  const cryptoAmount =
-    selectedCoin && selectedCoin.current_price
-      ? calculatedUSD / selectedCoin.current_price
-      : 0;
   const maxBalanceInUserCurrency = userBalance * exchangeRate;
 
   return (
@@ -333,17 +358,20 @@ export default function MarketPage() {
           userBalance={userBalance}
           exchangeRate={exchangeRate}
           displayAmount={displayAmount}
+          displayCryptoAmount={displayCryptoAmount}
           amountUserEntered={amountUserEntered}
           calculatedUSD={calculatedUSD}
-          cryptoAmount={cryptoAmount}
           maxBalanceInUserCurrency={maxBalanceInUserCurrency}
           isBuying={isBuying}
           buySuccess={buySuccess}
-          onClose={() => setSelectedCoin(null)}
+          onClose={() => {
+            setSelectedCoin(null);
+            setDisplayAmount("");
+            setDisplayCryptoAmount("");
+          }}
           onChangeAmount={handleInputChange}
-          onSetMax={() =>
-            setDisplayAmount(formatInputAmount(maxBalanceInUserCurrency.toFixed(2)))
-          }
+          onChangeCryptoAmount={handleCryptoInputChange}
+          onSetMax={() => handleInputChange(maxBalanceInUserCurrency.toFixed(2))}
           onSubmit={handleBuySubmit}
         />
       )}

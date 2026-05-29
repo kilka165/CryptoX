@@ -4,11 +4,13 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Asset;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 
 class ConvertService
 {
+    public function __construct(private CurrencyService $currency) {}
+
     public function validateConversion(User $user, array $fromCoins, array $toCoins): array
     {
         $errors = [];
@@ -88,19 +90,29 @@ class ConvertService
         }
     }
 
+    /**
+     * Цена монеты в указанной фиатной валюте.
+     * USD-цена берётся из локального кэша Binance (заполняется CoinsController::index).
+     * Дальше конвертируется в нужную валюту через CurrencyService.
+     */
     private function getCoinPrice(string $coinId, string $currency = 'USD'): float
     {
-        $response = Http::get("https://api.coingecko.com/api/v3/simple/price", [
-            'ids' => $coinId,
-            'vs_currencies' => strtolower($currency),
-        ]);
+        $coins = Cache::get('binance_coins_list', []);
+        $needle = strtolower($coinId);
+        $priceUsd = 0.0;
 
-        if ($response->successful()) {
-            $data = $response->json();
-            return $data[$coinId][strtolower($currency)] ?? 0;
+        foreach ($coins as $coin) {
+            if (($coin['id'] ?? null) === $needle || strtolower((string) ($coin['symbol'] ?? '')) === $needle) {
+                $priceUsd = (float) ($coin['current_price'] ?? 0);
+                break;
+            }
         }
 
-        return 0;
+        if ($priceUsd <= 0 || strtoupper($currency) === 'USD') {
+            return $priceUsd;
+        }
+
+        return $this->currency->convert($priceUsd, 'USD', $currency);
     }
 
     public function calculateExchangeRates(array $fromCoins, string $toCoinId): array

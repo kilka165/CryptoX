@@ -223,6 +223,7 @@
     "buyModal": {
       "currentPrice": "1 {{symbol}} ағымдағы бағасы",
       "amount": "Сома ({{currency}})",
+      "amountCrypto": "Саны ({{symbol}})",
       "max": "Макс: {{amount}} {{symbol}}",
       "amountUsd": "USD сомасы",
       "youReceive": "Сіз аласыз",
@@ -275,7 +276,14 @@
       "sellerPlaceholder": "Сатушы аты...",
       "sortBy": "Сұрыптау:",
       "price": "Баға",
-      "rating": "Рейтинг"
+      "rating": "Рейтинг",
+      "priceRange": "Баға диапазоны",
+      "amountRange": "Көлем диапазоны",
+      "min": "Бастап",
+      "max": "Дейін",
+      "advanced": "Қосымша сүзгілер",
+      "advancedCount": "Белсенді: {{count}}",
+      "reset": "Тазалау"
     },
     "tableHeader": {
       "makers": "Мейкерлер",
@@ -346,7 +354,10 @@
       "insufficientCrypto": "{{crypto}} жеткіліксіз. Қолжетімді: {{amount}}",
       "insufficientFunds": "Қаражат жеткіліксіз. Қажет: {{usd}} USD ({{local}} {{currency}}), қолжетімді: {{available}} USD",
       "createError": "Өтінім жасау қатесі",
-      "enterPriceFirst": "Алдымен бағаны көрсетіңіз"
+      "enterPriceFirst": "Алдымен бағаны көрсетіңіз",
+      "deviation": "Нарықтан ауытқу: {{sign}}{{pct}}% ({{abs}} {{currency}} {{direction}})",
+      "aboveMarket": "нарықтан жоғары",
+      "belowMarket": "нарықтан төмен"
     }
   },
   "convert": {

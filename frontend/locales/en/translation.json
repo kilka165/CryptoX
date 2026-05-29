@@ -223,6 +223,7 @@
     "buyModal": {
       "currentPrice": "Current price 1 {{symbol}}",
       "amount": "Amount ({{currency}})",
+      "amountCrypto": "Quantity ({{symbol}})",
       "max": "Max: {{amount}} {{symbol}}",
       "amountUsd": "Amount in USD",
       "youReceive": "You receive",
@@ -275,7 +276,14 @@
       "sellerPlaceholder": "Seller name...",
       "sortBy": "Sort by:",
       "price": "Price",
-      "rating": "Rating"
+      "rating": "Rating",
+      "priceRange": "Price range",
+      "amountRange": "Amount range",
+      "min": "From",
+      "max": "To",
+      "advanced": "Advanced filters",
+      "advancedCount": "Active: {{count}}",
+      "reset": "Reset"
     },
     "tableHeader": {
       "makers": "Makers",
@@ -346,7 +354,10 @@
       "insufficientCrypto": "Insufficient {{crypto}}. Available: {{amount}}",
       "insufficientFunds": "Insufficient funds. Required: {{usd}} USD ({{local}} {{currency}}), available: {{available}} USD",
       "createError": "Error creating offer",
-      "enterPriceFirst": "Specify the price first"
+      "enterPriceFirst": "Specify the price first",
+      "deviation": "Market deviation: {{sign}}{{pct}}% ({{abs}} {{currency}} {{direction}})",
+      "aboveMarket": "above market",
+      "belowMarket": "below market"
     }
   },
   "convert": {

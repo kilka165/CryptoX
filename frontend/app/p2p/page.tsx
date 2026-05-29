@@ -23,6 +23,10 @@ export default function P2PPage() {
   const [tradeType, setTradeType] = useState<"buy" | "sell">("buy");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"price" | "rate">("price");
+  const [priceMin, setPriceMin] = useState("");
+  const [priceMax, setPriceMax] = useState("");
+  const [amountMin, setAmountMin] = useState("");
+  const [amountMax, setAmountMax] = useState("");
   const [cryptoOptions, setCryptoOptions] = useState<string[]>([]);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
@@ -92,10 +96,30 @@ export default function P2PPage() {
       }
       return true;
     })
+    .filter((offer) => {
+      const pMin = parseFloat(priceMin.replace(",", "."));
+      const pMax = parseFloat(priceMax.replace(",", "."));
+      const aMin = parseFloat(amountMin.replace(",", "."));
+      const aMax = parseFloat(amountMax.replace(",", "."));
+      if (!isNaN(pMin) && offer.price < pMin) return false;
+      if (!isNaN(pMax) && offer.price > pMax) return false;
+      if (!isNaN(aMin) && offer.available_amount < aMin) return false;
+      if (!isNaN(aMax) && offer.available_amount > aMax) return false;
+      return true;
+    })
     .sort((a, b) => {
       if (sortBy === "price") return a.price - b.price;
       return b.completion_rate - a.completion_rate;
     });
+
+  const handleResetFilters = () => {
+    setPriceMin("");
+    setPriceMax("");
+    setAmountMin("");
+    setAmountMax("");
+    setSearchQuery("");
+    setSortBy("price");
+  };
 
   const handleBuyClick = (offer: P2POffer) => {
     setSelectedOffer(offer);
@@ -171,11 +195,20 @@ export default function P2PPage() {
           selectedCurrency={selectedCurrency}
           searchQuery={searchQuery}
           sortBy={sortBy}
+          priceMin={priceMin}
+          priceMax={priceMax}
+          amountMin={amountMin}
+          amountMax={amountMax}
           onTradeTypeChange={setTradeType}
           onCryptoChange={setSelectedCrypto}
           onCurrencyChange={setSelectedCurrency}
           onSearchChange={setSearchQuery}
           onSortChange={setSortBy}
+          onPriceMinChange={setPriceMin}
+          onPriceMaxChange={setPriceMax}
+          onAmountMinChange={setAmountMin}
+          onAmountMaxChange={setAmountMax}
+          onReset={handleResetFilters}
           onCryptoOptionsLoaded={handleCryptoOptionsLoaded}
         />
 

@@ -13,7 +13,7 @@
 - 📊 **Портфолио**: Отображение списка активов пользователя с их текущей стоимостью
 - 📜 **История транзакций**: Полный лог операций (покупки, продажи, депозиты)
 - 🎨 **UI/UX**: Адаптивный интерфейс с поддержкой темной/светлой темы (Tailwind CSS)
-- 🔄 **Реальные данные**: Интеграция с Binance API и CoinGecko API для актуальных курсов
+- 🔄 **Реальные данные**: Интеграция с Binance API для актуальных курсов
 
 ## 🛠 Технический стек
 
@@ -23,7 +23,7 @@
 - **Database**: MySQL
 - **Auth**: Laravel Sanctum
 - **API**: RESTful API
-- **Интеграции**: Binance API, CoinGecko API
+- **Интеграции**: Binance API
 
 ### Frontend (Client)
 - **Framework**: Next.js (React)
@@ -138,7 +138,6 @@ users (1) ─── (*) transactions
 
 BINANCE_API_KEY=your_binance_api_key
 BINANCE_API_SECRET=your_binance_api_secret
-COINGECKO_API_KEY=your_coingecko_api_key (опционально)
 
 
 ---

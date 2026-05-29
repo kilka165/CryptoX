@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { intlLocale } from "@/lib/utils/locale";
+import { BinanceAPI } from "@/lib/api/binance";
 
 interface CryptoPrice {
   id: string;
@@ -16,7 +17,6 @@ interface CryptoPrice {
   price_change_percentage_24h: number;
   market_cap: number;
   total_volume: number;
-  circulating_supply: number;
 }
 
 export default function PricesPage() {
@@ -31,11 +31,17 @@ export default function PricesPage() {
 
   const fetchCryptoPrices = async () => {
     try {
-      const response = await fetch(
-        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false"
-      );
-      const data = await response.json();
-      setCryptos(data);
+      const coins = await BinanceAPI.getMarketCoinsFromBinance();
+      const mapped: CryptoPrice[] = coins.slice(0, 50).map((c) => ({
+        id: c.id,
+        symbol: c.symbol,
+        name: c.name,
+        current_price: c.current_price,
+        price_change_percentage_24h: c.price_change_percentage_24h,
+        market_cap: c.market_cap ?? 0,
+        total_volume: c.total_volume ?? 0,
+      }));
+      setCryptos(mapped);
     } catch (error) {
       console.error("Error fetching crypto prices:", error);
     } finally {

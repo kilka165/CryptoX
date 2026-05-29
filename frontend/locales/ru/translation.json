@@ -223,6 +223,7 @@
     "buyModal": {
       "currentPrice": "Текущая цена 1 {{symbol}}",
       "amount": "Сумма ({{currency}})",
+      "amountCrypto": "Количество ({{symbol}})",
       "max": "Макс: {{amount}} {{symbol}}",
       "amountUsd": "Сумма в USD",
       "youReceive": "Вы получите",
@@ -275,7 +276,14 @@
       "sellerPlaceholder": "Имя продавца...",
       "sortBy": "Сортировать:",
       "price": "Цена",
-      "rating": "Рейтинг"
+      "rating": "Рейтинг",
+      "priceRange": "Диапазон цены",
+      "amountRange": "Диапазон количества",
+      "min": "От",
+      "max": "До",
+      "advanced": "Расширенные фильтры",
+      "advancedCount": "Активно: {{count}}",
+      "reset": "Сбросить"
     },
     "tableHeader": {
       "makers": "Мейкеры",
@@ -346,7 +354,10 @@
       "insufficientCrypto": "Недостаточно {{crypto}}. Доступно: {{amount}}",
       "insufficientFunds": "Недостаточно средств. Требуется: {{usd}} USD ({{local}} {{currency}}), доступно: {{available}} USD",
       "createError": "Ошибка при создании заявки",
-      "enterPriceFirst": "Сначала укажите цену"
+      "enterPriceFirst": "Сначала укажите цену",
+      "deviation": "Отклонение от рынка: {{sign}}{{pct}}% (на {{abs}} {{currency}} {{direction}})",
+      "aboveMarket": "выше рынка",
+      "belowMarket": "ниже рынка"
     }
   },
   "convert": {
