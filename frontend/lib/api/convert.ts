@@ -2,8 +2,7 @@
 import axios from "axios";
 import type { Coin } from "@/types/coin";
 import { BinanceAPI } from "@/lib/api/binance";
-
-const API_BASE = "http://127.0.0.1:8000/api";
+import { API_BASE } from "@/lib/config";
 
 export interface UserAsset {
   id: number;

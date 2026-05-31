@@ -8,6 +8,7 @@ import axios from "axios";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { intlLocale } from "@/lib/utils/locale";
+import { API_BASE } from "@/lib/config";
 
 export default function WithdrawPage() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function WithdrawPage() {
         try {
             const token = localStorage.getItem("auth_token");
             if (!token) return;
-            const res = await axios.get("http://localhost:8000/api/user", {
+            const res = await axios.get(`${API_BASE}/user`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBalance(res.data.wallet?.balance || 0);
@@ -65,7 +66,7 @@ export default function WithdrawPage() {
     try {
       const token = localStorage.getItem("auth_token");
       
-      await axios.post("http://localhost:8000/api/wallet/withdraw", {
+      await axios.post(`${API_BASE}/wallet/withdraw`, {
         amount: withdrawAmount,
       }, {
         headers: { Authorization: `Bearer ${token}` }

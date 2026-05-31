@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE } from "@/lib/config";
 
 interface CoinImageProps {
   coinId: string;
@@ -17,7 +18,7 @@ export const CoinImage: React.FC<CoinImageProps> = ({ coinId, name, className })
   useEffect(() => {
     const fetchIcon = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/api/coins-db/${coinId}/icon`);
+        const res = await axios.get(`${API_BASE}/coins-db/${coinId}/icon`);
         setImageUrl(res.data.icon_url || res.data.logo_url || null);
       } catch {
         setImageUrl(null);

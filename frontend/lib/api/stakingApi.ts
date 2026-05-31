@@ -1,7 +1,6 @@
 // frontend/lib/api/stakingApi.ts
 import axios from "axios";
-
-const API_URL = "http://localhost:8000/api";
+import { API_BASE as API_URL } from "@/lib/config";
 
 export interface StakingPlan {
   id: number;

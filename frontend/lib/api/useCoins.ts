@@ -1,6 +1,7 @@
 // frontend/lib/hooks/useCoins.ts
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { API_BASE } from '@/lib/config';
 
 interface Coin {
   id: string;
@@ -42,7 +43,7 @@ export function useCoins() {
       setLoading(true);
 
       try {
-        const response = await axios.get('http://localhost:8000/api/coins');
+        const response = await axios.get(`${API_BASE}/coins`);
         cachedCoins = response.data;
         cacheTimestamp = Date.now();
         setCoins(response.data);

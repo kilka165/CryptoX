@@ -9,6 +9,7 @@ import { MarketCard } from "@/components/market/MarketCard";
 import { BuyModal } from "@/components/market/BuyModal";
 import { Footer } from "@/components/Footer";
 import { BinanceAPI } from "@/lib/api/binance";
+import { API_BASE } from "@/lib/config";
 import { Coin } from "@/types/coin";
 import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
@@ -81,7 +82,7 @@ export default function MarketPage() {
     if (!token) return;
 
     axios
-      .get("http://127.0.0.1:8000/api/user", {
+      .get(`${API_BASE}/user`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -160,7 +161,7 @@ export default function MarketPage() {
       console.log("Отправляем payload:", payload);
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/trade/buy",
+        `${API_BASE}/trade/buy`,
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },

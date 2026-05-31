@@ -5,6 +5,7 @@ import { p2pApi } from "@/lib/api/p2pApi";
 import { currencies } from "@/lib/currencies";
 import { BinanceAPI } from "@/lib/api/binance";
 import axios from "axios";
+import { API_BASE } from "@/lib/config";
 import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
 import { intlLocale } from "@/lib/utils/locale";
@@ -106,10 +107,10 @@ export function P2PCreateOfferModal({
 
         // Параллельно загружаем активы и баланс кошелька (курсы валют — из RatesProvider).
         const [assetsResponse, walletResponse] = await Promise.all([
-          axios.get("http://localhost:8000/api/user/assets", {
+          axios.get(`${API_BASE}/user/assets`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:8000/api/wallet/balance", {
+          axios.get(`${API_BASE}/wallet/balance`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

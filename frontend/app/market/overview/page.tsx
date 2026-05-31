@@ -7,6 +7,7 @@ import { BarChart3, Flame, TrendingUp } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BinanceAPI } from "@/lib/api/binance";
+import { API_BASE } from "@/lib/config";
 import type { Coin } from "@/types/coin";
 import { MarketCard } from "@/components/market/MarketCard";
 import { CoinRow } from "@/components/market/CoinRow";
@@ -61,7 +62,7 @@ export default function MarketOverviewPage() {
     if (!token) return;
 
     axios
-      .get("http://127.0.0.1:8000/api/user", {
+      .get(`${API_BASE}/user`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {

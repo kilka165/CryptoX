@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { getAuthToken } from './auth';
+import { API_BASE } from './config';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: API_BASE,
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',

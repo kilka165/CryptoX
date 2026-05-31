@@ -10,6 +10,7 @@ import { CurrencySelectModal, CurrencyItem } from "@/components/convert/Currency
 import { BinanceAPI } from "@/lib/api/binance";
 import { Coin } from "@/types/coin";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "@/lib/config";
 import i18n from "@/lib/i18n";
 
 interface UserAsset {
@@ -91,7 +92,7 @@ export default function ConvertPage() {
         
         if (token) {
           try {
-            const settingsRes = await axios.get("http://127.0.0.1:8000/api/user/settings", {
+            const settingsRes = await axios.get(`${API_BASE}/user/settings`, {
               headers: { Authorization: `Bearer ${token}` },
             });
             currency = settingsRes.data.currency || "USD";
@@ -116,7 +117,7 @@ export default function ConvertPage() {
 
         if (token) {
           const assetsRes = await axios.get<UserAsset[]>(
-            "http://127.0.0.1:8000/api/user/assets",
+            `${API_BASE}/user/assets`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
@@ -295,7 +296,7 @@ export default function ConvertPage() {
       console.log("Отправляем на сервер:", JSON.stringify(payload, null, 2));
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/trade/multi-swap",
+        `${API_BASE}/trade/multi-swap`,
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -305,7 +306,7 @@ export default function ConvertPage() {
       console.log("Ответ от сервера:", response.data);
 
       const assetsRes = await axios.get<UserAsset[]>(
-        "http://127.0.0.1:8000/api/user/assets",
+        `${API_BASE}/user/assets`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { setAuthToken } from "@/lib/auth";
+import { API_BASE } from "@/lib/config";
 import { LogIn, Mail, Lock, ArrowLeft, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -31,7 +32,7 @@ export default function LoginPage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/login",
+        `${API_BASE}/login`,
         formData
       );
 

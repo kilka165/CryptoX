@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { intlLocale } from "@/lib/utils/locale";
+import { API_BASE } from "@/lib/config";
 import { 
   ArrowUpRight, 
   ArrowDownLeft, 
@@ -91,7 +92,7 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
       if (search) params.search = search;
 
       const response = await axios.get<TransactionResponse>(
-        "http://localhost:8000/api/transactions/history",
+        `${API_BASE}/transactions/history`,
         {
           headers: { Authorization: `Bearer ${token}` },
           params,

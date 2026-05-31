@@ -9,6 +9,7 @@ import { currencies } from "@/lib/currencies"; // Импортируем наш 
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { SUPPORTED_LANGUAGES } from "@/lib/i18n";
+import { API_BASE } from "@/lib/config";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function SettingsPage() {
       return;
     }
 
-    axios.get("http://localhost:8000/api/user", {
+    axios.get(`${API_BASE}/user`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(res => {
@@ -52,7 +53,7 @@ export default function SettingsPage() {
 
     try {
       const token = localStorage.getItem("auth_token");
-      await axios.put("http://localhost:8000/api/user/settings", {
+      await axios.put(`${API_BASE}/user/settings`, {
         name,
         currency
       }, {

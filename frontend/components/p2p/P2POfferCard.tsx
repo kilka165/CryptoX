@@ -6,6 +6,7 @@ import { P2POffer } from "@/lib/api/p2pApi";
 import { TrendingUp, CheckCircle, X, Eye, AlertTriangle } from "lucide-react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "@/lib/config";
 
 interface P2POfferCardProps {
   offer: P2POffer;
@@ -36,7 +37,7 @@ export function P2POfferCard({
     setIsDeleting(true);
     try {
       const token = localStorage.getItem("auth_token");
-      await axios.delete(`http://localhost:8000/api/p2p/offers/${offer.id}`, {
+      await axios.delete(`${API_BASE}/p2p/offers/${offer.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       

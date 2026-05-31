@@ -13,6 +13,7 @@ import { p2pApi, P2POffer } from "@/lib/api/p2pApi";
 import { Plus } from "lucide-react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "@/lib/config";
 
 export default function P2PPage() {
   const { t } = useTranslation();
@@ -42,7 +43,7 @@ export default function P2PPage() {
         const token = localStorage.getItem("auth_token");
         if (!token) return;
 
-        const response = await axios.get("http://localhost:8000/api/user", {
+        const response = await axios.get(`${API_BASE}/user`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCurrentUserId(response.data.id);

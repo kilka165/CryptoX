@@ -5,6 +5,7 @@ import axios from "axios";
 import { X, TrendingUp, AlertCircle } from "lucide-react";
 import { BinanceAPI } from "@/lib/api/binance";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "@/lib/config";
 
 interface Asset {
   id: number;
@@ -98,7 +99,7 @@ export function SellModal({
       }
 
       await axios.post(
-        "http://127.0.0.1:8000/api/trade/sell",
+        `${API_BASE}/trade/sell`,
         {
           coin_id: selectedAsset.name,
           amount: sellAmount,

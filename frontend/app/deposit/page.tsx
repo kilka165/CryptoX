@@ -7,6 +7,7 @@ import { CreditCard, ArrowLeft, ShieldCheck, CheckCircle } from "lucide-react";
 import axios from "axios";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "@/lib/config";
 
 export default function DepositPage() {
   const router = useRouter();
@@ -65,7 +66,7 @@ export default function DepositPage() {
       }
       
       // Отправляем запрос на сервер с полем currency
-      await axios.post("http://localhost:8000/api/wallet/deposit", {
+      await axios.post(`${API_BASE}/wallet/deposit`, {
         amount: depositAmount,
         currency: "USD" // <-- ДОБАВЛЕНО ОБЯЗАТЕЛЬНОЕ ПОЛЕ
       }, {

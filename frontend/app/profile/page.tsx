@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { BinanceAPI } from "@/lib/api/binance";
 import { clearAuthToken } from "@/lib/auth";
+import { API_BASE } from "@/lib/config";
 import { Header } from "@/components/Header";
 import { UserCard } from "@/components/profile/UserCard";
 import { UserNavigation } from "@/components/profile/UserNavigation";
@@ -120,7 +121,7 @@ export default function ProfilePage() {
 
   const loadUserData = (token: string) => {
     axios
-      .get("http://localhost:8000/api/user", {
+      .get(`${API_BASE}/user`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
