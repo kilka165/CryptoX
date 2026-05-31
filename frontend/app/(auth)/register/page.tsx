@@ -110,9 +110,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-white">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
       <div className="flex-1 flex items-center justify-center px-4">
-        <div className="w-full max-w-md bg-slate-900/80 border border-slate-800 rounded-2xl p-8 shadow-xl">
+        <div className="w-full max-w-md bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-xl transition-colors">
           {/* Назад на главную */}
           <button
             type="button"
@@ -140,7 +140,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-5 mt-4">
             {/* Имя */}
             <div className="space-y-1">
-              <label className="text-sm text-slate-300">{t("auth.register.nameLabel")}</label>
+              <label className="text-sm text-slate-700 dark:text-slate-300">{t("auth.register.nameLabel")}</label>
               <div className="relative">
                 <User className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -148,7 +148,7 @@ export default function RegisterPage() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   placeholder={t("auth.register.namePlaceholder")}
                 />
               </div>
@@ -162,7 +162,7 @@ export default function RegisterPage() {
 
             {/* Email */}
             <div className="space-y-1">
-              <label className="text-sm text-slate-300">{t("auth.emailLabel")}</label>
+              <label className="text-sm text-slate-700 dark:text-slate-300">{t("auth.emailLabel")}</label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -170,7 +170,7 @@ export default function RegisterPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   placeholder={t("common.emailPlaceholder")}
                 />
               </div>
@@ -184,7 +184,7 @@ export default function RegisterPage() {
 
             {/* Пароль */}
             <div className="space-y-1">
-              <label className="text-sm text-slate-300">{t("auth.passwordLabel")}</label>
+              <label className="text-sm text-slate-700 dark:text-slate-300">{t("auth.passwordLabel")}</label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -192,7 +192,7 @@ export default function RegisterPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   placeholder={t("auth.register.passwordPlaceholder")}
                 />
               </div>
@@ -210,7 +210,7 @@ export default function RegisterPage() {
 
             {/* Подтверждение пароля */}
             <div className="space-y-1">
-              <label className="text-sm text-slate-300">
+              <label className="text-sm text-slate-700 dark:text-slate-300">
                 {t("auth.register.confirmLabel")}
               </label>
               <div className="relative">
@@ -220,7 +220,7 @@ export default function RegisterPage() {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   placeholder={t("auth.register.confirmPlaceholder")}
                 />
               </div>
