@@ -33,7 +33,7 @@ private function fetchBinanceCoinsList(): array
 {
     $response = Http::withoutVerifying()
         ->timeout(10)
-        ->get('https://api.binance.com/api/v3/ticker/24hr');
+        ->get('https://data-api.binance.vision/api/v3/ticker/24hr');
 
     if (!$response->successful()) {
         throw new \Exception('Binance API error: ' . $response->status());
@@ -87,7 +87,7 @@ public function getPrice($symbol)
     try {
         $response = Http::withoutVerifying()
             ->timeout(5)
-            ->get('https://api.binance.com/api/v3/ticker/price', [
+            ->get('https://data-api.binance.vision/api/v3/ticker/price', [
                 'symbol' => strtoupper($symbol) . 'USDT'
             ]);
 
@@ -112,7 +112,7 @@ public function get24hStats($symbol)
     try {
         $response = Http::withoutVerifying() // Добавили
             ->timeout(5)
-            ->get('https://api.binance.com/api/v3/ticker/24hr', [
+            ->get('https://data-api.binance.vision/api/v3/ticker/24hr', [
                 'symbol' => strtoupper($symbol) . 'USDT'
             ]);
 
