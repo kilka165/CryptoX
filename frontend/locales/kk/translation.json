@@ -413,6 +413,7 @@
       "currentPrice": "Ағымдағы баға",
       "available": "Қолжетімді",
       "amountToSell": "Сату саны",
+      "amountInCurrency": "Сома ({{currency}})",
       "totalReceive": "Барлығы аласыз",
       "selling": "Сатылуда...",
       "sell": "Сату",

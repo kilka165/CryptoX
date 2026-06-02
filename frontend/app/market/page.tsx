@@ -144,21 +144,17 @@ export default function MarketPage() {
         return;
       }
 
-      const binancePrice = await BinanceAPI.getPrice(selectedCoin.symbol);
-      const cryptoAmountToBuy = amountInUSD / binancePrice;
+      // Используем ту же цену, что показывали в модалке (selectedCoin.current_price),
+      // а не отдельный /coins/price/{symbol} — иначе из-за рассинхрона между
+      // кэшированным списком и live-эндпоинтом сумма в истории отличалась на ~0.01%.
+      const coinPrice = selectedCoin.current_price;
+      const cryptoAmountToBuy = amountInUSD / coinPrice;
 
       const payload = {
         coin_id: selectedCoin.id,
         amount: cryptoAmountToBuy,
-        price_usd: binancePrice,
+        price_usd: coinPrice,
       };
-
-      console.log("=== ПОКУПКА ===");
-      console.log("selectedCoin:", selectedCoin);
-      console.log("Сумма в USD:", amountInUSD);
-      console.log("Цена Binance:", binancePrice);
-      console.log("Количество крипты:", cryptoAmountToBuy);
-      console.log("Отправляем payload:", payload);
 
       const response = await axios.post(
         `${API_BASE}/trade/buy`,

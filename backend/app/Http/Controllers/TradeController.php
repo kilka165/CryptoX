@@ -16,7 +16,7 @@ class TradeController extends Controller
         $validated = $request->validate([
             'coin_id' => 'required|string',
             'amount' => 'required|numeric|min:0.00000001',
-            'price_usd' => 'required|numeric|min:0',
+            'price_usd' => 'required|numeric|min:0.00000001',
         ]);
 
         $user = $request->user();
@@ -56,6 +56,7 @@ class TradeController extends Controller
             Transaction::create([
                 'user_id' => $user->id,
                 'asset_id' => $asset->id,
+                'coin' => $asset->name,
                 'type' => 'buy',
                 'amount' => $amount,
                 'price_usd' => $priceUsd,
@@ -81,10 +82,12 @@ class TradeController extends Controller
 
     public function sell(Request $request)
     {
+        // price_usd должен быть строго > 0: иначе total_usd выйдет 0 и
+        // пользователь отдаст актив бесплатно (баг с SellModal до фикса).
         $validated = $request->validate([
             'coin_id' => 'required|string',
             'amount' => 'required|numeric|min:0.00000001',
-            'price_usd' => 'required|numeric|min:0',
+            'price_usd' => 'required|numeric|min:0.00000001',
         ]);
 
         $user = $request->user();
@@ -108,8 +111,15 @@ class TradeController extends Controller
 
         try {
             $asset->amount -= $amount;
+
+            // Сохраняем id/имя ДО возможного удаления — без этого FK падал
+            // при попытке вставить transaction.asset_id уже удалённой строки.
+            $assetIdForTx = $asset->id;
+            $coinName = $asset->name;
+
             if ($asset->amount <= 0.00000001) {
                 $asset->delete();
+                $assetIdForTx = null;
             } else {
                 $asset->save();
             }
@@ -120,7 +130,8 @@ class TradeController extends Controller
 
             Transaction::create([
                 'user_id' => $user->id,
-                'asset_id' => $asset->id ?? null,
+                'asset_id' => $assetIdForTx,
+                'coin' => $coinName,
                 'type' => 'sell',
                 'amount' => $amount,
                 'price_usd' => $priceUsd,
@@ -150,11 +161,11 @@ class TradeController extends Controller
                 'from_coins' => 'required|array|min:1',
                 'from_coins.*.coin_id' => 'required|string',
                 'from_coins.*.amount' => 'required|numeric|min:0.00000001',
-                'from_coins.*.price_usd' => 'required|numeric|min:0',
+                'from_coins.*.price_usd' => 'required|numeric|min:0.00000001',
                 'to_coins' => 'required|array|min:1',
                 'to_coins.*.coin_id' => 'required|string',
                 'to_coins.*.weight' => 'required|numeric|min:0',
-                'price_usd' => 'required|numeric|min:0',
+                'price_usd' => 'required|numeric|min:0.00000001',
             ]);
 
             $user = $request->user();
@@ -183,11 +194,13 @@ class TradeController extends Controller
                 }
 
                 $asset->amount -= $amount;
+                $assetId = $asset->id;
+                $coinName = $asset->name;
+
                 if ($asset->amount <= 0.00000001) {
-                    $assetId = $asset->id;
                     $asset->delete();
+                    $assetId = null;
                 } else {
-                    $assetId = $asset->id;
                     $asset->save();
                 }
 
@@ -197,6 +210,7 @@ class TradeController extends Controller
                 Transaction::create([
                     'user_id' => $user->id,
                     'asset_id' => $assetId,
+                    'coin' => $coinName,
                     'type' => 'sell',
                     'amount' => $amount,
                     'price_usd' => $priceUsd,
@@ -233,6 +247,7 @@ class TradeController extends Controller
                 Transaction::create([
                     'user_id' => $user->id,
                     'asset_id' => $asset->id,
+                    'coin' => $asset->name,
                     'type' => 'buy',
                     'amount' => $boughtAmount,
                     'price_usd' => $toPriceUsd,

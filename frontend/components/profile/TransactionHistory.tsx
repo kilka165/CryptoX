@@ -4,6 +4,7 @@ import { CryptoIcon } from "@/components/CryptoIcon";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import { useRates } from "@/components/RatesProvider";
 import { intlLocale } from "@/lib/utils/locale";
 import { API_BASE } from "@/lib/config";
 import { 
@@ -24,6 +25,9 @@ interface Transaction {
   price_usd: number;
   total_usd: number;
   description: string;
+  // Сохраняется на бэке при создании транзакции — нужен, чтобы история не теряла
+  // название монеты, если актив пользователь полностью продал и его строка удалена.
+  coin: string | null;
   asset: {
     symbol: string;
     name: string;
@@ -54,19 +58,9 @@ const getCurrencySymbol = (currency: string): string => {
   return symbols[currency] || currency;
 };
 
-// Функция конвертации из USD
-const getExchangeRate = (currency: string): number => {
-  const rates: Record<string, number> = {
-    USD: 1,
-    RUB: 90,
-    EUR: 0.92,
-    KZT: 450,
-  };
-  return rates[currency] || 1;
-};
-
 export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryProps) {
   const { t, i18n } = useTranslation();
+  const { getRate } = useRates();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "buy" | "sell" | "deposit" | "withdraw">("all");
@@ -163,7 +157,7 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
     });
   };
 
-  const exchangeRate = getExchangeRate(userCurrency);
+  const exchangeRate = getRate(userCurrency);
   const currencySymbol = getCurrencySymbol(userCurrency);
 
   return (
@@ -241,25 +235,31 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
                         </div>
                       </td>
                       <td className="py-3">
-                        {tx.asset ? (
-                          <div className="flex items-center gap-2">
-                            <CryptoIcon
-                              symbol={tx.asset.symbol}
-                              logoUrl={tx.asset.logo_url}
-                              size={24}
-                            />
-                            <div>
-                              <div className="font-medium text-slate-900 dark:text-white uppercase">
-                                {tx.asset.symbol}
-                              </div>
-                              <div className="text-xs text-slate-500 capitalize">
-                                {tx.asset.name}
+                        {(() => {
+                          const symbol = tx.asset?.symbol
+                            || (tx.coin ? tx.coin.slice(0, 4).toUpperCase() : "");
+                          const name = tx.asset?.name || tx.coin || "";
+                          if (!symbol && !name) {
+                            return <span className="text-slate-400 text-xs">-</span>;
+                          }
+                          return (
+                            <div className="flex items-center gap-2">
+                              <CryptoIcon
+                                symbol={symbol}
+                                logoUrl={tx.asset?.logo_url}
+                                size={24}
+                              />
+                              <div>
+                                <div className="font-medium text-slate-900 dark:text-white uppercase">
+                                  {symbol}
+                                </div>
+                                <div className="text-xs text-slate-500 capitalize">
+                                  {name}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ) : (
-                          <span className="text-slate-400 text-xs">-</span>
-                        )}
+                          );
+                        })()}
                       </td>
                       <td className="py-3 text-right font-medium">
                         {tx.type === 'deposit' || tx.type === 'withdraw' ? (

@@ -413,6 +413,7 @@
       "currentPrice": "Текущая цена",
       "available": "Доступно",
       "amountToSell": "Количество для продажи",
+      "amountInCurrency": "Сумма ({{currency}})",
       "totalReceive": "Итого получите",
       "selling": "Продаём...",
       "sell": "Продать",

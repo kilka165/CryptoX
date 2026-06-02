@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { X, TrendingUp, AlertCircle } from "lucide-react";
-import { BinanceAPI } from "@/lib/api/binance";
+import { X, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useRates } from "@/components/RatesProvider";
 import { API_BASE } from "@/lib/config";
 
 interface Asset {
@@ -13,6 +13,9 @@ interface Asset {
   symbol: string;
   amount: number;
   logo_url?: string | null;
+  // Цена из обогащённого источника /api/coins (родитель profile/page.tsx).
+  // Если undefined — продажу не разрешаем, чтобы не записать total_usd=0.
+  currentPriceUSD?: number;
 }
 
 interface SellModalProps {
@@ -22,26 +25,16 @@ interface SellModalProps {
   onSellSuccess: () => void;
 }
 
-// Маппинг названий на символы
-const getCoinSymbol = (name: string): string => {
-  const symbolMap: Record<string, string> = {
-    'bitcoin': 'BTC',
-    'ethereum': 'ETH',
-    'ripple': 'XRP',
-    'binancecoin': 'BNB',
-    'cardano': 'ADA',
-    'solana': 'SOL',
-    'polkadot': 'DOT',
-    'dogecoin': 'DOGE',
-    'polygon': 'MATIC',
-    'avalanche': 'AVAX',
-    'chainlink': 'LINK',
-    'litecoin': 'LTC',
-    'uniswap': 'UNI',
-  };
-  
-  return symbolMap[name.toLowerCase()] || name.toUpperCase();
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: "$",
+  RUB: "₽",
+  EUR: "€",
+  KZT: "₸",
+  GBP: "£",
 };
+
+const getCurrencySymbol = (currency: string): string =>
+  CURRENCY_SYMBOLS[currency] || currency;
 
 export function SellModal({
   selectedAsset,
@@ -50,39 +43,69 @@ export function SellModal({
   onSellSuccess,
 }: SellModalProps) {
   const { t } = useTranslation();
-  const [amount, setAmount] = useState("");
+  const { getRate } = useRates();
+  const [cryptoAmount, setCryptoAmount] = useState("");
+  const [fiatAmount, setFiatAmount] = useState("");
   const [isSelling, setIsSelling] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentPrice, setCurrentPrice] = useState(0);
-
-  useEffect(() => {
-    if (selectedAsset) {
-      const fetchPrice = async () => {
-        try {
-          const binanceSymbol = getCoinSymbol(selectedAsset.name);
-          const price = await BinanceAPI.getPrice(binanceSymbol);
-          setCurrentPrice(price);
-        } catch (err) {
-          console.error("Ошибка загрузки цены:", err);
-          setCurrentPrice(0);
-        }
-      };
-
-      fetchPrice();
-      const interval = setInterval(fetchPrice, 10000);
-      return () => clearInterval(interval);
-    }
-  }, [selectedAsset]);
 
   if (!selectedAsset) return null;
 
+  const currentPrice = selectedAsset.currentPriceUSD ?? 0;
+  const priceUnavailable = currentPrice <= 0;
+  const exchangeRate = getRate(userCurrency);
+  const currencySymbol = getCurrencySymbol(userCurrency);
+  // Цена единицы актива в валюте пользователя (KZT и т.д.)
+  const priceInUserCurrency = currentPrice * exchangeRate;
+
+  // Двусторонняя синхронизация полей: правка одного пересчитывает другое
+  // через ту же цену, которую видит пользователь сверху модалки.
+  const handleCryptoChange = (raw: string) => {
+    const val = raw.replace(/[^0-9.]/g, "");
+    if ((val.match(/\./g) || []).length > 1) return;
+    setCryptoAmount(val);
+    const n = parseFloat(val || "0");
+    if (priceInUserCurrency > 0 && n > 0) {
+      setFiatAmount((n * priceInUserCurrency).toFixed(2));
+    } else {
+      setFiatAmount("");
+    }
+  };
+
+  const handleFiatChange = (raw: string) => {
+    const val = raw.replace(/[^0-9.]/g, "");
+    if ((val.match(/\./g) || []).length > 1) return;
+    setFiatAmount(val);
+    const n = parseFloat(val || "0");
+    if (priceInUserCurrency > 0 && n > 0) {
+      setCryptoAmount((n / priceInUserCurrency).toFixed(8));
+    } else {
+      setCryptoAmount("");
+    }
+  };
+
+  const setPercent = (pct: number) => {
+    const crypto = selectedAsset.amount * pct;
+    setCryptoAmount(crypto.toFixed(8));
+    if (priceInUserCurrency > 0) {
+      setFiatAmount((crypto * priceInUserCurrency).toFixed(2));
+    } else {
+      setFiatAmount("");
+    }
+  };
+
   const handleSell = async () => {
-    if (!amount || parseFloat(amount) <= 0) {
+    if (priceUnavailable) {
+      setError(t("profile.sellModal.errSellFailed"));
+      return;
+    }
+
+    const sellAmount = parseFloat(cryptoAmount || "0");
+    if (!sellAmount || sellAmount <= 0) {
       setError(t("profile.sellModal.errInvalidAmount"));
       return;
     }
 
-    const sellAmount = parseFloat(amount);
     if (sellAmount > selectedAsset.amount) {
       setError(t("common.insufficientFunds"));
       return;
@@ -112,7 +135,8 @@ export function SellModal({
 
       onSellSuccess();
       onClose();
-      setAmount("");
+      setCryptoAmount("");
+      setFiatAmount("");
     } catch (err: any) {
       setError(
         err.response?.data?.message || t("profile.sellModal.errSellFailed")
@@ -122,7 +146,7 @@ export function SellModal({
     }
   };
 
-  const totalValue = currentPrice * parseFloat(amount || "0");
+  const totalReceiveFiat = parseFloat(fiatAmount || "0");
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -142,7 +166,11 @@ export function SellModal({
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-slate-600 dark:text-slate-400">{t("profile.sellModal.currentPrice")}</span>
               <span className="text-lg font-bold">
-                ${currentPrice.toLocaleString()}
+                {currencySymbol}
+                {priceInUserCurrency.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: priceInUserCurrency < 1 ? 8 : 2,
+                })}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -162,58 +190,84 @@ export function SellModal({
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              {t("profile.sellModal.amountToSell")}
+              {t("profile.sellModal.amountToSell")} ({selectedAsset.symbol.toUpperCase()})
             </label>
             <input
-              type="number"
-              step="0.00000001"
-              min="0"
-              max={selectedAsset.amount}
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0.00"
-              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-[#0d0d0d] text-lg font-semibold outline-none focus:border-blue-500"
+              type="text"
+              inputMode="decimal"
+              value={cryptoAmount}
+              onChange={(e) => handleCryptoChange(e.target.value)}
+              disabled={priceUnavailable}
+              placeholder="0.00000000"
+              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-[#0d0d0d] text-lg font-semibold outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <div className="mt-2 flex justify-between">
               <button
-                onClick={() => setAmount((selectedAsset.amount * 0.25).toFixed(8))}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                type="button"
+                onClick={() => setPercent(0.25)}
+                disabled={priceUnavailable}
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-40 disabled:no-underline"
               >
                 25%
               </button>
               <button
-                onClick={() => setAmount((selectedAsset.amount * 0.5).toFixed(8))}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                type="button"
+                onClick={() => setPercent(0.5)}
+                disabled={priceUnavailable}
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-40 disabled:no-underline"
               >
                 50%
               </button>
               <button
-                onClick={() => setAmount((selectedAsset.amount * 0.75).toFixed(8))}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                type="button"
+                onClick={() => setPercent(0.75)}
+                disabled={priceUnavailable}
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-40 disabled:no-underline"
               >
                 75%
               </button>
               <button
-                onClick={() => setAmount(selectedAsset.amount.toFixed(8))}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                type="button"
+                onClick={() => setPercent(1)}
+                disabled={priceUnavailable}
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-40 disabled:no-underline"
               >
                 100%
               </button>
             </div>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              {t("profile.sellModal.amountInCurrency", { currency: userCurrency })}
+            </label>
+            <input
+              type="text"
+              inputMode="decimal"
+              value={fiatAmount}
+              onChange={(e) => handleFiatChange(e.target.value)}
+              disabled={priceUnavailable}
+              placeholder="0.00"
+              className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-[#0d0d0d] text-lg font-semibold outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+          </div>
+
           <div className="bg-slate-100 dark:bg-slate-800 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-slate-600 dark:text-slate-400">{t("profile.sellModal.totalReceive")}</span>
               <span className="text-xl font-bold text-green-600">
-                ${totalValue.toFixed(2)}
+                {currencySymbol}
+                {totalReceiveFiat.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </span>
             </div>
           </div>
 
           <button
             onClick={handleSell}
-            disabled={isSelling || !amount || parseFloat(amount) <= 0}
+            disabled={isSelling || !cryptoAmount || parseFloat(cryptoAmount) <= 0 || priceUnavailable}
             className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
           >
             {isSelling ? t("profile.sellModal.selling") : t("profile.sellModal.sell")}

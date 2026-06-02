@@ -10,6 +10,7 @@ class Transaction extends Model
     protected $fillable = [
         'user_id',
         'asset_id',
+        'coin',
         'type',
         'status',
         'amount',

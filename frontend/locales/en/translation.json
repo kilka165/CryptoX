@@ -413,6 +413,7 @@
       "currentPrice": "Current price",
       "available": "Available",
       "amountToSell": "Amount to sell",
+      "amountInCurrency": "Amount ({{currency}})",
       "totalReceive": "You receive",
       "selling": "Selling...",
       "sell": "Sell",
