@@ -343,7 +343,9 @@
       "errMaxAvailable": "Maximum available: {{amount}} {{crypto}}",
       "errMinSum": "Minimum sum: {{amount}} {{currency}}",
       "errMaxSum": "Maximum sum: {{amount}} {{currency}}",
-      "errTrade": "Error creating trade"
+      "errTrade": "Error creating trade",
+      "insufficientBuy": "Insufficient funds. Available: {{amount}} {{currency}}",
+      "insufficientSell": "Insufficient {{crypto}}. Available: {{amount}} {{crypto}}"
     },
     "createModal": {
       "sellTitle": "Sell cryptocurrency",
@@ -366,7 +368,7 @@
       "fillAllFields": "Fill in all fields",
       "allPositive": "All values must be greater than zero",
       "insufficientCrypto": "Insufficient {{crypto}}. Available: {{amount}}",
-      "insufficientFunds": "Insufficient funds. Required: {{usd}} USD ({{local}} {{currency}}), available: {{available}} USD",
+      "insufficientFunds": "Insufficient funds. Required: {{required}} {{currency}}, available: {{available}} {{currency}}",
       "createError": "Error creating offer",
       "enterPriceFirst": "Specify the price first",
       "deviation": "Market deviation: {{sign}}{{pct}}% ({{abs}} {{currency}} {{direction}})",

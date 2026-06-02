@@ -343,7 +343,9 @@
       "errMaxAvailable": "Ең көп қолжетімді: {{amount}} {{crypto}}",
       "errMinSum": "Ең аз сома: {{amount}} {{currency}}",
       "errMaxSum": "Ең көп сома: {{amount}} {{currency}}",
-      "errTrade": "Мәміле жасау қатесі"
+      "errTrade": "Мәміле жасау қатесі",
+      "insufficientBuy": "Қаражат жеткіліксіз. Қолжетімді: {{amount}} {{currency}}",
+      "insufficientSell": "{{crypto}} жеткіліксіз. Қолжетімді: {{amount}} {{crypto}}"
     },
     "createModal": {
       "sellTitle": "Криптовалюта сату",
@@ -366,7 +368,7 @@
       "fillAllFields": "Барлық өрістерді толтырыңыз",
       "allPositive": "Барлық мәндер нөлден үлкен болуы керек",
       "insufficientCrypto": "{{crypto}} жеткіліксіз. Қолжетімді: {{amount}}",
-      "insufficientFunds": "Қаражат жеткіліксіз. Қажет: {{usd}} USD ({{local}} {{currency}}), қолжетімді: {{available}} USD",
+      "insufficientFunds": "Қаражат жеткіліксіз. Қажет: {{required}} {{currency}}, қолжетімді: {{available}} {{currency}}",
       "createError": "Өтінім жасау қатесі",
       "enterPriceFirst": "Алдымен бағаны көрсетіңіз",
       "deviation": "Нарықтан ауытқу: {{sign}}{{pct}}% ({{abs}} {{currency}} {{direction}})",

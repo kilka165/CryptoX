@@ -343,7 +343,9 @@
       "errMaxAvailable": "Максимум доступно: {{amount}} {{crypto}}",
       "errMinSum": "Минимальная сумма: {{amount}} {{currency}}",
       "errMaxSum": "Максимальная сумма: {{amount}} {{currency}}",
-      "errTrade": "Ошибка при создании сделки"
+      "errTrade": "Ошибка при создании сделки",
+      "insufficientBuy": "Недостаточно средств. Доступно: {{amount}} {{currency}}",
+      "insufficientSell": "Недостаточно {{crypto}}. Доступно: {{amount}} {{crypto}}"
     },
     "createModal": {
       "sellTitle": "Продать криптовалюту",
@@ -366,7 +368,7 @@
       "fillAllFields": "Заполните все поля",
       "allPositive": "Все значения должны быть больше нуля",
       "insufficientCrypto": "Недостаточно {{crypto}}. Доступно: {{amount}}",
-      "insufficientFunds": "Недостаточно средств. Требуется: {{usd}} USD ({{local}} {{currency}}), доступно: {{available}} USD",
+      "insufficientFunds": "Недостаточно средств. Требуется: {{required}} {{currency}}, доступно: {{available}} {{currency}}",
       "createError": "Ошибка при создании заявки",
       "enterPriceFirst": "Сначала укажите цену",
       "deviation": "Отклонение от рынка: {{sign}}{{pct}}% (на {{abs}} {{currency}} {{direction}})",

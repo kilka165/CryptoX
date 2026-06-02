@@ -9,6 +9,9 @@ import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
 import { intlLocale } from "@/lib/utils/locale";
 import { getCurrencySymbol } from "@/lib/currencies";
+import { sanitizeDecimalInput } from "@/lib/utils/number";
+import axios from "axios";
+import { API_BASE } from "@/lib/config";
 
 interface P2PBuyModalProps {
   isOpen: boolean;
@@ -31,6 +34,10 @@ export function P2PBuyModal({
   const [error, setError] = useState("");
   const [marketPrice, setMarketPrice] = useState<number | null>(null);
   const [loadingMarketPrice, setLoadingMarketPrice] = useState(false);
+  const [walletUSD, setWalletUSD] = useState<number | null>(null);
+  const [userAssets, setUserAssets] = useState<
+    { name: string; symbol: string; amount: number }[]
+  >([]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -38,7 +45,45 @@ export function P2PBuyModal({
       setFiatAmount("");
       setError("");
       setMarketPrice(null);
+      setWalletUSD(null);
+      setUserAssets([]);
     }
+  }, [isOpen]);
+
+  // Загружаем баланс пользователя, чтобы проверять достаточность средств
+  // на клиенте (а не ловить ошибку с бэкенда после попытки сделки).
+  useEffect(() => {
+    if (!isOpen) return;
+    const token = localStorage.getItem("auth_token");
+    if (!token) return;
+
+    let active = true;
+    Promise.all([
+      axios.get(`${API_BASE}/wallet/balance`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+      axios.get(`${API_BASE}/user/assets`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+    ])
+      .then(([wallet, assets]) => {
+        if (!active) return;
+        setWalletUSD(parseFloat(wallet.data.balance || 0));
+        setUserAssets(
+          (assets.data || []).map((a: any) => ({
+            name: a.name || a.coin_name,
+            symbol: a.symbol || a.coin_symbol,
+            amount: parseFloat(a.amount || 0),
+          }))
+        );
+      })
+      .catch((err) => {
+        console.error("Failed to load balance:", err);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [isOpen]);
 
   // Загружаем рыночную цену при открытии (курсы валют — из единого RatesProvider).
@@ -99,12 +144,52 @@ export function P2PBuyModal({
   // Рассчитываем разницу с рынком
   const priceDifference = marketPrice ? ((offer.price - marketPrice) / marketPrice) * 100 : null;
 
+  // Доступный баланс пользователя для этой сделки.
+  // Покупка крипты (offer.type === "sell") → платим фиатом из USD-кошелька.
+  // Продажа крипты (offer.type === "buy") → отдаём крипту со своего актива.
+  const normAsset = (s: string) => (s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const cryptoAsset = userAssets.find(
+    (a) =>
+      normAsset(a.name) === normAsset(offer.crypto_currency) ||
+      normAsset(a.symbol) === normAsset(offer.crypto_currency)
+  );
+  const availableCrypto = cryptoAsset?.amount ?? 0;
+  const availableFiat =
+    walletUSD != null ? convert(walletUSD, "USD", offer.currency) : null;
+
+  const cryptoNumLive = parseFloat(cryptoAmount) || 0;
+  const fiatNumLive = parseFloat(fiatAmount) || 0;
+  // Покупка: проверяем фиат-баланс (надёжно — одна USD-сумма).
+  // Продажа: проверяем только если актив однозначно сопоставлен, иначе не
+  // блокируем (чтобы не дать ложный запрет из-за расхождения названий).
+  const insufficientFunds = isBuying
+    ? availableFiat != null && fiatNumLive > availableFiat + 1e-9
+    : cryptoAsset != null && cryptoNumLive > availableCrypto + 1e-9;
+  const showInsufficient =
+    (cryptoNumLive > 0 || fiatNumLive > 0) && insufficientFunds;
+
+  const insufficientMessage = isBuying
+    ? t("p2p.buyModal.insufficientBuy", {
+        amount: (availableFiat ?? 0).toLocaleString(intlLocale(i18n.language), {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        currency: fiat,
+      })
+    : t("p2p.buyModal.insufficientSell", {
+        amount: availableCrypto.toLocaleString(intlLocale(i18n.language), {
+          maximumFractionDigits: 8,
+        }),
+        crypto: offer.crypto_currency,
+      });
+
   const handleCryptoChange = (value: string) => {
-    setCryptoAmount(value);
+    const v = sanitizeDecimalInput(value);
+    setCryptoAmount(v);
     setError("");
 
-    if (value && !isNaN(parseFloat(value))) {
-      const crypto = parseFloat(value);
+    if (v && !isNaN(parseFloat(v))) {
+      const crypto = parseFloat(v);
       const calculatedFiat = crypto * offer.price;
       setFiatAmount(calculatedFiat.toFixed(2));
     } else {
@@ -113,11 +198,12 @@ export function P2PBuyModal({
   };
 
   const handleFiatChange = (value: string) => {
-    setFiatAmount(value);
+    const v = sanitizeDecimalInput(value);
+    setFiatAmount(v);
     setError("");
 
-    if (value && !isNaN(parseFloat(value))) {
-      const fiat = parseFloat(value);
+    if (v && !isNaN(parseFloat(v))) {
+      const fiat = parseFloat(v);
       const calculatedCrypto = fiat / offer.price;
       setCryptoAmount(calculatedCrypto.toFixed(8));
     } else {
@@ -156,6 +242,11 @@ export function P2PBuyModal({
 
     if (fiatNum > offer.max_limit) {
       setError(t("p2p.buyModal.errMaxSum", { amount: offer.max_limit, currency: fiat }));
+      return;
+    }
+
+    if (insufficientFunds) {
+      setError(insufficientMessage);
       return;
     }
 
@@ -378,6 +469,14 @@ export function P2PBuyModal({
             </>
           )}
 
+          {/* Предупреждение о нехватке средств */}
+          {showInsufficient && !error && (
+            <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 rounded-lg">
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <span className="text-sm">{insufficientMessage}</span>
+            </div>
+          )}
+
           {/* Ошибка */}
           {error && (
             <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg">
@@ -396,7 +495,7 @@ export function P2PBuyModal({
             </button>
             <button
               onClick={handleConfirm}
-              disabled={isProcessing || !cryptoAmount || !fiatAmount}
+              disabled={isProcessing || !cryptoAmount || !fiatAmount || showInsufficient}
               className={`flex-1 px-6 py-3 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
                 isBuying 
                   ? 'bg-emerald-600 hover:bg-emerald-700' 

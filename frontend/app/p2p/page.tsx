@@ -179,7 +179,9 @@ export default function P2PPage() {
       fetchOffers();
     } catch (error) {
       console.error("Error creating trade:", error);
-      alert(t("p2p.tradeCreateError"));
+      // Пробрасываем ошибку, чтобы модалка показала её inline-сообщением,
+      // а не системным alert поверх страницы.
+      throw error;
     }
   };
 

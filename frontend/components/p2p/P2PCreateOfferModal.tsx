@@ -9,6 +9,7 @@ import { API_BASE } from "@/lib/config";
 import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
 import { intlLocale } from "@/lib/utils/locale";
+import { sanitizeDecimalInput } from "@/lib/utils/number";
 
 interface P2PCreateOfferModalProps {
   isOpen: boolean;
@@ -223,8 +224,18 @@ export function P2PCreateOfferModal({
       const availableUSD = walletBalance?.balance || 0;
 
       if (totalInUSD > availableUSD) {
+        const availableInDisplay = convertFromUSD(availableUSD, displayCurrency);
+        const fmt = (n: number) =>
+          n.toLocaleString(intlLocale(i18n.language), {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
         setError(
-          t("p2p.createModal.insufficientFunds", { usd: totalInUSD.toFixed(2), local: totalInDisplayCurrency.toFixed(2), currency: getCurrencySymbol(displayCurrency), available: availableUSD.toFixed(2) })
+          t("p2p.createModal.insufficientFunds", {
+            required: fmt(totalInDisplayCurrency),
+            available: fmt(availableInDisplay),
+            currency: getCurrencySymbol(displayCurrency),
+          })
         );
         return;
       }
@@ -454,7 +465,7 @@ export function P2PCreateOfferModal({
                 type="text"
                 inputMode="decimal"
                 value={pricePerCrypto}
-                onChange={(e) => setPricePerCrypto(e.target.value)}
+                onChange={(e) => setPricePerCrypto(sanitizeDecimalInput(e.target.value))}
                 placeholder={loadingMarketPrice ? t("common.loading") : marketPrice ? marketPrice.toFixed(2) : "480.50"}
                 disabled={loadingMarketPrice}
                 className="w-full px-4 py-3 pr-16 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:border-blue-500 transition-colors disabled:opacity-50"
@@ -510,7 +521,7 @@ export function P2PCreateOfferModal({
                 type="text"
                 inputMode="decimal"
                 value={cryptoAmount}
-                onChange={(e) => setCryptoAmount(e.target.value)}
+                onChange={(e) => setCryptoAmount(sanitizeDecimalInput(e.target.value))}
                 placeholder="0.01"
                 className="w-full px-4 py-3 pr-20 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:border-blue-500 transition-colors"
               />
