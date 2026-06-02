@@ -4,6 +4,7 @@ import { CoinIcon } from "@/components/market/CoinIcon";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BinanceAPI } from "@/lib/api/binance";
+import { getCurrencySymbol } from "@/lib/currencies";
 import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
 import { intlLocale } from "@/lib/utils/locale";
@@ -47,17 +48,6 @@ interface TransactionResponse {
 interface TransactionHistoryProps {
   userCurrency?: string;
 }
-
-// Функция конвертации валюты в символ
-const getCurrencySymbol = (currency: string): string => {
-  const symbols: Record<string, string> = {
-    USD: "$",
-    RUB: "₽",
-    EUR: "€",
-    KZT: "₸",
-  };
-  return symbols[currency] || currency;
-};
 
 export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryProps) {
   const { t, i18n } = useTranslation();
@@ -258,7 +248,7 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
                   <th className="pb-3">{t("profile.history.colAsset")}</th>
                   <th className="pb-3 text-right">{t("profile.history.colAmount")}</th>
                   <th className="pb-3 text-right">{t("profile.history.colPrice")}</th>
-                  <th className="pb-3 text-right">{t("profile.history.colTotal", { currency: userCurrency })}</th>
+                  <th className="pb-3 text-right">{t("profile.history.colTotal", { currency: getCurrencySymbol(userCurrency) })}</th>
                   <th className="pb-3 text-right pr-2">{t("profile.history.colDate")}</th>
                 </tr>
               </thead>

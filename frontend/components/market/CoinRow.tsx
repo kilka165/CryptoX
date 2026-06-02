@@ -3,6 +3,7 @@
 import React from "react";
 import { Coin } from "@/types/coin";
 import { CoinIcon } from "@/components/market/CoinIcon";
+import { getCurrencySymbol } from "@/lib/currencies";
 import { useTranslation } from "react-i18next";
 
 interface CoinRowProps {
@@ -39,7 +40,7 @@ export function CoinRow({ coin, index, userCurrency, exchangeRate, onBuy, format
           minimumFractionDigits: 2,
           maximumFractionDigits: 8,
         })}{" "}
-        {userCurrency}
+        {getCurrencySymbol(userCurrency)}
       </td>
       <td className="px-3 sm:px-6 py-4 text-right">
         <span
@@ -54,10 +55,10 @@ export function CoinRow({ coin, index, userCurrency, exchangeRate, onBuy, format
         </span>
       </td>
       <td className="px-3 sm:px-6 py-4 text-right text-slate-600 dark:text-slate-400 hidden lg:table-cell whitespace-nowrap">
-        {formatNumber(coin.total_volume ?? 0)} {userCurrency}
+        {formatNumber(coin.total_volume ?? 0)} {getCurrencySymbol(userCurrency)}
       </td>
       <td className="px-3 sm:px-6 py-4 text-right text-slate-600 dark:text-slate-400 hidden xl:table-cell whitespace-nowrap">
-        {formatNumber((coin.market_cap ?? 0) * exchangeRate)} {userCurrency}
+        {formatNumber((coin.market_cap ?? 0) * exchangeRate)} {getCurrencySymbol(userCurrency)}
       </td>
 
       <td className="px-3 sm:px-6 py-4 text-right">

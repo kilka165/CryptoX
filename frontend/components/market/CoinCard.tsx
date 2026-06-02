@@ -3,6 +3,7 @@
 import React from "react";
 import { Coin } from "@/types/coin";
 import { CoinIcon } from "@/components/market/CoinIcon";
+import { getCurrencySymbol } from "@/lib/currencies";
 import { useTranslation } from "react-i18next";
 
 interface CoinCardProps {
@@ -38,7 +39,7 @@ export function CoinCard({ coin, index, userCurrency, exchangeRate, onBuy }: Coi
             minimumFractionDigits: 2,
             maximumFractionDigits: 8,
           })}{" "}
-          {userCurrency}
+          {getCurrencySymbol(userCurrency)}
         </span>
         <span
           className={`text-xs font-semibold ${

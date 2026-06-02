@@ -3,24 +3,27 @@
 
 import React, { useState } from "react";
 import { P2POffer } from "@/lib/api/p2pApi";
-import { TrendingUp, CheckCircle, X, Eye, AlertTriangle } from "lucide-react";
+import { TrendingUp, TrendingDown, CheckCircle, X, Eye, AlertTriangle } from "lucide-react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "@/lib/config";
+import { getCurrencySymbol } from "@/lib/currencies";
 
 interface P2POfferCardProps {
   offer: P2POffer;
   currentUserId: number | null;
+  tradeType: "buy" | "sell";
   onBuy: (offer: P2POffer) => void;
   onCancel?: (offerId: number) => void;
   onViewDetails?: (offer: P2POffer) => void;
 }
 
-export function P2POfferCard({ 
-  offer, 
-  currentUserId, 
-  onBuy, 
-  onCancel, 
+export function P2POfferCard({
+  offer,
+  currentUserId,
+  tradeType,
+  onBuy,
+  onCancel,
   onViewDetails
 }: P2POfferCardProps) {
   const { t } = useTranslation();
@@ -90,7 +93,7 @@ export function P2POfferCard({
             {/* Цена */}
             <div className="flex-1 lg:min-w-[140px] min-w-0">
               <div className="text-base sm:text-lg font-bold break-words">
-                {offer.price.toLocaleString()} {offer.currency}
+                {offer.price.toLocaleString()} {getCurrencySymbol(offer.currency)}
               </div>
               <div className="text-xs text-slate-500">
                 {t("p2p.offerCard.per1", { crypto: offer.crypto_currency })}
@@ -109,7 +112,7 @@ export function P2POfferCard({
           </div>
 
           {/* Действия */}
-          <div className="flex gap-2 lg:shrink-0">
+          <div className="flex gap-2 lg:shrink-0 lg:w-[280px] lg:justify-end">
             {isOwnOffer ? (
               <>
                 <button
@@ -131,10 +134,20 @@ export function P2POfferCard({
             ) : (
               <button
                 onClick={() => onBuy(offer)}
-                className="flex-1 lg:flex-none justify-center px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                className={`flex-1 lg:flex-none justify-center px-6 py-2 text-white rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                  tradeType === "sell"
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : "bg-emerald-600 hover:bg-emerald-700"
+                }`}
               >
-                <TrendingUp className="w-4 h-4 shrink-0" />
-                {t("p2p.offerCard.buy")}
+                {tradeType === "sell" ? (
+                  <TrendingDown className="w-4 h-4 shrink-0" />
+                ) : (
+                  <TrendingUp className="w-4 h-4 shrink-0" />
+                )}
+                {tradeType === "sell"
+                  ? t("p2p.offerCard.sell")
+                  : t("p2p.offerCard.buy")}
               </button>
             )}
           </div>
@@ -169,7 +182,7 @@ export function P2POfferCard({
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-500">{t("p2p.offerCard.priceLabel")}</span>
-                  <span className="font-medium">{offer.price} {offer.currency}</span>
+                  <span className="font-medium">{offer.price} {getCurrencySymbol(offer.currency)}</span>
                 </div>
               </div>
 

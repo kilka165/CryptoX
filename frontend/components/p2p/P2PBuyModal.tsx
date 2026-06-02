@@ -8,6 +8,7 @@ import { BinanceAPI } from "@/lib/api/binance";
 import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
 import { intlLocale } from "@/lib/utils/locale";
+import { getCurrencySymbol } from "@/lib/currencies";
 
 interface P2PBuyModalProps {
   isOpen: boolean;
@@ -88,6 +89,7 @@ export function P2PBuyModal({
 
   if (!isOpen || !offer) return null;
 
+  const fiat = getCurrencySymbol(offer.currency);
   const isBuying = offer.type === "sell";
   const isSelling = offer.type === "buy";
 
@@ -138,7 +140,7 @@ export function P2PBuyModal({
     }
 
     if (cryptoNum < minCryptoAmount) {
-      setError(t("p2p.buyModal.errMinAmount", { amount: minCryptoAmount, crypto: offer.crypto_currency, fiat: minFiatAmount.toFixed(2), currency: offer.currency }));
+      setError(t("p2p.buyModal.errMinAmount", { amount: minCryptoAmount, crypto: offer.crypto_currency, fiat: minFiatAmount.toFixed(2), currency: fiat }));
       return;
     }
 
@@ -148,12 +150,12 @@ export function P2PBuyModal({
     }
 
     if (fiatNum < offer.min_limit) {
-      setError(t("p2p.buyModal.errMinSum", { amount: offer.min_limit, currency: offer.currency }));
+      setError(t("p2p.buyModal.errMinSum", { amount: offer.min_limit, currency: fiat }));
       return;
     }
 
     if (fiatNum > offer.max_limit) {
-      setError(t("p2p.buyModal.errMaxSum", { amount: offer.max_limit, currency: offer.currency }));
+      setError(t("p2p.buyModal.errMaxSum", { amount: offer.max_limit, currency: fiat }));
       return;
     }
 
@@ -218,7 +220,7 @@ export function P2PBuyModal({
             <div className="flex justify-between items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
               <span className="text-sm text-slate-600 dark:text-slate-400">{t("p2p.buyModal.offerPrice")}</span>
               <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                {offer.price.toLocaleString()} {offer.currency}
+                {offer.price.toLocaleString()} {fiat}
               </span>
             </div>
 
@@ -233,7 +235,7 @@ export function P2PBuyModal({
                 <div className="flex items-center gap-2">
                   <BarChart3 className="w-4 h-4 text-slate-500" />
                   <span className="text-xs text-slate-600 dark:text-slate-400">
-                    {t("p2p.buyModal.marketPrice")}: <strong>{marketPrice.toLocaleString(intlLocale(i18n.language), { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {offer.currency}</strong>
+                    {t("p2p.buyModal.marketPrice")}: <strong>{marketPrice.toLocaleString(intlLocale(i18n.language), { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {fiat}</strong>
                   </span>
                 </div>
                 <span className={`text-xs font-medium px-2 py-1 rounded ${
@@ -278,7 +280,7 @@ export function P2PBuyModal({
                   </span>
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
-                  {t("p2p.buyModal.minimumHint", { amount: minCryptoAmount, crypto: offer.crypto_currency, fiat: minFiatAmount.toFixed(2), currency: offer.currency })}
+                  {t("p2p.buyModal.minimumHint", { amount: minCryptoAmount, crypto: offer.crypto_currency, fiat: minFiatAmount.toFixed(2), currency: fiat })}
                 </div>
                 <div className="flex gap-2 mt-2">
                   {[25, 50, 75, 100].map((percent) => (
@@ -296,7 +298,7 @@ export function P2PBuyModal({
 
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  {t("p2p.buyModal.iPay", { unit: offer.currency })}
+                  {t("p2p.buyModal.iPay", { unit: fiat })}
                 </label>
                 <div className="relative">
                   <input
@@ -304,15 +306,15 @@ export function P2PBuyModal({
                     inputMode="decimal"
                     value={fiatAmount}
                     onChange={(e) => handleFiatChange(e.target.value)}
-                    placeholder={`0.00 ${offer.currency}`}
+                    placeholder={`0.00 ${fiat}`}
                     className="w-full px-4 py-3 pr-16 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:border-blue-500 transition-colors text-lg font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">
-                    {offer.currency}
+                    {fiat}
                   </span>
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
-                  {t("p2p.buyModal.limit", { min: offer.min_limit.toLocaleString(intlLocale(i18n.language)), max: offer.max_limit.toLocaleString(intlLocale(i18n.language)), currency: offer.currency })}
+                  {t("p2p.buyModal.limit", { min: offer.min_limit.toLocaleString(intlLocale(i18n.language)), max: offer.max_limit.toLocaleString(intlLocale(i18n.language)), currency: fiat })}
                 </div>
               </div>
             </>
@@ -336,7 +338,7 @@ export function P2PBuyModal({
                   </span>
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
-                  {t("p2p.buyModal.minimumHint", { amount: minCryptoAmount, crypto: offer.crypto_currency, fiat: minFiatAmount.toFixed(2), currency: offer.currency })}
+                  {t("p2p.buyModal.minimumHint", { amount: minCryptoAmount, crypto: offer.crypto_currency, fiat: minFiatAmount.toFixed(2), currency: fiat })}
                 </div>
                 <div className="flex gap-2 mt-2">
                   {[25, 50, 75, 100].map((percent) => (
@@ -354,7 +356,7 @@ export function P2PBuyModal({
 
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  {t("p2p.buyModal.iReceive", { unit: offer.currency })}
+                  {t("p2p.buyModal.iReceive", { unit: fiat })}
                 </label>
                 <div className="relative">
                   <input
@@ -362,15 +364,15 @@ export function P2PBuyModal({
                     inputMode="decimal"
                     value={fiatAmount}
                     onChange={(e) => handleFiatChange(e.target.value)}
-                    placeholder={`0.00 ${offer.currency}`}
+                    placeholder={`0.00 ${fiat}`}
                     className="w-full px-4 py-3 pr-16 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:border-blue-500 transition-colors text-lg font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">
-                    {offer.currency}
+                    {fiat}
                   </span>
                 </div>
                 <div className="text-xs text-slate-500 mt-1">
-                  {t("p2p.buyModal.limit", { min: offer.min_limit.toLocaleString(intlLocale(i18n.language)), max: offer.max_limit.toLocaleString(intlLocale(i18n.language)), currency: offer.currency })}
+                  {t("p2p.buyModal.limit", { min: offer.min_limit.toLocaleString(intlLocale(i18n.language)), max: offer.max_limit.toLocaleString(intlLocale(i18n.language)), currency: fiat })}
                 </div>
               </div>
             </>

@@ -12,6 +12,7 @@ import type { Coin } from "@/types/coin";
 import { MarketCard } from "@/components/market/MarketCard";
 import { CoinRow } from "@/components/market/CoinRow";
 import { CoinCard } from "@/components/market/CoinCard";
+import { getCurrencySymbol } from "@/lib/currencies";
 import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
 
@@ -131,7 +132,7 @@ export default function MarketOverviewPage() {
               <BarChart3 className="w-4 h-4 text-slate-400" />
             </div>
             <p className="text-lg font-semibold">
-              {formatNumber(totalMarketCap * exchangeRate)} {userCurrency}
+              {formatNumber(totalMarketCap * exchangeRate)} {getCurrencySymbol(userCurrency)}
             </p>
             <p className="text-xs text-slate-500 mt-1">
               {t("market.overview.basedOnTop")}
@@ -146,7 +147,7 @@ export default function MarketOverviewPage() {
               <Flame className="w-4 h-4 text-orange-400" />
             </div>
             <p className="text-lg font-semibold">
-              {formatNumber(totalVolume * exchangeRate)} {userCurrency}
+              {formatNumber(totalVolume * exchangeRate)} {getCurrencySymbol(userCurrency)}
             </p>
             <p className="text-xs text-slate-500 mt-1">
               {t("market.overview.totalTradingVolume")}
@@ -202,7 +203,7 @@ export default function MarketOverviewPage() {
               {t("market.overview.top20")}
             </h2>
             <span className="text-xs text-slate-500">
-              {t("market.overview.pricesIn", { currency: userCurrency })}
+              {t("market.overview.pricesIn", { currency: getCurrencySymbol(userCurrency) })}
             </span>
           </div>
 
@@ -212,7 +213,7 @@ export default function MarketOverviewPage() {
             <span className="w-9 shrink-0" />
             <span className="flex-1 min-w-0">{t("market.coin")}</span>
             <span className="text-right shrink-0">
-              {t("market.priceCur", { currency: userCurrency })} / {t("market.change24h")}
+              {t("market.priceCur", { currency: getCurrencySymbol(userCurrency) })} / {t("market.change24h")}
             </span>
             <span className="px-3 text-sm invisible shrink-0">{t("market.buy")}</span>
           </div>
@@ -242,7 +243,7 @@ export default function MarketOverviewPage() {
                 <tr>
                   <th className="px-6 py-3">#</th>
                   <th className="px-6 py-3">{t("market.coin")}</th>
-                  <th className="px-6 py-3 text-right">{t("market.priceCur", { currency: userCurrency })}</th>
+                  <th className="px-6 py-3 text-right">{t("market.priceCur", { currency: getCurrencySymbol(userCurrency) })}</th>
                   <th className="px-6 py-3 text-right">{t("market.change24h")}</th>
                   <th className="px-6 py-3 text-right hidden lg:table-cell">
                     {t("market.volume")}

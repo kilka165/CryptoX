@@ -24,7 +24,7 @@ export function P2PTableHeader() {
             {t("p2p.tableHeader.amount")}
           </span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex lg:w-[280px] lg:justify-end">
           <span className="text-xs font-medium text-slate-500 uppercase">
             {t("p2p.tableHeader.trades")}
           </span>

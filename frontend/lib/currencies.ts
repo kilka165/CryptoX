@@ -40,3 +40,12 @@ export const currencies = [
   { code: "KGS", name: "Киргизский сом", symbol: "с" },
   { code: "UZS", name: "Узбекский сум", symbol: "сум" },
 ];
+
+const CURRENCY_SYMBOLS: Record<string, string> = Object.fromEntries(
+  currencies.map((c) => [c.code, c.symbol])
+);
+
+// Возвращает символ валюты по коду (₸, $, ₫…). Если символа нет — сам код.
+export function getCurrencySymbol(code: string): string {
+  return CURRENCY_SYMBOLS[code?.toUpperCase()] || code;
+}

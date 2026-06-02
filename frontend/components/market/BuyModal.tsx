@@ -4,6 +4,7 @@ import React from "react";
 import { X, CheckCircle } from "lucide-react";
 import { Coin } from "@/types/coin";
 import { useTranslation } from "react-i18next";
+import { getCurrencySymbol } from "@/lib/currencies";
 
 interface BuyModalProps {
   isOpen: boolean;
@@ -24,16 +25,6 @@ interface BuyModalProps {
   onSetMax: () => void;
   onSubmit: (e: React.FormEvent) => void;
 }
-
-const getCurrencySymbol = (currency: string): string => {
-  const symbols: Record<string, string> = {
-    USD: "$",
-    RUB: "₽",
-    EUR: "€",
-    KZT: "₸",
-  };
-  return symbols[currency] || currency;
-};
 
 export function BuyModal({
   isOpen,
@@ -89,7 +80,7 @@ export function BuyModal({
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium">{t("market.buyModal.amount", { currency: userCurrency })}</label>
+              <label className="block text-sm font-medium">{t("market.buyModal.amount", { currency: getCurrencySymbol(userCurrency) })}</label>
               <button type="button" onClick={onSetMax} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
                 {t("market.buyModal.max", { amount: maxBalanceInUserCurrency.toFixed(2), symbol: currencySymbol })}
               </button>

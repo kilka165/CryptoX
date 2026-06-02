@@ -4,16 +4,17 @@
 import React, { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { P2PFilters } from "@/components/p2p/P2PFilters";
+import { P2PFilters, SortKey, SortDir } from "@/components/p2p/P2PFilters";
 import { P2PTableHeader } from "@/components/p2p/P2PTableHeader";
 import { P2POfferCard } from "@/components/p2p/P2POfferCard";
 import { P2PBuyModal } from "@/components/p2p/P2PBuyModal";
 import { P2PCreateOfferModal } from "@/components/p2p/P2PCreateOfferModal";
 import { p2pApi, P2POffer } from "@/lib/api/p2pApi";
-import { Plus } from "lucide-react";
+import { Plus, User } from "lucide-react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "@/lib/config";
+import { getCurrencySymbol } from "@/lib/currencies";
 
 export default function P2PPage() {
   const { t } = useTranslation();
@@ -23,11 +24,16 @@ export default function P2PPage() {
   const [selectedCurrency, setSelectedCurrency] = useState("");
   const [tradeType, setTradeType] = useState<"buy" | "sell">("buy");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<"price" | "rate">("price");
+  const [sortBy, setSortBy] = useState<SortKey>("price");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [amountMin, setAmountMin] = useState("");
   const [amountMax, setAmountMax] = useState("");
+  const [ordersMin, setOrdersMin] = useState("");
+  const [completionMin, setCompletionMin] = useState("");
+  const [hideMine, setHideMine] = useState(false);
+  const [onlyMine, setOnlyMine] = useState(false);
   const [cryptoOptions, setCryptoOptions] = useState<string[]>([]);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
@@ -102,15 +108,28 @@ export default function P2PPage() {
       const pMax = parseFloat(priceMax.replace(",", "."));
       const aMin = parseFloat(amountMin.replace(",", "."));
       const aMax = parseFloat(amountMax.replace(",", "."));
+      const oMin = parseFloat(ordersMin.replace(",", "."));
+      const cMin = parseFloat(completionMin.replace(",", "."));
       if (!isNaN(pMin) && offer.price < pMin) return false;
       if (!isNaN(pMax) && offer.price > pMax) return false;
       if (!isNaN(aMin) && offer.available_amount < aMin) return false;
       if (!isNaN(aMax) && offer.available_amount > aMax) return false;
+      if (!isNaN(oMin) && offer.orders_count < oMin) return false;
+      if (!isNaN(cMin) && offer.completion_rate < cMin) return false;
+      return true;
+    })
+    .filter((offer) => {
+      const isMine = currentUserId != null && offer.seller_id === currentUserId;
+      if (onlyMine) return isMine;
+      if (hideMine) return !isMine;
       return true;
     })
     .sort((a, b) => {
-      if (sortBy === "price") return a.price - b.price;
-      return b.completion_rate - a.completion_rate;
+      let cmp = 0;
+      if (sortBy === "price") cmp = a.price - b.price;
+      else if (sortBy === "orders") cmp = a.orders_count - b.orders_count;
+      else cmp = a.completion_rate - b.completion_rate;
+      return sortDir === "asc" ? cmp : -cmp;
     });
 
   const handleResetFilters = () => {
@@ -118,8 +137,12 @@ export default function P2PPage() {
     setPriceMax("");
     setAmountMin("");
     setAmountMax("");
+    setOrdersMin("");
+    setCompletionMin("");
+    setHideMine(false);
     setSearchQuery("");
     setSortBy("price");
+    setSortDir("asc");
   };
 
   const handleBuyClick = (offer: P2POffer) => {
@@ -181,13 +204,26 @@ export default function P2PPage() {
               {t("p2p.subtitle")}
             </p>
           </div>
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            <span className="hidden sm:inline">{t("p2p.createOffer")}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setOnlyMine((v) => !v)}
+              className={`flex items-center gap-2 px-4 md:px-5 py-3 rounded-lg font-medium border transition-colors ${
+                onlyMine
+                  ? "bg-blue-600 border-blue-600 text-white"
+                  : "bg-transparent border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400"
+              }`}
+            >
+              <User className="w-5 h-5" />
+              <span className="hidden sm:inline">{t("p2p.myOffers")}</span>
+            </button>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="hidden sm:inline">{t("p2p.createOffer")}</span>
+            </button>
+          </div>
         </div>
 
         <P2PFilters
@@ -196,19 +232,28 @@ export default function P2PPage() {
           selectedCurrency={selectedCurrency}
           searchQuery={searchQuery}
           sortBy={sortBy}
+          sortDir={sortDir}
           priceMin={priceMin}
           priceMax={priceMax}
           amountMin={amountMin}
           amountMax={amountMax}
+          ordersMin={ordersMin}
+          completionMin={completionMin}
+          hideMine={hideMine}
+          onlyMine={onlyMine}
           onTradeTypeChange={setTradeType}
           onCryptoChange={setSelectedCrypto}
           onCurrencyChange={setSelectedCurrency}
           onSearchChange={setSearchQuery}
           onSortChange={setSortBy}
+          onSortDirChange={setSortDir}
           onPriceMinChange={setPriceMin}
           onPriceMaxChange={setPriceMax}
           onAmountMinChange={setAmountMin}
           onAmountMaxChange={setAmountMax}
+          onOrdersMinChange={setOrdersMin}
+          onCompletionMinChange={setCompletionMin}
+          onHideMineChange={setHideMine}
           onReset={handleResetFilters}
           onCryptoOptionsLoaded={handleCryptoOptionsLoaded}
         />
@@ -231,6 +276,7 @@ export default function P2PPage() {
                 key={offer.id}
                 offer={offer}
                 currentUserId={currentUserId}
+                tradeType={tradeType}
                 onBuy={handleBuyClick}
                 onCancel={handleCancelOffer}
                 onViewDetails={handleViewDetails}
@@ -286,7 +332,7 @@ export default function P2PPage() {
               </div>
               <div className="flex justify-between py-2 border-b border-slate-300 dark:border-slate-800">
                 <span className="text-slate-500">{t("p2p.price")}</span>
-                <span className="font-medium text-lg">{selectedOffer.price.toLocaleString()} {selectedOffer.currency}</span>
+                <span className="font-medium text-lg">{selectedOffer.price.toLocaleString()} {getCurrencySymbol(selectedOffer.currency)}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-300 dark:border-slate-800">
                 <span className="text-slate-500">{t("p2p.available")}</span>
@@ -294,11 +340,11 @@ export default function P2PPage() {
               </div>
               <div className="flex justify-between py-2 border-b border-slate-300 dark:border-slate-800">
                 <span className="text-slate-500">{t("p2p.minLimit")}</span>
-                <span className="font-medium">{selectedOffer.min_limit.toLocaleString()} {selectedOffer.currency}</span>
+                <span className="font-medium">{selectedOffer.min_limit.toLocaleString()} {getCurrencySymbol(selectedOffer.currency)}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-300 dark:border-slate-800">
                 <span className="text-slate-500">{t("p2p.maxLimit")}</span>
-                <span className="font-medium">{selectedOffer.max_limit.toLocaleString()} {selectedOffer.currency}</span>
+                <span className="font-medium">{selectedOffer.max_limit.toLocaleString()} {getCurrencySymbol(selectedOffer.currency)}</span>
               </div>
               <div className="flex justify-between py-2">
                 <span className="text-slate-500">{t("p2p.type")}</span>

@@ -2,30 +2,50 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Search, ArrowUpDown, ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
+import {
+  Search,
+  ChevronDown,
+  ChevronUp,
+  RotateCcw,
+  ArrowUpNarrowWide,
+  ArrowDownWideNarrow,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { BinanceAPI } from "@/lib/api/binance";
 import { currencies } from "@/lib/currencies";
+import { SearchableSelect } from "./SearchableSelect";
+
+export type SortKey = "price" | "orders" | "completion";
+export type SortDir = "asc" | "desc";
 
 interface P2PFiltersProps {
   tradeType: "buy" | "sell";
   selectedCrypto: string;
   selectedCurrency: string;
   searchQuery: string;
-  sortBy: "price" | "rate";
+  sortBy: SortKey;
+  sortDir: SortDir;
   priceMin: string;
   priceMax: string;
   amountMin: string;
   amountMax: string;
+  ordersMin: string;
+  completionMin: string;
+  hideMine: boolean;
+  onlyMine: boolean;
   onTradeTypeChange: (type: "buy" | "sell") => void;
   onCryptoChange: (crypto: string) => void;
   onCurrencyChange: (currency: string) => void;
   onSearchChange: (query: string) => void;
-  onSortChange: (sort: "price" | "rate") => void;
+  onSortChange: (sort: SortKey) => void;
+  onSortDirChange: (dir: SortDir) => void;
   onPriceMinChange: (value: string) => void;
   onPriceMaxChange: (value: string) => void;
   onAmountMinChange: (value: string) => void;
   onAmountMaxChange: (value: string) => void;
+  onOrdersMinChange: (value: string) => void;
+  onCompletionMinChange: (value: string) => void;
+  onHideMineChange: (value: boolean) => void;
   onReset: () => void;
   onCryptoOptionsLoaded?: (options: string[]) => void;
 }
@@ -106,19 +126,28 @@ export function P2PFilters({
   selectedCurrency,
   searchQuery,
   sortBy,
+  sortDir,
   priceMin,
   priceMax,
   amountMin,
   amountMax,
+  ordersMin,
+  completionMin,
+  hideMine,
+  onlyMine,
   onTradeTypeChange,
   onCryptoChange,
   onCurrencyChange,
   onSearchChange,
   onSortChange,
+  onSortDirChange,
   onPriceMinChange,
   onPriceMaxChange,
   onAmountMinChange,
   onAmountMaxChange,
+  onOrdersMinChange,
+  onCompletionMinChange,
+  onHideMineChange,
   onReset,
   onCryptoOptionsLoaded,
 }: P2PFiltersProps) {
@@ -147,79 +176,86 @@ export function P2PFilters({
     fetchAvailableAssets();
   }, []);
 
-  const activeRangeCount = [priceMin, priceMax, amountMin, amountMax].filter(
-    (v) => v.trim() !== ""
-  ).length;
+  const activeRangeCount =
+    [priceMin, priceMax, amountMin, amountMax, ordersMin, completionMin].filter(
+      (v) => v.trim() !== ""
+    ).length + (hideMine ? 1 : 0);
 
   const priceSuffix = selectedCurrency || "—";
   const amountSuffix = selectedCrypto
     ? selectedCrypto.slice(0, 6).toUpperCase()
     : "—";
 
+  const cryptoOptions = availableCryptos.map((c) => ({ value: c, label: c }));
+  const currencyOptions = currencies.map((c) => ({
+    value: c.code,
+    label: `${c.code} — ${c.name}`,
+  }));
+
   return (
     <div className="bg-white dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 p-4 space-y-4">
       {/* Ряд 1: широкие табы Купить/Продать */}
-      <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
-        <button
-          onClick={() => onTradeTypeChange("buy")}
-          className={`flex-1 py-2.5 px-4 rounded-md font-medium transition-colors ${
-            tradeType === "buy"
-              ? "bg-emerald-600 text-white"
-              : "text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-          }`}
-        >
-          {t("p2p.filters.buy")}
-        </button>
-        <button
-          onClick={() => onTradeTypeChange("sell")}
-          className={`flex-1 py-2.5 px-4 rounded-md font-medium transition-colors ${
-            tradeType === "sell"
-              ? "bg-blue-600 text-white"
-              : "text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-          }`}
-        >
-          {t("p2p.filters.sell")}
-        </button>
-      </div>
+      {!onlyMine && (
+        <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+          <button
+            onClick={() => onTradeTypeChange("buy")}
+            className={`flex-1 py-2.5 px-4 rounded-md font-medium transition-colors ${
+              tradeType === "buy"
+                ? "bg-emerald-600 text-white"
+                : "text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+            }`}
+          >
+            {t("p2p.filters.buy")}
+          </button>
+          <button
+            onClick={() => onTradeTypeChange("sell")}
+            className={`flex-1 py-2.5 px-4 rounded-md font-medium transition-colors ${
+              tradeType === "sell"
+                ? "bg-blue-600 text-white"
+                : "text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+            }`}
+          >
+            {t("p2p.filters.sell")}
+          </button>
+        </div>
+      )}
 
       {/* Ряд 2: основные фильтры */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div
+        className={`grid grid-cols-1 gap-4 ${
+          onlyMine ? "md:grid-cols-2" : "md:grid-cols-2 lg:grid-cols-4"
+        }`}
+      >
         <div>
           <label className="block text-xs text-slate-500 mb-1">
             {t("p2p.filters.coin")}
           </label>
-          <select
+          <SearchableSelect
             value={selectedCrypto}
-            onChange={(e) => onCryptoChange(e.target.value)}
-            className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">{t("p2p.filters.allCoins")}</option>
-            {availableCryptos.map((crypto) => (
-              <option key={crypto} value={crypto}>
-                {crypto}
-              </option>
-            ))}
-          </select>
+            options={cryptoOptions}
+            onChange={onCryptoChange}
+            allLabel={t("p2p.filters.allCoins")}
+            searchPlaceholder={t("p2p.filters.searchCoin")}
+            emptyText={t("p2p.filters.nothingFound")}
+          />
         </div>
 
         <div>
           <label className="block text-xs text-slate-500 mb-1">
             {t("p2p.filters.currency")}
           </label>
-          <select
+          <SearchableSelect
             value={selectedCurrency}
-            onChange={(e) => onCurrencyChange(e.target.value)}
-            className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">{t("p2p.filters.allCurrencies")}</option>
-            {currencies.map((curr) => (
-              <option key={curr.code} value={curr.code}>
-                {curr.code} — {curr.name}
-              </option>
-            ))}
-          </select>
+            options={currencyOptions}
+            onChange={onCurrencyChange}
+            allLabel={t("p2p.filters.allCurrencies")}
+            searchPlaceholder={t("p2p.filters.searchCurrency")}
+            emptyText={t("p2p.filters.nothingFound")}
+          />
         </div>
 
+        {!onlyMine && (
+          <>
         <div>
           <label className="block text-xs text-slate-500 mb-1">
             {t("p2p.filters.searchSeller")}
@@ -240,20 +276,49 @@ export function P2PFilters({
           <label className="block text-xs text-slate-500 mb-1">
             {t("p2p.filters.sortBy")}
           </label>
-          <div className="relative">
-            <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <div className="flex items-center gap-2">
             <select
               value={sortBy}
-              onChange={(e) => onSortChange(e.target.value as "price" | "rate")}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => onSortChange(e.target.value as SortKey)}
+              className="flex-1 min-w-0 px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="price">{t("p2p.filters.price")}</option>
-              <option value="rate">{t("p2p.filters.rating")}</option>
+              <option value="orders">{t("p2p.filters.sortOrders")}</option>
+              <option value="completion">
+                {t("p2p.filters.sortCompletion")}
+              </option>
             </select>
+            <button
+              type="button"
+              onClick={() =>
+                onSortDirChange(sortDir === "asc" ? "desc" : "asc")
+              }
+              title={
+                sortDir === "asc"
+                  ? t("p2p.filters.sortAsc")
+                  : t("p2p.filters.sortDesc")
+              }
+              aria-label={
+                sortDir === "asc"
+                  ? t("p2p.filters.sortAsc")
+                  : t("p2p.filters.sortDesc")
+              }
+              className="shrink-0 p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-400 transition-colors"
+            >
+              {sortDir === "asc" ? (
+                <ArrowUpNarrowWide className="w-4 h-4" />
+              ) : (
+                <ArrowDownWideNarrow className="w-4 h-4" />
+              )}
+            </button>
           </div>
         </div>
+          </>
+        )}
       </div>
 
+      {!onlyMine && (
+        <>
       {/* Ряд 3: расширенные фильтры */}
       <div className="border-t border-slate-300 dark:border-slate-800 pt-3">
         <button
@@ -275,27 +340,75 @@ export function P2PFilters({
         </button>
 
         {advancedOpen && (
-          <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <RangeInput
-              label={t("p2p.filters.priceRange")}
-              minValue={priceMin}
-              maxValue={priceMax}
-              onMinChange={onPriceMinChange}
-              onMaxChange={onPriceMaxChange}
-              suffix={priceSuffix}
-              minPlaceholder={t("p2p.filters.min")}
-              maxPlaceholder={t("p2p.filters.max")}
-            />
-            <RangeInput
-              label={t("p2p.filters.amountRange")}
-              minValue={amountMin}
-              maxValue={amountMax}
-              onMinChange={onAmountMinChange}
-              onMaxChange={onAmountMaxChange}
-              suffix={amountSuffix}
-              minPlaceholder={t("p2p.filters.min")}
-              maxPlaceholder={t("p2p.filters.max")}
-            />
+          <div className="mt-3 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <RangeInput
+                label={t("p2p.filters.priceRange")}
+                minValue={priceMin}
+                maxValue={priceMax}
+                onMinChange={onPriceMinChange}
+                onMaxChange={onPriceMaxChange}
+                suffix={priceSuffix}
+                minPlaceholder={t("p2p.filters.min")}
+                maxPlaceholder={t("p2p.filters.max")}
+              />
+              <RangeInput
+                label={t("p2p.filters.amountRange")}
+                minValue={amountMin}
+                maxValue={amountMax}
+                onMinChange={onAmountMinChange}
+                onMaxChange={onAmountMaxChange}
+                suffix={amountSuffix}
+                minPlaceholder={t("p2p.filters.min")}
+                maxPlaceholder={t("p2p.filters.max")}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">
+                  {t("p2p.filters.minTrades")}
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={ordersMin}
+                  onChange={(e) => onOrdersMinChange(e.target.value)}
+                  placeholder={t("p2p.filters.min")}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">
+                  {t("p2p.filters.minCompletion")}
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={completionMin}
+                    onChange={(e) => onCompletionMinChange(e.target.value)}
+                    placeholder={t("p2p.filters.min")}
+                    className="w-full px-3 py-2 pr-8 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">
+                    %
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <label className="flex items-center gap-2 cursor-pointer select-none w-fit">
+              <input
+                type="checkbox"
+                checked={hideMine}
+                onChange={(e) => onHideMineChange(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm text-slate-700 dark:text-slate-300">
+                {t("p2p.filters.hideMine")}
+              </span>
+            </label>
           </div>
         )}
       </div>
@@ -311,6 +424,8 @@ export function P2PFilters({
           <span>{t("p2p.filters.reset")}</span>
         </button>
       </div>
+        </>
+      )}
     </div>
   );
 }

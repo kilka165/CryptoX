@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ComponentType } from "react";
 import { Coin } from "@/types/coin";
 import { CoinIcon } from "@/components/market/CoinIcon";
+import { getCurrencySymbol } from "@/lib/currencies";
 
 interface MarketCardProps {
   title: string;
@@ -68,7 +69,7 @@ export function MarketCard({ title, icon: Icon, coins, onBuy, userCurrency, exch
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 8,
                   })}{" "}
-                  {userCurrency}
+                  {getCurrencySymbol(userCurrency)}
                 </span>
                 <span
                   className={`text-xs font-medium ${

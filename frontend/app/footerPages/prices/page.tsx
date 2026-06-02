@@ -61,6 +61,7 @@ export default function PricesPage() {
     return new Intl.NumberFormat(intlLocale(i18n.language), {
       style: "currency",
       currency: "USD",
+      currencyDisplay: "narrowSymbol",
       minimumFractionDigits: 2,
       maximumFractionDigits: price < 1 ? 6 : 2,
     }).format(price);

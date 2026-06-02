@@ -6,6 +6,7 @@ import { X, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
 import { API_BASE } from "@/lib/config";
+import { getCurrencySymbol } from "@/lib/currencies";
 
 interface Asset {
   id: number;
@@ -24,17 +25,6 @@ interface SellModalProps {
   userCurrency: string;
   onSellSuccess: () => void;
 }
-
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  USD: "$",
-  RUB: "₽",
-  EUR: "€",
-  KZT: "₸",
-  GBP: "£",
-};
-
-const getCurrencySymbol = (currency: string): string =>
-  CURRENCY_SYMBOLS[currency] || currency;
 
 export function SellModal({
   selectedAsset,
@@ -239,7 +229,7 @@ export function SellModal({
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              {t("profile.sellModal.amountInCurrency", { currency: userCurrency })}
+              {t("profile.sellModal.amountInCurrency", { currency: getCurrencySymbol(userCurrency) })}
             </label>
             <input
               type="text"

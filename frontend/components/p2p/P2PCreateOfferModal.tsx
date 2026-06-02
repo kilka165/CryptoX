@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { X, AlertCircle, CheckCircle2, Plus, Wallet, TrendingUp, BarChart3 } from "lucide-react";
 import { p2pApi } from "@/lib/api/p2pApi";
-import { currencies } from "@/lib/currencies";
+import { currencies, getCurrencySymbol } from "@/lib/currencies";
 import { BinanceAPI } from "@/lib/api/binance";
 import axios from "axios";
 import { API_BASE } from "@/lib/config";
@@ -224,7 +224,7 @@ export function P2PCreateOfferModal({
 
       if (totalInUSD > availableUSD) {
         setError(
-          t("p2p.createModal.insufficientFunds", { usd: totalInUSD.toFixed(2), local: totalInDisplayCurrency.toFixed(2), currency: displayCurrency, available: availableUSD.toFixed(2) })
+          t("p2p.createModal.insufficientFunds", { usd: totalInUSD.toFixed(2), local: totalInDisplayCurrency.toFixed(2), currency: getCurrencySymbol(displayCurrency), available: availableUSD.toFixed(2) })
         );
         return;
       }
@@ -432,7 +432,7 @@ export function P2PCreateOfferModal({
               {balanceInfo.amount.toLocaleString(intlLocale(i18n.language), {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: balanceInfo.isUSD ? 2 : 8
-              })} {balanceInfo.currency}
+              })} {balanceInfo.isUSD ? getCurrencySymbol(balanceInfo.currency) : balanceInfo.currency}
             </div>
           </div>
 
@@ -445,7 +445,7 @@ export function P2PCreateOfferModal({
               {marketPrice && (
                 <div className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
                   <TrendingUp className="w-3 h-3" />
-                  <span>{t("p2p.createModal.market", { price: marketPrice.toLocaleString(intlLocale(i18n.language), { minimumFractionDigits: 2, maximumFractionDigits: 2 }), currency: displayCurrency })}</span>
+                  <span>{t("p2p.createModal.market", { price: marketPrice.toLocaleString(intlLocale(i18n.language), { minimumFractionDigits: 2, maximumFractionDigits: 2 }), currency: getCurrencySymbol(displayCurrency) })}</span>
                 </div>
               )}
             </div>
@@ -482,7 +482,7 @@ export function P2PCreateOfferModal({
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       }),
-                      currency: displayCurrency,
+                      currency: getCurrencySymbol(displayCurrency),
                       direction: isAbove
                         ? t("p2p.createModal.aboveMarket")
                         : t("p2p.createModal.belowMarket"),

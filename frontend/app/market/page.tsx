@@ -9,6 +9,7 @@ import { CoinCard } from "@/components/market/CoinCard";
 import { MarketCard } from "@/components/market/MarketCard";
 import { MarketCardsCarousel, MarketCardDef } from "@/components/market/MarketCardsCarousel";
 import { Pagination } from "@/components/market/Pagination";
+import { getCurrencySymbol } from "@/lib/currencies";
 import { BuyModal } from "@/components/market/BuyModal";
 import { Footer } from "@/components/Footer";
 import { BinanceAPI } from "@/lib/api/binance";
@@ -289,7 +290,7 @@ export default function MarketPage() {
             <span className="w-9 shrink-0" />
             <span className="flex-1 min-w-0">{t("market.coin")}</span>
             <span className="text-right shrink-0">
-              {t("market.priceCur", { currency: userCurrency })} / {t("market.change24h")}
+              {t("market.priceCur", { currency: getCurrencySymbol(userCurrency) })} / {t("market.change24h")}
             </span>
             <span className="px-3 text-sm invisible shrink-0">{t("market.buy")}</span>
           </div>
@@ -320,7 +321,7 @@ export default function MarketPage() {
                 <tr>
                   <th className="px-3 sm:px-6 py-4 hidden sm:table-cell">#</th>
                   <th className="px-3 sm:px-6 py-4">{t("market.coin")}</th>
-                  <th className="px-3 sm:px-6 py-4 text-right">{t("market.priceCur", { currency: userCurrency })}</th>
+                  <th className="px-3 sm:px-6 py-4 text-right">{t("market.priceCur", { currency: getCurrencySymbol(userCurrency) })}</th>
                   <th className="px-3 sm:px-6 py-4 text-right">{t("market.change24h")}</th>
                   <th className="px-3 sm:px-6 py-4 text-right hidden lg:table-cell">{t("market.volume")}</th>
                   <th className="px-3 sm:px-6 py-4 text-right hidden xl:table-cell">{t("market.marketCap")}</th>

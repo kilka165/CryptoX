@@ -14,6 +14,7 @@ export function useCurrencyConverter(baseAmountUSD: number, targetCurrency: stri
       return baseAmountUSD.toLocaleString("en-US", {
         style: "currency",
         currency: "USD",
+        currencyDisplay: "narrowSymbol",
         minimumFractionDigits: 2,
         maximumFractionDigits: 8,
       });
@@ -25,6 +26,7 @@ export function useCurrencyConverter(baseAmountUSD: number, targetCurrency: stri
       return result.toLocaleString("ru-RU", {
         style: "currency",
         currency: target,
+        currencyDisplay: "narrowSymbol",
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       });

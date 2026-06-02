@@ -4,6 +4,7 @@ import React from "react";
 import { TrendingUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
+import { getCurrencySymbol } from "@/lib/currencies";
 
 interface PortfolioValueProps {
   // Суммарная стоимость портфеля в USD (считается родителем из единого источника цен)
@@ -11,17 +12,6 @@ interface PortfolioValueProps {
   userCurrency?: string;
   loading?: boolean;
 }
-
-// Функция конвертации валюты в символ
-const getCurrencySymbol = (currency: string): string => {
-  const symbols: Record<string, string> = {
-    USD: "$",
-    RUB: "₽",
-    EUR: "€",
-    KZT: "₸",
-  };
-  return symbols[currency] || currency;
-};
 
 export function PortfolioValue({
   totalValueUSD = 0,

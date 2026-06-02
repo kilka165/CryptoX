@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { ArrowLeft, ArrowUpDown, CheckCircle, X, ChevronDown, AlertTriangle } from "lucide-react";
 import { CurrencySelectModal, CurrencyItem } from "@/components/convert/CurrencySelectModal";
 import { CoinIcon } from "@/components/market/CoinIcon";
+import { getCurrencySymbol } from "@/lib/currencies";
 import { BinanceAPI } from "@/lib/api/binance";
 import { Coin } from "@/types/coin";
 import { useTranslation } from "react-i18next";
@@ -500,7 +501,7 @@ export default function ConvertPage() {
                 <div className="text-sm text-slate-600 dark:text-slate-400 text-center">
                   {t("convert.totalSwap")}{" "}
                   <span className="text-slate-900 dark:text-slate-200 font-semibold">
-                    {totalInUserCurrency.toFixed(2)} {userCurrency}
+                    {totalInUserCurrency.toFixed(2)} {getCurrencySymbol(userCurrency)}
                   </span>
                 </div>
 

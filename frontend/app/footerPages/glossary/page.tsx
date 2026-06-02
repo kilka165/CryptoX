@@ -6,18 +6,21 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 
+type CategoryKey = "all" | "basics" | "tech" | "trading" | "security" | "cryptos";
+
 interface GlossaryTerm {
   term: string;
   definition: string;
-  category: string;
+  category: CategoryKey;
 }
 
 export default function GlossaryPage() {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(t("footerPages.glossary.catAll"));
+  const [selectedCategory, setSelectedCategory] = useState<CategoryKey>("all");
 
-  const cat = {
+  const categoryLabels: Record<CategoryKey, string> = {
+    all: t("footerPages.glossary.catAll"),
     basics: t("footerPages.glossary.catBasics"),
     tech: t("footerPages.glossary.catTech"),
     trading: t("footerPages.glossary.catTrading"),
@@ -26,39 +29,38 @@ export default function GlossaryPage() {
   };
 
   const terms: GlossaryTerm[] = [
-    { term: t("footerPages.glossary.t1Term"), definition: t("footerPages.glossary.t1Def"), category: cat.tech },
-    { term: t("footerPages.glossary.t2Term"), definition: t("footerPages.glossary.t2Def"), category: cat.cryptos },
-    { term: t("footerPages.glossary.t3Term"), definition: t("footerPages.glossary.t3Def"), category: cat.cryptos },
-    { term: t("footerPages.glossary.t4Term"), definition: t("footerPages.glossary.t4Def"), category: cat.basics },
-    { term: t("footerPages.glossary.t5Term"), definition: t("footerPages.glossary.t5Def"), category: cat.security },
-    { term: t("footerPages.glossary.t6Term"), definition: t("footerPages.glossary.t6Def"), category: cat.security },
-    { term: t("footerPages.glossary.t7Term"), definition: t("footerPages.glossary.t7Def"), category: cat.tech },
-    { term: t("footerPages.glossary.t8Term"), definition: t("footerPages.glossary.t8Def"), category: cat.trading },
-    { term: t("footerPages.glossary.t9Term"), definition: t("footerPages.glossary.t9Def"), category: cat.tech },
-    { term: t("footerPages.glossary.t10Term"), definition: t("footerPages.glossary.t10Def"), category: cat.tech },
-    { term: t("footerPages.glossary.t11Term"), definition: t("footerPages.glossary.t11Def"), category: cat.tech },
-    { term: t("footerPages.glossary.t12Term"), definition: t("footerPages.glossary.t12Def"), category: cat.trading },
-    { term: t("footerPages.glossary.t13Term"), definition: t("footerPages.glossary.t13Def"), category: cat.trading },
-    { term: t("footerPages.glossary.t14Term"), definition: t("footerPages.glossary.t14Def"), category: cat.trading },
-    { term: t("footerPages.glossary.t15Term"), definition: t("footerPages.glossary.t15Def"), category: cat.basics },
-    { term: t("footerPages.glossary.t16Term"), definition: t("footerPages.glossary.t16Def"), category: cat.trading },
-    { term: t("footerPages.glossary.t17Term"), definition: t("footerPages.glossary.t17Def"), category: cat.trading },
-    { term: t("footerPages.glossary.t18Term"), definition: t("footerPages.glossary.t18Def"), category: cat.security },
-    { term: t("footerPages.glossary.t19Term"), definition: t("footerPages.glossary.t19Def"), category: cat.security },
-    { term: t("footerPages.glossary.t20Term"), definition: t("footerPages.glossary.t20Def"), category: cat.basics },
-    { term: t("footerPages.glossary.t21Term"), definition: t("footerPages.glossary.t21Def"), category: cat.tech },
-    { term: t("footerPages.glossary.t22Term"), definition: t("footerPages.glossary.t22Def"), category: cat.tech },
-    { term: t("footerPages.glossary.t23Term"), definition: t("footerPages.glossary.t23Def"), category: cat.trading },
-    { term: t("footerPages.glossary.t24Term"), definition: t("footerPages.glossary.t24Def"), category: cat.basics }
+    { term: t("footerPages.glossary.t1Term"), definition: t("footerPages.glossary.t1Def"), category: "tech" },
+    { term: t("footerPages.glossary.t2Term"), definition: t("footerPages.glossary.t2Def"), category: "cryptos" },
+    { term: t("footerPages.glossary.t3Term"), definition: t("footerPages.glossary.t3Def"), category: "cryptos" },
+    { term: t("footerPages.glossary.t4Term"), definition: t("footerPages.glossary.t4Def"), category: "basics" },
+    { term: t("footerPages.glossary.t5Term"), definition: t("footerPages.glossary.t5Def"), category: "security" },
+    { term: t("footerPages.glossary.t6Term"), definition: t("footerPages.glossary.t6Def"), category: "security" },
+    { term: t("footerPages.glossary.t7Term"), definition: t("footerPages.glossary.t7Def"), category: "tech" },
+    { term: t("footerPages.glossary.t8Term"), definition: t("footerPages.glossary.t8Def"), category: "trading" },
+    { term: t("footerPages.glossary.t9Term"), definition: t("footerPages.glossary.t9Def"), category: "tech" },
+    { term: t("footerPages.glossary.t10Term"), definition: t("footerPages.glossary.t10Def"), category: "tech" },
+    { term: t("footerPages.glossary.t11Term"), definition: t("footerPages.glossary.t11Def"), category: "tech" },
+    { term: t("footerPages.glossary.t12Term"), definition: t("footerPages.glossary.t12Def"), category: "trading" },
+    { term: t("footerPages.glossary.t13Term"), definition: t("footerPages.glossary.t13Def"), category: "trading" },
+    { term: t("footerPages.glossary.t14Term"), definition: t("footerPages.glossary.t14Def"), category: "trading" },
+    { term: t("footerPages.glossary.t15Term"), definition: t("footerPages.glossary.t15Def"), category: "basics" },
+    { term: t("footerPages.glossary.t16Term"), definition: t("footerPages.glossary.t16Def"), category: "trading" },
+    { term: t("footerPages.glossary.t17Term"), definition: t("footerPages.glossary.t17Def"), category: "trading" },
+    { term: t("footerPages.glossary.t18Term"), definition: t("footerPages.glossary.t18Def"), category: "security" },
+    { term: t("footerPages.glossary.t19Term"), definition: t("footerPages.glossary.t19Def"), category: "security" },
+    { term: t("footerPages.glossary.t20Term"), definition: t("footerPages.glossary.t20Def"), category: "basics" },
+    { term: t("footerPages.glossary.t21Term"), definition: t("footerPages.glossary.t21Def"), category: "tech" },
+    { term: t("footerPages.glossary.t22Term"), definition: t("footerPages.glossary.t22Def"), category: "tech" },
+    { term: t("footerPages.glossary.t23Term"), definition: t("footerPages.glossary.t23Def"), category: "trading" },
+    { term: t("footerPages.glossary.t24Term"), definition: t("footerPages.glossary.t24Def"), category: "basics" }
   ];
 
-  const allCat = t("footerPages.glossary.catAll");
-  const categories = [allCat, cat.basics, cat.tech, cat.trading, cat.security, cat.cryptos];
+  const categories: CategoryKey[] = ["all", "basics", "tech", "trading", "security", "cryptos"];
 
   const filteredTerms = terms.filter((item) => {
     const matchesSearch = item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.definition.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === allCat || item.category === selectedCategory;
+    const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -114,7 +116,7 @@ export default function GlossaryPage() {
                     : "bg-slate-100 dark:bg-[#131416] text-slate-700 dark:text-slate-300 hover:bg-purple-500 hover:text-white"
                 }`}
               >
-                {category}
+                {categoryLabels[category]}
               </button>
             ))}
           </div>
@@ -138,7 +140,7 @@ export default function GlossaryPage() {
                         {item.term}
                       </h3>
                       <span className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 whitespace-nowrap">
-                        {item.category}
+                        {categoryLabels[item.category]}
                       </span>
                     </div>
                     <p className="text-slate-600 dark:text-slate-400 leading-relaxed">

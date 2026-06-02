@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { CoinIcon } from "@/components/market/CoinIcon";
 import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
+import { getCurrencySymbol } from "@/lib/currencies";
 
 interface Asset {
   id: number;
@@ -25,17 +26,6 @@ interface AssetsTableProps {
   userCurrency?: string;
   onSellClick?: (asset: Asset) => void;
 }
-
-// Функция конвертации валюты в символ
-const getCurrencySymbol = (currency: string): string => {
-  const symbols: Record<string, string> = {
-    USD: "$",
-    RUB: "₽",
-    EUR: "€",
-    KZT: "₸",
-  };
-  return symbols[currency] || currency;
-};
 
 export function AssetsTable({ assets, userCurrency = "USD", onSellClick }: AssetsTableProps) {
   const { t } = useTranslation();
@@ -75,7 +65,7 @@ export function AssetsTable({ assets, userCurrency = "USD", onSellClick }: Asset
               <th className="pb-3 pr-4 text-sm font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">{t("profile.assets.asset")}</th>
               <th className="pb-3 pr-4 text-sm font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">{t("profile.assets.amount")}</th>
               <th className="pb-3 pr-4 text-sm font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">{t("profile.assets.price")}</th>
-              <th className="pb-3 pr-4 text-sm font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">{t("profile.assets.value", { currency: userCurrency })}</th>
+              <th className="pb-3 pr-4 text-sm font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">{t("profile.assets.value", { currency: getCurrencySymbol(userCurrency) })}</th>
               <th className="pb-3 pr-4 text-sm font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">{t("profile.assets.change24h")}</th>
               <th className="pb-3 text-sm font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">{t("profile.assets.action")}</th>
             </tr>
@@ -185,7 +175,7 @@ export function AssetsTable({ assets, userCurrency = "USD", onSellClick }: Asset
                   })}
                 </span>
 
-                <span className="text-slate-500 dark:text-slate-400">{t("profile.assets.value", { currency: userCurrency })}</span>
+                <span className="text-slate-500 dark:text-slate-400">{t("profile.assets.value", { currency: getCurrencySymbol(userCurrency) })}</span>
                 <span className="text-right font-semibold">
                   {currencySymbol}{totalValueInUserCurrency.toFixed(2)}
                 </span>
