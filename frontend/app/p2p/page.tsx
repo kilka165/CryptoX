@@ -53,7 +53,6 @@ export default function P2PPage() {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCurrentUserId(response.data.id);
-        console.log("Current user ID:", response.data.id);
       } catch (error) {
         console.error("Error fetching current user:", error);
       }
@@ -77,10 +76,7 @@ export default function P2PPage() {
         params.currency = selectedCurrency;
       }
 
-      console.log("Fetching offers with params:", params);
-      
       const data = await p2pApi.getOffers(params);
-      console.log("Fetched offers:", data);
       setOffers(data);
     } catch (error) {
       console.error("Error fetching offers:", error);
@@ -190,7 +186,6 @@ export default function P2PPage() {
   };
 
   const handleOfferCreated = () => {
-    console.log("Offer created, refreshing list...");
     fetchOffers();
   };
 

@@ -60,7 +60,7 @@ class WalletController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Ошибка при пополнении: ' . $e->getMessage()
+                'message' => 'Ошибка при пополнении'
             ], 500);
         }
     }
@@ -104,7 +104,7 @@ class WalletController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Ошибка при выводе: ' . $e->getMessage()
+                'message' => 'Ошибка при выводе'
             ], 500);
         }
     }

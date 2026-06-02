@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Search, Flame, TrendingUp, BarChart3, Zap } from "lucide-react";
 import { Header } from "@/components/Header";
@@ -56,7 +56,6 @@ export default function MarketPage() {
   useEffect(() => {
     const fetchCoins = async () => {
       try {
-        console.log("Загружаем цены с Binance...");
         const binancePrices = await BinanceAPI.get24hPrices();
         
         const coinsData: Coin[] = binancePrices.map(bp => ({
@@ -168,8 +167,6 @@ export default function MarketPage() {
         }
       );
 
-      console.log("Ответ от сервера:", response.data);
-
       setUserBalance((prev) => prev - amountInUSD);
       setBuySuccess(true);
       setTimeout(() => {
@@ -194,10 +191,14 @@ export default function MarketPage() {
   };
 
 
-  const filteredCoins = coins.filter(
-    (coin) =>
-      coin.name.toLowerCase().includes(search.toLowerCase()) ||
-      coin.symbol.toLowerCase().includes(search.toLowerCase())
+  const filteredCoins = useMemo(
+    () =>
+      coins.filter(
+        (coin) =>
+          coin.name.toLowerCase().includes(search.toLowerCase()) ||
+          coin.symbol.toLowerCase().includes(search.toLowerCase())
+      ),
+    [coins, search]
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredCoins.length / perPage));
@@ -210,18 +211,30 @@ export default function MarketPage() {
     setCurrentPage(1);
   }, [search]);
 
-  const topGainers = [...coins]
-    .sort((a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0))
-    .slice(0, 4);
+  const topGainers = useMemo(
+    () =>
+      [...coins]
+        .sort((a, b) => (b.price_change_percentage_24h ?? 0) - (a.price_change_percentage_24h ?? 0))
+        .slice(0, 4),
+    [coins]
+  );
 
-  const topVolume = [...coins]
-    .sort((a, b) => (b.total_volume ?? 0) - (a.total_volume ?? 0))
-    .slice(0, 4);
+  const topVolume = useMemo(
+    () =>
+      [...coins]
+        .sort((a, b) => (b.total_volume ?? 0) - (a.total_volume ?? 0))
+        .slice(0, 4),
+    [coins]
+  );
 
-  const newGems = [...coins]
-    .sort((a, b) => (a.market_cap ?? 0) - (b.market_cap ?? 0))
-    .filter((c) => (c.market_cap ?? 0) > 0)
-    .slice(0, 4);
+  const newGems = useMemo(
+    () =>
+      [...coins]
+        .sort((a, b) => (a.market_cap ?? 0) - (b.market_cap ?? 0))
+        .filter((c) => (c.market_cap ?? 0) > 0)
+        .slice(0, 4),
+    [coins]
+  );
 
   const amountUserEntered = parseFloat(cleanInputAmount(displayAmount) || "0") || 0;
   const calculatedUSD = amountUserEntered / exchangeRate;

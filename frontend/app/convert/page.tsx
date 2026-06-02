@@ -104,7 +104,6 @@ export default function ConvertPage() {
           }
         }
 
-        console.log("Загружаем цены с Binance...");
         const binancePrices = await BinanceAPI.get24hPrices();
         
         const coinsData: Coin[] = binancePrices.map(bp => ({
@@ -295,17 +294,13 @@ export default function ConvertPage() {
         price_usd: toPrice,
       };
       
-      console.log("Отправляем на сервер:", JSON.stringify(payload, null, 2));
-
-      const response = await axios.post(
+      await axios.post(
         `${API_BASE}/trade/multi-swap`,
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-      console.log("Ответ от сервера:", response.data);
 
       const assetsRes = await axios.get<UserAsset[]>(
         `${API_BASE}/user/assets`,

@@ -25,10 +25,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/coins', [CoinsController::class, 'index']);
 Route::get('/coins/price/{symbol}', [CoinsController::class, 'getPrice']);
 Route::get('/coins/stats/{symbol}', [CoinsController::class, 'get24hStats']);
-Route::post('/coins/sync', [CoinsController::class, 'index']);
 Route::get('/coins/{coinId}', [CoinsController::class, 'show']);
-Route::get('/coins-db/all', [CoinsController::class, 'fromDatabase']);
-Route::get('/coins-db/{coinId}/icon', [CoinsController::class, 'getCoinIcon']);
 
 // Валюты
 Route::get('/currencies', [CurrencyController::class, 'getSupportedCurrencies']);
@@ -79,7 +76,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ========== КОШЕЛЁК ==========
 
-    Route::get('/wallet', [WalletController::class, 'getBalance']);
     Route::get('/wallet/balance', [WalletController::class, 'getBalance']);
     Route::post('/wallet/deposit', [WalletController::class, 'deposit']);
     Route::post('/wallet/withdraw', [WalletController::class, 'withdraw']);

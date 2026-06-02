@@ -135,7 +135,7 @@ class StakingController extends Controller
             DB::rollBack();
             Log::error('Staking creation failed', ['error' => $e->getMessage()]);
             return response()->json([
-                'message' => 'Ошибка при создании стейкинга: ' . $e->getMessage()
+                'message' => 'Ошибка при создании стейкинга'
             ], 500);
         }
     }
@@ -180,8 +180,7 @@ class StakingController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             return response()->json([
-                'message' => 'Ошибка при получении стейкингов',
-                'error' => $e->getMessage()
+                'message' => 'Ошибка при получении стейкингов'
             ], 500);
         }
     }

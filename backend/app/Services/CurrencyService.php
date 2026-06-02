@@ -20,7 +20,7 @@ class CurrencyService
     {
         return Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
             try {
-                $response = Http::withoutVerifying()
+                $response = Http::withOptions(['verify' => ! app()->isLocal()])
                     ->timeout(10)
                     ->get('https://api.exchangerate-api.com/v4/latest/USD');
 

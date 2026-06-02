@@ -87,8 +87,7 @@ class AssetController extends Controller
             ]);
 
             return response()->json([
-                'message' => 'Error fetching user assets',
-                'error' => $e->getMessage()
+                'message' => 'Error fetching user assets'
             ], 500);
         }
     }

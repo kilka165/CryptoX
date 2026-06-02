@@ -13,11 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Добавляем CORS middleware для всех запросов
-        $middleware->use([
-            \App\Http\Middleware\HandleCors::class,
-        ]);
-
+        // CORS обрабатывается стандартным Illuminate\Http\Middleware\HandleCors
+        // (входит в глобальный стек по умолчанию) на основе config/cors.php.
         $middleware->statefulApi();
 
         $middleware->api(prepend: [

@@ -73,12 +73,6 @@ export function P2PCreateOfferModal({
         const priceInCurrency = convertFromUSD(priceInUSD, currency);
         setMarketPrice(priceInCurrency);
         setPricePerCrypto(priceInCurrency.toFixed(2));
-        console.log("💰 Market price loaded:", {
-          crypto: cryptoName,
-          priceUSD: priceInUSD,
-          currency,
-          priceInCurrency
-        });
       } else {
         console.warn("Market price not found for:", cryptoName);
         setMarketPrice(null);
@@ -115,9 +109,6 @@ export function P2PCreateOfferModal({
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-
-        console.log("📦 Assets response:", assetsResponse.data);
-        console.log("💰 Wallet response:", walletResponse.data);
 
         // Обрабатываем активы
         const assets: UserAsset[] = assetsResponse.data.map((asset: any) => ({
@@ -253,16 +244,6 @@ export function P2PCreateOfferModal({
         return;
       }
 
-      console.log("📤 Creating offer:", {
-        crypto_currency: cryptoCurrency,
-        currency: displayCurrency,
-        price: priceNum,
-        min_limit: minLimit,
-        max_limit: maxLimit,
-        available_amount: amountNum,
-        type,
-        estimated_usd: totalInUSD,
-      });
 
       await p2pApi.createOffer(token, {
         crypto_currency: cryptoCurrency,

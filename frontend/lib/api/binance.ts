@@ -13,18 +13,43 @@ interface Coin24hData {
   total_volume?: number;
 }
 
+// Кэш на уровне модуля: get24hPrices вызывается многими методами ниже, без
+// него каждый делал бы отдельный полный запрос /coins. TTL синхронен с
+// бэкенд-кэшем; coinsInFlight дедуплицирует параллельные вызовы.
+let coinsCache: Coin24hData[] | null = null;
+let coinsCacheAt = 0;
+let coinsInFlight: Promise<Coin24hData[]> | null = null;
+const COINS_TTL_MS = 30_000;
+
 export const BinanceAPI = {
   /**
-   * Получает все монеты с бэкенда
+   * Получает все монеты с бэкенда (с кэшированием и дедупликацией запросов)
    */
   async get24hPrices(): Promise<Coin24hData[]> {
-    try {
-      const response = await axios.get(`${API_BASE}/coins`);
-      return response.data;
-    } catch (error: any) {
-      console.error('Error fetching coins:', error.message);
-      return [];
+    const now = Date.now();
+    if (coinsCache && now - coinsCacheAt < COINS_TTL_MS) {
+      return coinsCache;
     }
+    if (coinsInFlight) {
+      return coinsInFlight;
+    }
+
+    coinsInFlight = axios
+      .get(`${API_BASE}/coins`)
+      .then((response) => {
+        coinsCache = response.data;
+        coinsCacheAt = Date.now();
+        return coinsCache as Coin24hData[];
+      })
+      .catch((error: any) => {
+        console.error('Error fetching coins:', error.message);
+        return coinsCache ?? [];
+      })
+      .finally(() => {
+        coinsInFlight = null;
+      });
+
+    return coinsInFlight;
   },
 
   /**

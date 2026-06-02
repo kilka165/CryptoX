@@ -78,12 +78,6 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Настройки сохранены', 'user' => $user]);
     }
-    // ПОЛУЧЕНИЕ ПРОФИЛЯ
-    public function user(Request $request)
-    {
-        return $request->user();
-    }
-    
     // ВЫХОД
     public function logout(Request $request)
     {

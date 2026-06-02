@@ -12,7 +12,6 @@ class Asset extends Model
         'symbol',
         'amount',
         'logo_url',
-        'icon_url', 
     ];
 
     protected $casts = [

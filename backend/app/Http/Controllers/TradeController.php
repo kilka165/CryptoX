@@ -75,7 +75,7 @@ class TradeController extends Controller
             Log::error('Buy error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Ошибка при покупке: ' . $e->getMessage()
+                'message' => 'Ошибка при покупке'
             ], 500);
         }
     }
@@ -149,7 +149,7 @@ class TradeController extends Controller
             Log::error('Sell error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Ошибка при продаже: ' . $e->getMessage()
+                'message' => 'Ошибка при продаже'
             ], 500);
         }
     }
@@ -274,7 +274,7 @@ class TradeController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Ошибка сервера: ' . $e->getMessage(),
+                'message' => 'Ошибка сервера',
             ], 500);
         }
     }

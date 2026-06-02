@@ -50,30 +50,42 @@ class P2PController extends Controller
 
             $offers = $query->orderBy('price', 'asc')->get();
 
-            return response()->json($offers->map(function ($offer) {
-                // Получаем реальное количество завершённых сделок пользователя
-                $completedTrades = 0;
-                $totalTrades = 0;
+            // Статистика сделок по продавцам — один агрегирующий запрос вместо 2N
+            // (раньше тут был N+1, причём фильтр по несуществующей колонке
+            // p2p_trades.seller_id всегда падал и глушился, давая 0 / 100%).
+            // Продавец участвует в сделке либо как покупатель (buyer_id), либо как
+            // владелец заявки (p2p_offers.seller_id через offer_id).
+            $sellerIds = $offers->pluck('seller_id')->unique()->values()->all();
+            $completedBySeller = [];
+            $totalBySeller = [];
 
-                try {
-                    $completedTrades = P2PTrade::where(function ($query) use ($offer) {
-                            $query->where('buyer_id', $offer->seller_id)
-                                  ->orWhere('seller_id', $offer->seller_id);
-                        })
-                        ->where('status', 'completed')
-                        ->count();
+            if (!empty($sellerIds)) {
+                $rows = P2PTrade::query()
+                    ->leftJoin('p2p_offers', 'p2p_trades.offer_id', '=', 'p2p_offers.id')
+                    ->whereIn('p2p_trades.status', ['completed', 'cancelled'])
+                    ->where(function ($q) use ($sellerIds) {
+                        $q->whereIn('p2p_trades.buyer_id', $sellerIds)
+                          ->orWhereIn('p2p_offers.seller_id', $sellerIds);
+                    })
+                    ->get(['p2p_trades.status', 'p2p_trades.buyer_id', 'p2p_offers.seller_id']);
 
-                    $totalTrades = P2PTrade::where(function ($query) use ($offer) {
-                            $query->where('buyer_id', $offer->seller_id)
-                                  ->orWhere('seller_id', $offer->seller_id);
-                        })
-                        ->whereIn('status', ['completed', 'cancelled'])
-                        ->count();
-                } catch (\Exception $e) {
-                    Log::warning('Error fetching P2P trade stats', ['error' => $e->getMessage()]);
+                foreach ($rows as $row) {
+                    foreach (array_unique([$row->buyer_id, $row->seller_id]) as $sid) {
+                        if ($sid === null || !in_array($sid, $sellerIds, true)) {
+                            continue;
+                        }
+                        $totalBySeller[$sid] = ($totalBySeller[$sid] ?? 0) + 1;
+                        if ($row->status === 'completed') {
+                            $completedBySeller[$sid] = ($completedBySeller[$sid] ?? 0) + 1;
+                        }
+                    }
                 }
+            }
 
-                // Вычисляем процент выполнения
+            return response()->json($offers->map(function ($offer) use ($completedBySeller, $totalBySeller) {
+                $completedTrades = $completedBySeller[$offer->seller_id] ?? 0;
+                $totalTrades = $totalBySeller[$offer->seller_id] ?? 0;
+
                 $completionRate = $totalTrades > 0
                     ? round(($completedTrades / $totalTrades) * 100)
                     : 100;
@@ -100,8 +112,7 @@ class P2PController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             return response()->json([
-                'message' => 'Ошибка при получении заявок',
-                'error' => $e->getMessage()
+                'message' => 'Ошибка при получении заявок'
             ], 500);
         }
     }
@@ -216,7 +227,7 @@ class P2PController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('P2P Offer Creation Failed', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Ошибка при создании заявки: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Ошибка при создании заявки'], 500);
         }
     }
 
@@ -299,12 +310,6 @@ class P2PController extends Controller
      */
     public function createTrade(Request $request)
     {
-        // Диагностика (можно удалить после решения проблемы)
-        Log::info('P2P createTrade - Request received', [
-            'all_data' => $request->all(),
-            'user_id' => auth()->id(),
-        ]);
-
         try {
             $validated = $request->validate([
                 'offer_id' => 'required|exists:p2p_offers,id',
@@ -425,7 +430,7 @@ class P2PController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             return response()->json([
-                'message' => 'Ошибка при создании сделки: ' . $e->getMessage()
+                'message' => 'Ошибка при создании сделки'
             ], 500);
         }
     }
@@ -593,7 +598,7 @@ class P2PController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('P2P Trade Confirmation Failed', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Ошибка при подтверждении сделки: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Ошибка при подтверждении сделки'], 500);
         }
     }
 

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Asset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -15,12 +14,11 @@ class CoinsController extends Controller
     public function index()
 {
     try {
-        $coins = Cache::remember('binance_coins_list', 30, fn() => $this->fetchBinanceCoinsList());
+        $coins = Cache::remember('binance_coins_list', 60, fn() => $this->fetchBinanceCoinsList());
         return response()->json($coins);
     } catch (\Exception $e) {
         \Log::error('CoinsController error: ' . $e->getMessage());
         return response()->json([
-            'error' => $e->getMessage(),
             'message' => 'Failed to fetch coins from Binance'
         ], 500);
     }
@@ -31,7 +29,7 @@ class CoinsController extends Controller
  */
 private function fetchBinanceCoinsList(): array
 {
-    $response = Http::withoutVerifying()
+    $response = Http::withOptions(['verify' => ! app()->isLocal()])
         ->timeout(10)
         ->get('https://data-api.binance.vision/api/v3/ticker/24hr');
 
@@ -85,7 +83,7 @@ private function fetchBinanceCoinsList(): array
 public function getPrice($symbol)
 {
     try {
-        $response = Http::withoutVerifying()
+        $response = Http::withOptions(['verify' => ! app()->isLocal()])
             ->timeout(5)
             ->get('https://data-api.binance.vision/api/v3/ticker/price', [
                 'symbol' => strtoupper($symbol) . 'USDT'
@@ -100,7 +98,7 @@ public function getPrice($symbol)
             'price' => floatval($response->json()['price'])
         ]);
     } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
+        return response()->json(['error' => 'Server error'], 500);
     }
 }
 
@@ -110,7 +108,7 @@ public function getPrice($symbol)
 public function get24hStats($symbol)
 {
     try {
-        $response = Http::withoutVerifying() // Добавили
+        $response = Http::withOptions(['verify' => ! app()->isLocal()])
             ->timeout(5)
             ->get('https://data-api.binance.vision/api/v3/ticker/24hr', [
                 'symbol' => strtoupper($symbol) . 'USDT'
@@ -122,7 +120,7 @@ public function get24hStats($symbol)
 
         return response()->json($response->json());
     } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
+        return response()->json(['error' => 'Server error'], 500);
     }
 }
 
@@ -243,7 +241,6 @@ private function getCoinMapping()
         'dym' => ['id' => 'dymension', 'name' => 'Dymension', 'slug' => 'dymension-dym'],
         'aevo' => ['id' => 'aevo', 'name' => 'Aevo', 'slug' => 'aevo-aevo'],
         'render' => ['id' => 'render-token', 'name' => 'Render', 'slug' => 'render-token-render'],
-        'fet' => ['id' => 'fetch-ai', 'name' => 'Fetch.ai', 'slug' => 'fetch-ai-fet'],
         'woo' => ['id' => 'woo-network', 'name' => 'WOO Network', 'slug' => 'woo-network-woo'],
         'pendle' => ['id' => 'pendle', 'name' => 'Pendle', 'slug' => 'pendle-pendle'],
         'sfp' => ['id' => 'safepal', 'name' => 'SafePal', 'slug' => 'safepal-sfp'],
@@ -260,7 +257,7 @@ private function getCoinMapping()
         try {
             $needle = strtolower($coinId);
 
-            $coins = Cache::remember('binance_coins_list', 30, fn() => $this->fetchBinanceCoinsList());
+            $coins = Cache::remember('binance_coins_list', 60, fn() => $this->fetchBinanceCoinsList());
 
             $coin = collect($coins)->first(
                 fn($c) => ($c['id'] ?? null) === $needle
@@ -271,46 +268,9 @@ private function getCoinMapping()
                 return response()->json(['error' => 'Coin not found'], 404);
             }
 
-            Asset::updateOrCreate(
-                ['name' => $coin['id']],
-                [
-                    'symbol' => strtoupper($coin['symbol']),
-                    'icon_url' => $coin['image'] ?: null,
-                    'logo_url' => $coin['image'] ?: null,
-                ]
-            );
-
             return response()->json($coin);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Server error'], 500);
         }
-    }
-
-    /**
-     * Получить все монеты из БД
-     */
-    public function fromDatabase()
-    {
-        $assets = Asset::all(['name', 'symbol', 'icon_url', 'logo_url']);
-        return response()->json($assets);
-    }
-
-    /**
-     * Получить иконку конкретной монеты из БД
-     */
-    public function getCoinIcon($coinId)
-    {
-        $asset = Asset::where('name', $coinId)->first();
-
-        if (!$asset || !$asset->icon_url) {
-            return response()->json(['error' => 'Icon not found'], 404);
-        }
-
-        return response()->json([
-            'id' => $asset->name,
-            'symbol' => $asset->symbol,
-            'icon_url' => $asset->icon_url,
-            'logo_url' => $asset->logo_url,
-        ]);
     }
 }
