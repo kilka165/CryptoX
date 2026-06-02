@@ -123,6 +123,34 @@
       "errPassSpecial": "Нужен хотя бы один спецсимвол (!@#$...)",
       "errPassMismatch": "Пароли не совпадают",
       "serverError": "Произошла ошибка сервера. Попробуйте позже."
+    },
+    "forgot": {
+      "title": "Восстановление пароля",
+      "subtitle": "Введите e-mail — пришлём код для сброса",
+      "emailLabel": "Email адрес",
+      "sendCode": "Отправить код",
+      "sending": "Отправка...",
+      "codeSent": "Если такой e-mail зарегистрирован, мы отправили на него код.",
+      "codeLabel": "Код из письма",
+      "codePlaceholder": "6-значный код",
+      "newPasswordLabel": "Новый пароль",
+      "confirmLabel": "Подтвердите пароль",
+      "submit": "Сменить пароль",
+      "submitting": "Сохранение...",
+      "backToLogin": "Вернуться ко входу",
+      "success": "Пароль изменён. Войдите с новым паролем.",
+      "invalidCode": "Неверный или просроченный код",
+      "serverError": "Ошибка сервера. Попробуйте позже."
+    },
+    "twoFactor": {
+      "title": "Двухфакторная аутентификация",
+      "prompt": "Введите 6-значный код из приложения-аутентификатора",
+      "codeLabel": "Код подтверждения",
+      "codePlaceholder": "123456 или recovery-код",
+      "submit": "Подтвердить",
+      "submitting": "Проверка...",
+      "invalidCode": "Неверный код",
+      "back": "Назад"
     }
   },
   "settings": {
@@ -137,7 +165,52 @@
     "selectCurrency": "Выберите валюту",
     "searchCurrency": "Поиск (RUB, Евро...)",
     "language": "Язык интерфейса",
-    "languageHint": "Выберите язык интерфейса сайта."
+    "languageHint": "Выберите язык интерфейса сайта.",
+    "security": {
+      "title": "Безопасность",
+      "emailTitle": "Подтверждение e-mail",
+      "emailVerified": "E-mail подтверждён",
+      "emailNotVerified": "E-mail не подтверждён",
+      "emailHint": "Без подтверждения лимит вывода $100/день, после подтверждения — $1000/день.",
+      "sendCode": "Отправить код",
+      "sending": "Отправка...",
+      "codeSent": "Код отправлен на вашу почту",
+      "codeLabel": "Код из письма",
+      "codePlaceholder": "6-значный код",
+      "verify": "Подтвердить",
+      "verifying": "Проверка...",
+      "verifiedSuccess": "E-mail подтверждён!",
+      "invalidCode": "Неверный или просроченный код",
+      "twoFactorTitle": "Двухфакторная аутентификация (2FA)",
+      "twoFactorEnabled": "2FA включён",
+      "twoFactorDisabled": "2FA выключен",
+      "twoFactorHint": "С включённым 2FA вывод без лимита. Используйте Google Authenticator.",
+      "verifyEmailFirst": "Сначала подтвердите e-mail, чтобы включить 2FA.",
+      "enable": "Включить 2FA",
+      "enabling": "Включение...",
+      "scanQr": "Отсканируйте QR-код в Google Authenticator",
+      "orEnterManually": "Или введите ключ вручную:",
+      "confirmCodeLabel": "Код из приложения",
+      "confirm": "Подтвердить и включить",
+      "confirming": "Подтверждение...",
+      "recoveryTitle": "Сохраните recovery-коды",
+      "recoveryHint": "Эти коды помогут войти, если потеряете телефон. Показываются один раз.",
+      "recoveryDone": "Я сохранил коды",
+      "disable": "Отключить 2FA",
+      "disabling": "Отключение...",
+      "disableHint": "Введите пароль, чтобы отключить 2FA",
+      "passwordLabel": "Пароль",
+      "changePasswordTitle": "Смена пароля",
+      "currentPassword": "Текущий пароль",
+      "newPassword": "Новый пароль",
+      "confirmPassword": "Подтвердите новый пароль",
+      "changePassword": "Сменить пароль",
+      "changing": "Сохранение...",
+      "passwordChanged": "Пароль изменён!",
+      "wrongCurrent": "Текущий пароль неверный",
+      "cancel": "Отмена",
+      "serverError": "Ошибка сервера. Попробуйте позже."
+    }
   },
   "staking": {
     "title": "Стейкинг",
@@ -401,6 +474,8 @@
   },
   "profile": {
     "verified": "Верифицирован",
+    "notVerified": "Не верифицирован",
+    "twoFa": "2FA",
     "nav": {
       "walletOverview": "Обзор кошелька",
       "history": "История операций"
@@ -484,7 +559,10 @@
     "processing": "Обработка...",
     "withdraw": "Вывести ${{amount}}",
     "minInfo": "Минимальная сумма вывода $10. Зачисление от 1 до 3 рабочих дней.",
-    "withdrawError": "Ошибка при выводе средств"
+    "withdrawError": "Ошибка при выводе средств",
+    "limitUnverified": "Дневной лимит вывода — $100. Подтвердите e-mail в настройках, чтобы повысить лимит до $1000.",
+    "limitVerified": "Дневной лимит вывода — $1000. Включите 2FA в настройках, чтобы снять лимит.",
+    "limitNone": "Лимит вывода снят — 2FA включён."
   },
   "footerPages": {
     "about": {

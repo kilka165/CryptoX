@@ -1,14 +1,16 @@
 "use client";
 
-import { ShieldCheck, UserIcon } from "lucide-react";
+import { ShieldCheck, ShieldAlert, UserIcon, Smartphone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface UserCardProps {
   name: string;
   email: string;
+  emailVerified?: boolean;
+  twoFactorEnabled?: boolean;
 }
 
-export function UserCard({ name, email }: UserCardProps) {
+export function UserCard({ name, email, emailVerified = false, twoFactorEnabled = false }: UserCardProps) {
   const { t } = useTranslation();
   return (
     <div className="bg-white dark:bg-[#131416] p-6 rounded-2xl shadow-sm border border-slate-300 dark:border-slate-800 text-center">
@@ -17,8 +19,23 @@ export function UserCard({ name, email }: UserCardProps) {
       </div>
       <h2 className="text-xl font-bold truncate">{name}</h2>
       <p className="text-sm text-slate-500 truncate">{email}</p>
-      <div className="mt-4 inline-flex items-center gap-1 text-xs text-green-600 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">
-        <ShieldCheck size={12} /> {t("profile.verified")}
+
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+        {emailVerified ? (
+          <span className="inline-flex items-center gap-1 text-xs text-green-600 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">
+            <ShieldCheck size={12} /> {t("profile.verified")}
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 text-xs text-amber-600 bg-amber-100 dark:bg-amber-900/30 px-2 py-1 rounded-full">
+            <ShieldAlert size={12} /> {t("profile.notVerified")}
+          </span>
+        )}
+
+        {twoFactorEnabled && (
+          <span className="inline-flex items-center gap-1 text-xs text-blue-600 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-full">
+            <Smartphone size={12} /> {t("profile.twoFa")}
+          </span>
+        )}
       </div>
     </div>
   );

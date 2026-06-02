@@ -78,6 +78,31 @@ class WalletController extends Controller
             return response()->json(['message' => 'Недостаточно средств'], 400);
         }
 
+        // Дневной лимит вывода зависит от уровня защиты аккаунта:
+        // 2FA — без лимита, e-mail подтверждён — $1000/день, иначе — $100/день.
+        $dailyLimit = $user->two_factor_confirmed_at
+            ? null
+            : ($user->email_verified_at ? 1000 : 100);
+
+        if ($dailyLimit !== null) {
+            $withdrawnToday = (float) Transaction::where('user_id', $user->id)
+                ->where('type', 'withdraw')
+                ->whereDate('created_at', today())
+                ->sum('total_usd');
+
+            if ($withdrawnToday + $validated['amount'] > $dailyLimit) {
+                $remaining = max(0, $dailyLimit - $withdrawnToday);
+
+                return response()->json([
+                    'message' => "Превышен дневной лимит вывода (\${$dailyLimit}/день). "
+                        . "Доступно сегодня: \${$remaining}. Подтвердите e-mail или включите 2FA, чтобы повысить лимит.",
+                    'daily_limit' => $dailyLimit,
+                    'withdrawn_today' => $withdrawnToday,
+                    'remaining_today' => $remaining,
+                ], 403);
+            }
+        }
+
         DB::beginTransaction();
         try {
             $wallet->balance -= $validated['amount'];

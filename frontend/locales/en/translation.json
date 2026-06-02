@@ -123,6 +123,34 @@
       "errPassSpecial": "Need at least one special character (!@#$...)",
       "errPassMismatch": "Passwords do not match",
       "serverError": "A server error occurred. Please try again later."
+    },
+    "forgot": {
+      "title": "Reset password",
+      "subtitle": "Enter your e-mail — we'll send a reset code",
+      "emailLabel": "Email address",
+      "sendCode": "Send code",
+      "sending": "Sending...",
+      "codeSent": "If this e-mail is registered, we've sent a code to it.",
+      "codeLabel": "Code from e-mail",
+      "codePlaceholder": "6-digit code",
+      "newPasswordLabel": "New password",
+      "confirmLabel": "Confirm password",
+      "submit": "Change password",
+      "submitting": "Saving...",
+      "backToLogin": "Back to sign in",
+      "success": "Password changed. Sign in with your new password.",
+      "invalidCode": "Invalid or expired code",
+      "serverError": "Server error. Please try again later."
+    },
+    "twoFactor": {
+      "title": "Two-factor authentication",
+      "prompt": "Enter the 6-digit code from your authenticator app",
+      "codeLabel": "Verification code",
+      "codePlaceholder": "123456 or recovery code",
+      "submit": "Confirm",
+      "submitting": "Checking...",
+      "invalidCode": "Invalid code",
+      "back": "Back"
     }
   },
   "settings": {
@@ -137,7 +165,52 @@
     "selectCurrency": "Select currency",
     "searchCurrency": "Search (RUB, Euro...)",
     "language": "Interface language",
-    "languageHint": "Choose the site interface language."
+    "languageHint": "Choose the site interface language.",
+    "security": {
+      "title": "Security",
+      "emailTitle": "Email verification",
+      "emailVerified": "Email verified",
+      "emailNotVerified": "Email not verified",
+      "emailHint": "Without verification the withdrawal limit is $100/day, after verification — $1000/day.",
+      "sendCode": "Send code",
+      "sending": "Sending...",
+      "codeSent": "Code sent to your e-mail",
+      "codeLabel": "Code from e-mail",
+      "codePlaceholder": "6-digit code",
+      "verify": "Verify",
+      "verifying": "Checking...",
+      "verifiedSuccess": "Email verified!",
+      "invalidCode": "Invalid or expired code",
+      "twoFactorTitle": "Two-factor authentication (2FA)",
+      "twoFactorEnabled": "2FA enabled",
+      "twoFactorDisabled": "2FA disabled",
+      "twoFactorHint": "With 2FA enabled withdrawals are unlimited. Use Google Authenticator.",
+      "verifyEmailFirst": "Verify your e-mail first to enable 2FA.",
+      "enable": "Enable 2FA",
+      "enabling": "Enabling...",
+      "scanQr": "Scan the QR code in Google Authenticator",
+      "orEnterManually": "Or enter the key manually:",
+      "confirmCodeLabel": "Code from the app",
+      "confirm": "Confirm and enable",
+      "confirming": "Confirming...",
+      "recoveryTitle": "Save your recovery codes",
+      "recoveryHint": "These codes let you sign in if you lose your phone. Shown only once.",
+      "recoveryDone": "I've saved the codes",
+      "disable": "Disable 2FA",
+      "disabling": "Disabling...",
+      "disableHint": "Enter your password to disable 2FA",
+      "passwordLabel": "Password",
+      "changePasswordTitle": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "changePassword": "Change password",
+      "changing": "Saving...",
+      "passwordChanged": "Password changed!",
+      "wrongCurrent": "Current password is incorrect",
+      "cancel": "Cancel",
+      "serverError": "Server error. Please try again later."
+    }
   },
   "staking": {
     "title": "Staking",
@@ -401,6 +474,8 @@
   },
   "profile": {
     "verified": "Verified",
+    "notVerified": "Not verified",
+    "twoFa": "2FA",
     "nav": {
       "walletOverview": "Wallet overview",
       "history": "Transaction history"
@@ -484,7 +559,10 @@
     "processing": "Processing...",
     "withdraw": "Withdraw ${{amount}}",
     "minInfo": "Minimum withdrawal $10. Credited within 1 to 3 business days.",
-    "withdrawError": "Error withdrawing funds"
+    "withdrawError": "Error withdrawing funds",
+    "limitUnverified": "Daily withdrawal limit — $100. Verify your e-mail in settings to raise it to $1000.",
+    "limitVerified": "Daily withdrawal limit — $1000. Enable 2FA in settings to remove the limit.",
+    "limitNone": "Withdrawal limit removed — 2FA enabled."
   },
   "footerPages": {
     "about": {

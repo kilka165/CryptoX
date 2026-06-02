@@ -19,7 +19,12 @@ use App\Http\Controllers\AssetController;
 
 // Аутентификация
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+Route::post('/login/2fa', [AuthController::class, 'twoFactorChallenge'])->middleware('throttle:10,1');
+
+// Восстановление пароля (по 6-значному коду на e-mail)
+Route::post('/password/forgot', [AuthController::class, 'forgotPassword'])->middleware('throttle:6,1');
+Route::post('/password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:10,1');
 
 // Список монет (ПУБЛИЧНЫЕ - доступны всем!)
 Route::get('/coins', [CoinsController::class, 'index']);
@@ -61,11 +66,22 @@ Route::middleware('auth:sanctum')->group(function () {
             'wallet' => $user->wallet,
             'assets' => $user->assets,
             'balance' => $user->wallet->balance ?? 0,
+            'email_verified' => (bool) $user->email_verified_at,
+            'two_factor_enabled' => (bool) $user->two_factor_confirmed_at,
         ]);
     });
 
     // Выход
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // ========== БЕЗОПАСНОСТЬ (верификация e-mail, пароль, 2FA) ==========
+
+    Route::post('/email/verify/send', [AuthController::class, 'sendVerificationCode']);
+    Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
+    Route::post('/password/change', [AuthController::class, 'changePassword']);
+    Route::post('/2fa/enable', [AuthController::class, 'enableTwoFactor']);
+    Route::post('/2fa/confirm', [AuthController::class, 'confirmTwoFactor']);
+    Route::post('/2fa/disable', [AuthController::class, 'disableTwoFactor']);
 
     // ========== НАСТРОЙКИ ПОЛЬЗОВАТЕЛЯ ==========
 

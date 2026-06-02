@@ -31,6 +31,8 @@ interface AuthUser {
   created_at: string;
   currency?: string;
   balance?: number;
+  email_verified?: boolean;
+  two_factor_enabled?: boolean;
   wallet?: {
     balance: number;
   };
@@ -194,7 +196,12 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* ЛЕВАЯ КОЛОНКА */}
           <div className="space-y-6">
-            <UserCard name={authUser.name} email={authUser.email} />
+            <UserCard
+              name={authUser.name}
+              email={authUser.email}
+              emailVerified={authUser.email_verified}
+              twoFactorEnabled={authUser.two_factor_enabled}
+            />
             <UserNavigation onLogout={handleLogout} />
           </div>
 

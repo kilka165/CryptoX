@@ -123,6 +123,34 @@
       "errPassSpecial": "Кемінде бір арнайы таңба қажет (!@#$...)",
       "errPassMismatch": "Құпия сөздер сәйкес келмейді",
       "serverError": "Сервер қатесі орын алды. Кейінірек қайталап көріңіз."
+    },
+    "forgot": {
+      "title": "Құпия сөзді қалпына келтіру",
+      "subtitle": "Email енгізіңіз — қалпына келтіру кодын жібереміз",
+      "emailLabel": "Email мекенжайы",
+      "sendCode": "Код жіберу",
+      "sending": "Жіберілуде...",
+      "codeSent": "Егер бұл email тіркелген болса, біз оған код жібердік.",
+      "codeLabel": "Хаттан келген код",
+      "codePlaceholder": "6 таңбалы код",
+      "newPasswordLabel": "Жаңа құпия сөз",
+      "confirmLabel": "Құпия сөзді растаңыз",
+      "submit": "Құпия сөзді өзгерту",
+      "submitting": "Сақталуда...",
+      "backToLogin": "Кіруге оралу",
+      "success": "Құпия сөз өзгертілді. Жаңа құпия сөзбен кіріңіз.",
+      "invalidCode": "Қате немесе мерзімі өткен код",
+      "serverError": "Сервер қатесі. Кейінірек қайталап көріңіз."
+    },
+    "twoFactor": {
+      "title": "Екі факторлы аутентификация",
+      "prompt": "Аутентификатор қолданбасынан 6 таңбалы кодты енгізіңіз",
+      "codeLabel": "Растау коды",
+      "codePlaceholder": "123456 немесе recovery-код",
+      "submit": "Растау",
+      "submitting": "Тексерілуде...",
+      "invalidCode": "Қате код",
+      "back": "Артқа"
     }
   },
   "settings": {
@@ -137,7 +165,52 @@
     "selectCurrency": "Валютаны таңдаңыз",
     "searchCurrency": "Іздеу (RUB, Еуро...)",
     "language": "Интерфейс тілі",
-    "languageHint": "Сайт интерфейсінің тілін таңдаңыз."
+    "languageHint": "Сайт интерфейсінің тілін таңдаңыз.",
+    "security": {
+      "title": "Қауіпсіздік",
+      "emailTitle": "Email растау",
+      "emailVerified": "Email расталған",
+      "emailNotVerified": "Email расталмаған",
+      "emailHint": "Растаусыз шығару лимиті $100/күн, растаудан кейін — $1000/күн.",
+      "sendCode": "Код жіберу",
+      "sending": "Жіберілуде...",
+      "codeSent": "Код поштаңызға жіберілді",
+      "codeLabel": "Хаттан келген код",
+      "codePlaceholder": "6 таңбалы код",
+      "verify": "Растау",
+      "verifying": "Тексерілуде...",
+      "verifiedSuccess": "Email расталды!",
+      "invalidCode": "Қате немесе мерзімі өткен код",
+      "twoFactorTitle": "Екі факторлы аутентификация (2FA)",
+      "twoFactorEnabled": "2FA қосулы",
+      "twoFactorDisabled": "2FA өшірулі",
+      "twoFactorHint": "2FA қосулы болса шығару лимитсіз. Google Authenticator қолданыңыз.",
+      "verifyEmailFirst": "2FA қосу үшін алдымен e-mail растаңыз.",
+      "enable": "2FA қосу",
+      "enabling": "Қосылуда...",
+      "scanQr": "Google Authenticator-де QR-кодты сканерлеңіз",
+      "orEnterManually": "Немесе кілтті қолмен енгізіңіз:",
+      "confirmCodeLabel": "Қолданбадан код",
+      "confirm": "Растау және қосу",
+      "confirming": "Расталуда...",
+      "recoveryTitle": "Recovery-кодтарды сақтаңыз",
+      "recoveryHint": "Бұл кодтар телефоныңызды жоғалтсаңыз кіруге көмектеседі. Бір рет қана көрсетіледі.",
+      "recoveryDone": "Кодтарды сақтадым",
+      "disable": "2FA өшіру",
+      "disabling": "Өшірілуде...",
+      "disableHint": "2FA өшіру үшін құпия сөзді енгізіңіз",
+      "passwordLabel": "Құпия сөз",
+      "changePasswordTitle": "Құпия сөзді өзгерту",
+      "currentPassword": "Ағымдағы құпия сөз",
+      "newPassword": "Жаңа құпия сөз",
+      "confirmPassword": "Жаңа құпия сөзді растаңыз",
+      "changePassword": "Құпия сөзді өзгерту",
+      "changing": "Сақталуда...",
+      "passwordChanged": "Құпия сөз өзгертілді!",
+      "wrongCurrent": "Ағымдағы құпия сөз қате",
+      "cancel": "Бас тарту",
+      "serverError": "Сервер қатесі. Кейінірек қайталап көріңіз."
+    }
   },
   "staking": {
     "title": "Стейкинг",
@@ -401,6 +474,8 @@
   },
   "profile": {
     "verified": "Верификацияланған",
+    "notVerified": "Верификацияланбаған",
+    "twoFa": "2FA",
     "nav": {
       "walletOverview": "Әмиян шолуы",
       "history": "Операциялар тарихы"
@@ -484,7 +559,10 @@
     "processing": "Өңделуде...",
     "withdraw": "${{amount}} шығару",
     "minInfo": "Ең аз шығару сомасы $10. Есептеу 1-3 жұмыс күні ішінде.",
-    "withdrawError": "Қаражатты шығару қатесі"
+    "withdrawError": "Қаражатты шығару қатесі",
+    "limitUnverified": "Күндік шығару лимиті — $100. Лимитті $1000-ға дейін көтеру үшін баптауларда e-mail растаңыз.",
+    "limitVerified": "Күндік шығару лимиті — $1000. Лимитті алып тастау үшін баптауларда 2FA қосыңыз.",
+    "limitNone": "Шығару лимиті алынды — 2FA қосулы."
   },
   "footerPages": {
     "about": {

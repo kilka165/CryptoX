@@ -10,6 +10,7 @@ import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { SUPPORTED_LANGUAGES } from "@/lib/i18n";
 import { API_BASE } from "@/lib/config";
+import { SecuritySettings } from "@/components/settings/SecuritySettings";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -177,6 +178,9 @@ export default function SettingsPage() {
             </div>
           </form>
         </div>
+
+        {/* Секции безопасности: верификация e-mail, 2FA, смена пароля */}
+        <SecuritySettings />
       </main>
 
       {/* МОДАЛЬНОЕ ОКНО ВЫБОРА ВАЛЮТЫ */}

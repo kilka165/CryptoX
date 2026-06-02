@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
-import { CreditCard, ArrowLeft, ShieldCheck, CheckCircle, AlertCircle, Wallet } from "lucide-react";
+import { CreditCard, ArrowLeft, ShieldCheck, CheckCircle, AlertCircle, Wallet, Info } from "lucide-react";
 import axios from "axios";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
@@ -20,6 +20,8 @@ export default function WithdrawPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
 
   // Загружаем баланс при открытии страницы
   useEffect(() => {
@@ -31,12 +33,21 @@ export default function WithdrawPage() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBalance(res.data.wallet?.balance || 0);
+            setEmailVerified(!!res.data.email_verified);
+            setTwoFactorEnabled(!!res.data.two_factor_enabled);
         } catch (e) {
             console.error("Error loading balance", e);
         }
     };
     fetchBalance();
   }, []);
+
+  // Подсказка о дневном лимите вывода в зависимости от уровня защиты.
+  const limitInfo = twoFactorEnabled
+    ? { text: t("withdraw.limitNone"), tone: "ok" as const }
+    : emailVerified
+    ? { text: t("withdraw.limitVerified"), tone: "warn" as const }
+    : { text: t("withdraw.limitUnverified"), tone: "warn" as const };
 
   const withdrawAmount = parseFloat(amount) || 0;
   const commission = withdrawAmount * 0.01; // 1%
@@ -208,6 +219,22 @@ export default function WithdrawPage() {
                 placeholder="0000 0000 0000 0000"
                 className="block w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-red-500 outline-none"
               />
+            </div>
+
+            {/* Информация о дневном лимите вывода */}
+            <div
+              className={`p-4 rounded-xl flex items-start gap-3 text-sm border ${
+                limitInfo.tone === "ok"
+                  ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300"
+                  : "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300"
+              }`}
+            >
+              {limitInfo.tone === "ok" ? (
+                <ShieldCheck size={18} className="mt-0.5 flex-shrink-0" />
+              ) : (
+                <Info size={18} className="mt-0.5 flex-shrink-0" />
+              )}
+              <span>{limitInfo.text}</span>
             </div>
 
             <button
