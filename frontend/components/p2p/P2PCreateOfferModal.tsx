@@ -322,8 +322,8 @@ export function P2PCreateOfferModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-2xl shadow-xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800 sticky top-0 bg-white dark:bg-[#131416] z-10">
+      <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-300 dark:border-slate-800 w-full max-w-2xl shadow-xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-slate-300 dark:border-slate-800 sticky top-0 bg-white dark:bg-[#131416] z-10">
           <div className="flex items-center gap-2">
             <Plus className="w-6 h-6 text-blue-600" />
             <h3 className="text-xl font-bold">

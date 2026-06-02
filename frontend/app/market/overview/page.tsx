@@ -11,6 +11,7 @@ import { API_BASE } from "@/lib/config";
 import type { Coin } from "@/types/coin";
 import { MarketCard } from "@/components/market/MarketCard";
 import { CoinRow } from "@/components/market/CoinRow";
+import { CoinCard } from "@/components/market/CoinCard";
 import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
 
@@ -122,7 +123,7 @@ export default function MarketOverviewPage() {
         </header>
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-300 dark:border-slate-800 p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-500">
                 {t("market.overview.totalMarketCap")}
@@ -137,7 +138,7 @@ export default function MarketOverviewPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-300 dark:border-slate-800 p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-500">
                 {t("market.overview.volume24h")}
@@ -152,7 +153,7 @@ export default function MarketOverviewPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
+          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-300 dark:border-slate-800 p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-500">
                 {t("market.overview.coinsUp24h")}
@@ -195,8 +196,8 @@ export default function MarketOverviewPage() {
           />
         </section>
 
-        <section className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <section className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-300 dark:border-slate-800 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-300 dark:border-slate-800 flex items-center justify-between">
             <h2 className="text-sm md:text-base font-semibold">
               {t("market.overview.top20")}
             </h2>
@@ -205,7 +206,37 @@ export default function MarketOverviewPage() {
             </span>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Подписи колонок (планшет) */}
+          <div className="hidden sm:flex lg:hidden items-center gap-3 px-5 pt-3 text-[11px] font-medium uppercase tracking-wide text-slate-400">
+            <span className="w-5 text-center shrink-0">#</span>
+            <span className="w-9 shrink-0" />
+            <span className="flex-1 min-w-0">{t("market.coin")}</span>
+            <span className="text-right shrink-0">
+              {t("market.priceCur", { currency: userCurrency })} / {t("market.change24h")}
+            </span>
+            <span className="px-3 text-sm invisible shrink-0">{t("market.buy")}</span>
+          </div>
+
+          {/* Мобильный/планшетный список — карточки */}
+          <div className="lg:hidden divide-y divide-slate-100 dark:divide-slate-800/60">
+            {loading
+              ? [...Array(8)].map((_, i) => (
+                  <div key={i} className="h-16 animate-pulse bg-slate-50 dark:bg-[#131416]/40" />
+                ))
+              : topTable.map((coin, index) => (
+                  <div key={coin.id} className="p-2">
+                    <CoinCard
+                      coin={coin}
+                      index={index + 1}
+                      userCurrency={userCurrency}
+                      exchangeRate={exchangeRate}
+                      onBuy={() => {}}
+                    />
+                  </div>
+                ))}
+          </div>
+
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs uppercase text-slate-500">
                 <tr>
@@ -213,10 +244,10 @@ export default function MarketOverviewPage() {
                   <th className="px-6 py-3">{t("market.coin")}</th>
                   <th className="px-6 py-3 text-right">{t("market.priceCur", { currency: userCurrency })}</th>
                   <th className="px-6 py-3 text-right">{t("market.change24h")}</th>
-                  <th className="px-6 py-3 text-right hidden md:table-cell">
+                  <th className="px-6 py-3 text-right hidden lg:table-cell">
                     {t("market.volume")}
                   </th>
-                  <th className="px-6 py-3 text-right hidden lg:table-cell">
+                  <th className="px-6 py-3 text-right hidden xl:table-cell">
                     {t("market.marketCap")}
                   </th>
                   <th className="px-6 py-3 text-right">{t("market.actions")}</th>

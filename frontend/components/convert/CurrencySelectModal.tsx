@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Search, X } from "lucide-react";
+import { CoinIcon } from "@/components/market/CoinIcon";
 import { useTranslation } from "react-i18next";
 
 export interface CurrencyItem {
@@ -76,10 +77,8 @@ export function CurrencySelectModal({
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-left"
               >
-                <div className="w-8 h-8 rounded-full bg-slate-300 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
-                  {coin.symbol.slice(0, 3).toUpperCase()}
-                </div>
-                <div className="flex-1">
+                <CoinIcon src={coin.image} symbol={coin.symbol} className="w-8 h-8" />
+                <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold">{coin.symbol.toUpperCase()}</div>
                   <div className="text-xs text-slate-500 dark:text-slate-400">{coin.name}</div>
                 </div>

@@ -157,7 +157,7 @@ export function P2PFilters({
     : "—";
 
   return (
-    <div className="bg-white dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-4">
+    <div className="bg-white dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 p-4 space-y-4">
       {/* Ряд 1: широкие табы Купить/Продать */}
       <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
         <button
@@ -255,7 +255,7 @@ export function P2PFilters({
       </div>
 
       {/* Ряд 3: расширенные фильтры */}
-      <div className="border-t border-slate-200 dark:border-slate-800 pt-3">
+      <div className="border-t border-slate-300 dark:border-slate-800 pt-3">
         <button
           type="button"
           onClick={() => setAdvancedOpen((v) => !v)}

@@ -41,12 +41,17 @@ interface BinanceTicker {
   symbol: string;
   lastPrice: string;
   priceChangePercent: string;
+  // Правильный символ и картинка сопоставленной монеты (у активов символы бывают «битые»)
+  coinSymbol: string;
+  image: string;
 }
 
 interface EnrichedAsset extends Asset {
   valueUSD: number;
   change24h: number;
   currentPriceUSD: number;
+  iconSymbol?: string;
+  iconSrc?: string;
 }
 
 export default function ProfilePage() {
@@ -98,6 +103,8 @@ export default function ProfilePage() {
               symbol: `${coin.symbol.toUpperCase()}USDT`,
               lastPrice: String(coin.current_price),
               priceChangePercent: String(coin.price_change_percentage_24h ?? 0),
+              coinSymbol: coin.symbol,
+              image: coin.image,
             };
           }
         });
@@ -152,6 +159,8 @@ export default function ProfilePage() {
         valueUSD,
         change24h,
         currentPriceUSD,
+        iconSymbol: ticker?.coinSymbol,
+        iconSrc: ticker?.image,
       };
     }) || [];
 

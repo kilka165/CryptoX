@@ -11,7 +11,7 @@ interface UserCardProps {
 export function UserCard({ name, email }: UserCardProps) {
   const { t } = useTranslation();
   return (
-    <div className="bg-white dark:bg-[#131416] p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 text-center">
+    <div className="bg-white dark:bg-[#131416] p-6 rounded-2xl shadow-sm border border-slate-300 dark:border-slate-800 text-center">
       <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400">
         <UserIcon size={40} />
       </div>

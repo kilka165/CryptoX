@@ -26,7 +26,7 @@ export function StakingPlanCard({ plan, onSelect }: StakingPlanCardProps) {
   const localizedDesc = descKey ? t(descKey) : plan.description;
 
   return (
-    <div className="bg-white dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-6 hover:border-blue-500 dark:hover:border-blue-500 transition-all group">
+    <div className="bg-white dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 p-6 hover:border-blue-500 dark:hover:border-blue-500 transition-all group">
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="text-xl font-bold flex items-center gap-2">

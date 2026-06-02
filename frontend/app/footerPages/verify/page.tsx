@@ -66,7 +66,7 @@ export default function VerifyPage() {
               {verificationLevels.map((level, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-6 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800"
+                  className="flex items-center justify-between p-6 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800"
                 >
                   <div>
                     <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">
@@ -93,7 +93,7 @@ export default function VerifyPage() {
               {t("footerPages.verify.processTitle")}
             </h2>
 
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-8">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-2xl border border-slate-300 dark:border-slate-800 p-8">
               {/* Шаг 1: Личные данные */}
               {step === 1 && (
                 <div className="space-y-4">
@@ -181,7 +181,7 @@ export default function VerifyPage() {
               )}
 
               {/* Навигация */}
-              <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-300 dark:border-slate-800">
                 {step > 1 && (
                   <button
                     onClick={() => setStep(step - 1)}

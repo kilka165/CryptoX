@@ -29,7 +29,9 @@
     "settings": "Settings",
     "login": "Sign in",
     "register": "Sign up",
-    "logout": "Log out"
+    "logout": "Log out",
+    "menu": "Menu",
+    "language": "Language"
   },
   "home": {
     "heroTitle": "Buy and sell<br/><hl>Cryptocurrency</hl> instantly",

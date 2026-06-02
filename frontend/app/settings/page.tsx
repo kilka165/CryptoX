@@ -78,7 +78,7 @@ export default function SettingsPage() {
 
   const selectedCurrencyInfo = currencies.find(c => c.code === currency) || { code: currency, name: "Unknown", symbol: "" };
 
-  if (loading) return <div className="flex h-screen items-center justify-center bg-slate-950 text-white">{t("common.loading")}</div>;
+  if (loading) return <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white">{t("common.loading")}</div>;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white">
@@ -91,7 +91,7 @@ export default function SettingsPage() {
 
         <h1 className="text-3xl font-bold mb-8">{t("settings.title")}</h1>
 
-        <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8">
+        <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-300 dark:border-slate-800 p-6 md:p-8">
           <form onSubmit={handleSave} className="space-y-6">
             
             {/* Имя */}
@@ -115,13 +115,13 @@ export default function SettingsPage() {
               <p className="text-xs text-slate-500 mb-3">
                 {t("settings.languageHint")}
               </p>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {SUPPORTED_LANGUAGES.map((lang) => (
                   <button
                     key={lang.code}
                     type="button"
                     onClick={() => i18n.changeLanguage(lang.code)}
-                    className={`px-4 py-3 rounded-xl border text-sm font-medium transition-colors ${
+                    className={`px-2 sm:px-4 py-3 rounded-xl border text-xs sm:text-sm font-medium transition-colors text-center truncate ${
                       i18n.resolvedLanguage === lang.code
                         ? "bg-blue-50 dark:bg-blue-900/20 border-blue-500 text-blue-600 dark:text-blue-400"
                         : "bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/50"
@@ -182,7 +182,7 @@ export default function SettingsPage() {
       {/* МОДАЛЬНОЕ ОКНО ВЫБОРА ВАЛЮТЫ */}
       {isCurrencyModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-[#131416] w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[80vh]">
+          <div className="bg-white dark:bg-[#131416] w-full max-w-md rounded-2xl shadow-2xl border border-slate-300 dark:border-slate-800 flex flex-col max-h-[80vh]">
             
             {/* Заголовок и поиск */}
             <div className="p-4 border-b border-slate-100 dark:border-slate-800">

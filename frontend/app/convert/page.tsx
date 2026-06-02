@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ArrowLeft, ArrowUpDown, CheckCircle, X, ChevronDown, AlertTriangle } from "lucide-react";
 import { CurrencySelectModal, CurrencyItem } from "@/components/convert/CurrencySelectModal";
+import { CoinIcon } from "@/components/market/CoinIcon";
 import { BinanceAPI } from "@/lib/api/binance";
 import { Coin } from "@/types/coin";
 import { useTranslation } from "react-i18next";
@@ -369,7 +370,7 @@ export default function ConvertPage() {
             </div>
           )}
 
-          <div className="bg-slate-100 dark:bg-[#131416] rounded-2xl border border-slate-300 dark:border-slate-700 p-5 space-y-4">
+          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-300 dark:border-slate-700 p-5 space-y-4">
             {loading ? (
               <div className="h-40 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-xl" />
             ) : (
@@ -397,7 +398,7 @@ export default function ConvertPage() {
                     return (
                       <div key={idx} className="space-y-1">
                         <div
-                          className={`flex items-center gap-2 bg-white dark:bg-[#0d0d0d] rounded-xl px-3 py-3 border ${
+                          className={`flex items-center gap-2 min-w-0 bg-slate-50 dark:bg-[#0d0d0d] rounded-xl px-3 py-3 border ${
                             hasError
                               ? "border-red-500/50 bg-red-50 dark:bg-red-950/20"
                               : "border-slate-300 dark:border-slate-700"
@@ -406,27 +407,25 @@ export default function ConvertPage() {
                           <button
                             type="button"
                             onClick={() => openPicker("from", idx)}
-                            className="flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg px-2 py-1"
+                            className="flex items-center gap-2 min-w-0 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg px-2 py-1"
                           >
-                            <div className="w-7 h-7 rounded-full bg-slate-300 dark:bg-slate-700 flex items-center justify-center text-[11px] font-bold">
-                              {fc.coin.symbol.slice(0, 3).toUpperCase()}
-                            </div>
-                            <div className="flex flex-col text-left">
+                            <CoinIcon src={fc.coin.image} symbol={fc.coin.symbol} className="w-7 h-7" />
+                            <div className="flex flex-col text-left min-w-0">
                               <span className="text-xs font-semibold">
                                 {fc.coin.symbol.toUpperCase()}
                               </span>
-                              <span className="text-xs text-slate-500 dark:text-slate-400">
+                              <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
                                 {t("convert.balance", { amount: balance.toFixed(8) })}
                               </span>
                             </div>
-                            <ChevronDown size={14} className="text-slate-500" />
+                            <ChevronDown size={14} className="text-slate-500 shrink-0" />
                           </button>
                           <input
                             type="text"
                             placeholder="0.00"
                             value={fc.amount}
                             onChange={(e) => updateFromAmount(idx, e.target.value)}
-                            className={`flex-1 bg-transparent text-right text-sm font-semibold outline-none ${
+                            className={`flex-1 min-w-0 bg-transparent text-right text-sm font-semibold outline-none ${
                               hasError ? "text-red-600 dark:text-red-400" : ""
                             }`}
                           />
@@ -434,7 +433,7 @@ export default function ConvertPage() {
                             <button
                               type="button"
                               onClick={() => removeFromCoin(idx)}
-                              className="text-slate-500 hover:text-red-600 dark:hover:text-red-400"
+                              className="text-slate-500 hover:text-red-600 dark:hover:text-red-400 shrink-0"
                             >
                               <X size={16} />
                             </button>
@@ -468,29 +467,31 @@ export default function ConvertPage() {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 bg-white dark:bg-[#0d0d0d] rounded-xl px-3 py-4 border border-slate-300 dark:border-slate-700">
+                  <div className="flex items-center gap-2 min-w-0 bg-slate-50 dark:bg-[#0d0d0d] rounded-xl px-3 py-4 border border-slate-300 dark:border-slate-700">
                     <button
                       type="button"
                       onClick={() => openPicker("to")}
-                      className="flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg px-2 py-1"
+                      className="flex items-center gap-2 min-w-0 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg px-2 py-1"
                     >
-                      <div className="w-7 h-7 rounded-full bg-slate-300 dark:bg-slate-700 flex items-center justify-center text-[11px] font-bold">
-                        {toCoin
-                          ? toCoin.symbol.slice(0, 3).toUpperCase()
-                          : "?"}
-                      </div>
-                      <div className="flex flex-col text-left">
+                      {toCoin ? (
+                        <CoinIcon src={toCoin.image} symbol={toCoin.symbol} className="w-7 h-7" />
+                      ) : (
+                        <div className="w-7 h-7 rounded-full bg-slate-300 dark:bg-slate-700 flex items-center justify-center text-[11px] font-bold shrink-0">
+                          ?
+                        </div>
+                      )}
+                      <div className="flex flex-col text-left min-w-0">
                         <span className="text-xs font-semibold">
                           {toCoin ? toCoin.symbol.toUpperCase() : t("convert.select")}
                         </span>
-                        <span className="text-[10px] text-slate-500">
+                        <span className="text-[10px] text-slate-500 truncate">
                           {toCoin?.name || ""}
                         </span>
                       </div>
-                      <ChevronDown size={14} className="text-slate-500" />
+                      <ChevronDown size={14} className="text-slate-500 shrink-0" />
                     </button>
 
-                    <span className="flex-1 text-right text-lg font-semibold text-slate-600 dark:text-slate-400">
+                    <span className="flex-1 min-w-0 text-right text-lg font-semibold text-slate-600 dark:text-slate-400 truncate">
                       ≈ {calculatedToAmount.toFixed(8)}
                     </span>
                   </div>
@@ -506,13 +507,13 @@ export default function ConvertPage() {
                 {toCoin && fromCoins.length > 0 && (
                   <div className="space-y-1">
                     {fromCoins.map((fc, idx) => (
-                      <div key={idx} className="text-xs text-slate-500 flex justify-between px-1">
-                        <span>
+                      <div key={idx} className="text-xs text-slate-500 flex flex-col sm:flex-row sm:justify-between gap-0.5 px-1">
+                        <span className="truncate">
                           1 {fc.coin.symbol.toUpperCase()} ≈{" "}
                           {(fc.coin.current_price / toCoin.current_price).toFixed(8)}{" "}
                           {toCoin.symbol.toUpperCase()}
                         </span>
-                        <span>
+                        <span className="truncate">
                           1 {toCoin.symbol.toUpperCase()} ≈{" "}
                           {(toCoin.current_price / fc.coin.current_price).toFixed(8)}{" "}
                           {fc.coin.symbol.toUpperCase()}

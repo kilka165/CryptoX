@@ -108,7 +108,7 @@ export default function CookiesPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               {t("footerPages.cookies.tableTitle")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-100 dark:bg-slate-800">
@@ -169,7 +169,7 @@ export default function CookiesPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               {t("footerPages.cookies.manageTitle")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-300 dark:border-slate-800">
               <div className="flex items-start gap-4 mb-4">
                 <Settings className="text-orange-600 dark:text-orange-400 flex-shrink-0 mt-1" size={24} />
                 <div>
@@ -232,7 +232,7 @@ export default function CookiesPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               {t("footerPages.cookies.questionsTitle")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-300 dark:border-slate-800">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 {t("footerPages.cookies.questionsP1")}
               </p>

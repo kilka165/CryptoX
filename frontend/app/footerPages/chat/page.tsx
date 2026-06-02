@@ -112,7 +112,7 @@ export default function ChatPage() {
 
         {/* Chat container */}
         <div className="max-w-5xl mx-auto px-4 py-6">
-          <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden" style={{ height: "500px" }}>
+          <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 overflow-hidden" style={{ height: "500px" }}>
             {/* Messages */}
             <div ref={chatContainerRef} className="h-full overflow-y-auto p-4 space-y-3">
               {messages.map((message) => (
@@ -150,7 +150,7 @@ export default function ChatPage() {
           </div>
 
           {/* Input */}
-          <div className="mt-4 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+          <div className="mt-4 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 p-3">
             <div className="flex items-end gap-2">
               <button 
                 type="button"

@@ -155,7 +155,7 @@ export default function SupportPage() {
             {filteredFAQ.map((item, index) => (
               <div
                 key={index}
-                className="bg-slate-50 dark:bg-[#131416] rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden"
+                className="bg-slate-50 dark:bg-[#131416] rounded-lg border border-slate-300 dark:border-slate-800 overflow-hidden"
               >
                 <button
                   type="button"

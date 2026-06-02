@@ -39,7 +39,7 @@ export default function PrivacyPage() {
               {t("footerPages.privacy.s1Title")}
             </h2>
             <div className="space-y-4">
-              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-300 dark:border-slate-800">
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
                   <Database size={20} className="text-blue-600 dark:text-blue-400" />
                   {t("footerPages.privacy.s1c1Title")}
@@ -51,7 +51,7 @@ export default function PrivacyPage() {
                 </ul>
               </div>
 
-              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-300 dark:border-slate-800">
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
                   <Eye size={20} className="text-blue-600 dark:text-blue-400" />
                   {t("footerPages.privacy.s1c2Title")}
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
                 </ul>
               </div>
 
-              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-300 dark:border-slate-800">
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
                   <Lock size={20} className="text-blue-600 dark:text-blue-400" />
                   {t("footerPages.privacy.s1c3Title")}
@@ -82,7 +82,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               {t("footerPages.privacy.s2Title")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-300 dark:border-slate-800">
               <ul className="space-y-3 text-slate-600 dark:text-slate-400">
                 {[1, 2, 3, 4, 5, 6].map((n) => (
                   <li key={n} className="flex items-start gap-2">
@@ -121,7 +121,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               {t("footerPages.privacy.s4Title")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-300 dark:border-slate-800">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 {t("footerPages.privacy.s4intro")}
               </p>
@@ -173,7 +173,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               {t("footerPages.privacy.s7Title")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-300 dark:border-slate-800">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 {t("footerPages.privacy.s7pre")}
                 <a href="/footerPages/cookies" className="text-blue-600 dark:text-blue-400 hover:underline">
@@ -188,7 +188,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               {t("footerPages.privacy.s8Title")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-300 dark:border-slate-800">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 {t("footerPages.privacy.s8p1")}
               </p>

@@ -81,7 +81,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
               {t("footerPages.about.historyTitle")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 p-6">
               <p className="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
                 {t("footerPages.about.historyP1")}
               </p>
@@ -125,7 +125,7 @@ export default function AboutPage() {
                 return (
                   <div
                     key={index}
-                    className="bg-slate-50 dark:bg-[#131416] p-5 rounded-xl border border-slate-200 dark:border-slate-800"
+                    className="bg-slate-50 dark:bg-[#131416] p-5 rounded-xl border border-slate-300 dark:border-slate-800"
                   >
                     <Icon className="text-blue-600 dark:text-blue-400 mb-3" size={28} />
                     <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-2">

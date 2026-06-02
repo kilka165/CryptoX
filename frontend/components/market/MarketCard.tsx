@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ComponentType } from "react";
 import { Coin } from "@/types/coin";
+import { CoinIcon } from "@/components/market/CoinIcon";
 
 interface MarketCardProps {
   title: string;
@@ -14,7 +15,7 @@ interface MarketCardProps {
 
 export function MarketCard({ title, icon: Icon, coins, onBuy, userCurrency, exchangeRate, href }: MarketCardProps) {
   return (
-    <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 hover:shadow-lg transition-all">
+    <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-300 dark:border-slate-800 p-4 hover:shadow-lg transition-all">
       <div className="flex items-center justify-between mb-4">
         {href ? (
           <Link
@@ -51,11 +52,9 @@ export function MarketCard({ title, icon: Icon, coins, onBuy, userCurrency, exch
               className="flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors cursor-pointer"
               onClick={() => onBuy(coin)}
             >
-              <div className="flex items-center gap-2 flex-1">
-                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold">
-                  {coin.symbol.slice(0, 3).toUpperCase()}
-                </div>
-                <div className="flex flex-col">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <CoinIcon src={coin.image} symbol={coin.symbol} className="w-8 h-8" />
+                <div className="flex flex-col min-w-0">
                   <span className="text-sm font-semibold text-slate-900 dark:text-white">
                     {coin.symbol.toUpperCase()}
                   </span>

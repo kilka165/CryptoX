@@ -83,7 +83,7 @@ export default function SecurityPage() {
                 return (
                   <div
                     key={index}
-                    className="bg-slate-50 dark:bg-[#131416] p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-red-500 dark:hover:border-red-500 transition-all"
+                    className="bg-slate-50 dark:bg-[#131416] p-5 rounded-xl border border-slate-300 dark:border-slate-800 hover:border-red-500 dark:hover:border-red-500 transition-all"
                   >
                     <Icon className="text-red-600 dark:text-red-400 mb-3" size={28} />
                     <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-2">
@@ -103,7 +103,7 @@ export default function SecurityPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
               {t("footerPages.security.levelsTitle")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-100 dark:bg-slate-800">
@@ -157,7 +157,7 @@ export default function SecurityPage() {
               {bestPractices.map((practice, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-3 bg-slate-50 dark:bg-[#131416] p-4 rounded-lg border border-slate-200 dark:border-slate-800"
+                  className="flex items-start gap-3 bg-slate-50 dark:bg-[#131416] p-4 rounded-lg border border-slate-300 dark:border-slate-800"
                 >
                   <CheckCircle className="flex-shrink-0 text-green-600 dark:text-green-400 mt-0.5" size={18} />
                   <p className="text-sm text-slate-600 dark:text-slate-400">{practice}</p>

@@ -1,8 +1,9 @@
 "use client";
 
-import { CryptoIcon } from "@/components/CryptoIcon";
+import { CoinIcon } from "@/components/market/CoinIcon";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { BinanceAPI } from "@/lib/api/binance";
 import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
 import { intlLocale } from "@/lib/utils/locale";
@@ -67,6 +68,50 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
+
+  // Карта монет (id/символ -> правильный символ и картинка),
+  // т.к. в транзакциях символ актива бывает «битый» (BIT вместо BTC).
+  const [coinMap, setCoinMap] = useState<Record<string, { symbol: string; image: string }>>({});
+
+  useEffect(() => {
+    let active = true;
+    BinanceAPI.get24hPrices().then((coins) => {
+      if (!active) return;
+      const map: Record<string, { symbol: string; image: string }> = {};
+      coins.forEach((c) => {
+        const entry = { symbol: c.symbol, image: c.image };
+        map[c.id.toLowerCase()] = entry;
+        map[c.symbol.toLowerCase()] = entry;
+      });
+      setCoinMap(map);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Иконка транзакции: ищем монету по id (name актива) или символу.
+  // Пока монеты не загружены — нейтральная текстовая заглушка, без чужого логотипа.
+  const renderTxIcon = (tx: Transaction, sizeClass: string) => {
+    const idKey = (tx.asset?.name || tx.coin || "").toLowerCase();
+    const symKey = (tx.asset?.symbol || "").toLowerCase();
+    const coin = coinMap[idKey] || coinMap[symKey];
+    const letters = (tx.asset?.symbol || tx.coin || "").slice(0, 3).toUpperCase();
+
+    if (!coin) {
+      return (
+        <div
+          className={`${sizeClass} rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold uppercase shrink-0`}
+        >
+          {letters}
+        </div>
+      );
+    }
+
+    return (
+      <CoinIcon src={coin.image} symbol={coin.symbol} className={sizeClass} />
+    );
+  };
 
   useEffect(() => {
     loadTransactions(currentPage);
@@ -161,7 +206,7 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
   const currencySymbol = getCurrencySymbol(userCurrency);
 
   return (
-    <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+    <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-300 dark:border-slate-800 p-4 sm:p-6">
       <div className="mb-6">
         <h3 className="text-lg font-bold mb-4">{t("profile.history.title")}</h3>
 
@@ -204,7 +249,8 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
         </div>
       ) : transactions.length > 0 ? (
         <>
-          <div className="overflow-x-auto">
+          {/* Десктоп: таблица */}
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-xs text-slate-500 border-b border-slate-100 dark:border-slate-800 text-left">
@@ -244,11 +290,7 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
                           }
                           return (
                             <div className="flex items-center gap-2">
-                              <CryptoIcon
-                                symbol={symbol}
-                                logoUrl={tx.asset?.logo_url}
-                                size={24}
-                              />
+                              {renderTxIcon(tx, "w-6 h-6")}
                               <div>
                                 <div className="font-medium text-slate-900 dark:text-white uppercase">
                                   {symbol}
@@ -288,6 +330,64 @@ export function TransactionHistory({ userCurrency = "USD" }: TransactionHistoryP
                 })}
               </tbody>
             </table>
+          </div>
+
+          {/* Мобильный/планшет: карточки */}
+          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {transactions.map((tx) => {
+              const priceUSD = Number(tx.price_usd);
+              const totalUSD = Number(tx.total_usd);
+              const priceConverted = priceUSD * exchangeRate;
+              const totalConverted = totalUSD * exchangeRate;
+              const symbol = tx.asset?.symbol || (tx.coin ? tx.coin.slice(0, 4).toUpperCase() : "");
+              const name = tx.asset?.name || tx.coin || "";
+              const isCoinTx = tx.type !== "deposit" && tx.type !== "withdraw";
+
+              return (
+                <div
+                  key={tx.id}
+                  className="rounded-xl border border-slate-300 dark:border-slate-800 p-4"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg ${getTypeColor(tx.type)}`}>
+                      {getTypeIcon(tx.type)}
+                      <span className="text-xs font-medium">{getTypeLabel(tx.type)}</span>
+                    </div>
+                    <span className={`font-bold ${
+                      tx.type === 'buy' || tx.type === 'withdraw' ? 'text-slate-900 dark:text-white' : 'text-green-600'
+                    }`}>
+                      {tx.type === 'deposit' || tx.type === 'sell' ? '+' : '-'}{currencySymbol}{totalConverted.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+
+                  {(symbol || name) && (
+                    <div className="flex items-center gap-2 mb-3">
+                      {renderTxIcon(tx, "w-6 h-6")}
+                      <div className="min-w-0">
+                        <div className="font-medium text-slate-900 dark:text-white uppercase text-sm">{symbol}</div>
+                        <div className="text-xs text-slate-500 capitalize truncate">{name}</div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-y-1.5 text-sm">
+                    {isCoinTx && (
+                      <>
+                        <span className="text-slate-500 dark:text-slate-400">{t("profile.history.colAmount")}</span>
+                        <span className="text-right break-all">{Number(tx.amount).toFixed(6)}</span>
+
+                        <span className="text-slate-500 dark:text-slate-400">{t("profile.history.colPrice")}</span>
+                        <span className="text-right">
+                          {currencySymbol}{priceConverted.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                        </span>
+                      </>
+                    )}
+                    <span className="text-slate-500 dark:text-slate-400">{t("profile.history.colDate")}</span>
+                    <span className="text-right text-xs text-slate-500">{formatDate(tx.created_at)}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {totalPages > 1 && (

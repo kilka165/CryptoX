@@ -119,7 +119,7 @@ export default function GuidesPage() {
               <Link
                 key={guide.id}
                 href={`/guides/${guide.id}`}
-                className="group bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 hover:shadow-lg overflow-hidden"
+                className="group bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 hover:shadow-lg overflow-hidden"
               >
                 <div className="p-6">
                   {/* Иконка и категория */}
@@ -143,7 +143,7 @@ export default function GuidesPage() {
                   </p>
 
                   {/* Метаинформация */}
-                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-500 pt-4 border-t border-slate-200 dark:border-slate-800">
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-500 pt-4 border-t border-slate-300 dark:border-slate-800">
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1">
                         <Clock size={14} />

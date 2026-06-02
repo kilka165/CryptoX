@@ -216,7 +216,7 @@ export default function P2PPage() {
         <P2PTableHeader />
 
         {loading ? (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
             {[...Array(5)].map((_, i) => (
               <div
                 key={i}
@@ -225,7 +225,7 @@ export default function P2PPage() {
             ))}
           </div>
         ) : filteredOffers.length > 0 ? (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
             {filteredOffers.map((offer) => (
               <P2POfferCard
                 key={offer.id}
@@ -269,34 +269,34 @@ export default function P2PPage() {
       {/* Модалка с подробностями */}
       {isDetailsModalOpen && selectedOffer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg p-6">
+          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-300 dark:border-slate-800 w-full max-w-lg p-6">
             <h3 className="text-xl font-bold mb-4">{t("p2p.details")}</h3>
             <div className="space-y-3">
-              <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex justify-between py-2 border-b border-slate-300 dark:border-slate-800">
                 <span className="text-slate-500">{t("p2p.offerId")}</span>
                 <span className="font-medium">#{selectedOffer.id}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex justify-between py-2 border-b border-slate-300 dark:border-slate-800">
                 <span className="text-slate-500">{t("p2p.crypto")}</span>
                 <span className="font-medium">{selectedOffer.crypto_currency}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex justify-between py-2 border-b border-slate-300 dark:border-slate-800">
                 <span className="text-slate-500">{t("p2p.currency")}</span>
                 <span className="font-medium">{selectedOffer.currency}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex justify-between py-2 border-b border-slate-300 dark:border-slate-800">
                 <span className="text-slate-500">{t("p2p.price")}</span>
                 <span className="font-medium text-lg">{selectedOffer.price.toLocaleString()} {selectedOffer.currency}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex justify-between py-2 border-b border-slate-300 dark:border-slate-800">
                 <span className="text-slate-500">{t("p2p.available")}</span>
                 <span className="font-medium">{selectedOffer.available_amount.toLocaleString()} {selectedOffer.crypto_currency}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex justify-between py-2 border-b border-slate-300 dark:border-slate-800">
                 <span className="text-slate-500">{t("p2p.minLimit")}</span>
                 <span className="font-medium">{selectedOffer.min_limit.toLocaleString()} {selectedOffer.currency}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex justify-between py-2 border-b border-slate-300 dark:border-slate-800">
                 <span className="text-slate-500">{t("p2p.maxLimit")}</span>
                 <span className="font-medium">{selectedOffer.max_limit.toLocaleString()} {selectedOffer.currency}</span>
               </div>

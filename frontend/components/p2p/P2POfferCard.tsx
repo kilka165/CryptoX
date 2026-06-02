@@ -56,19 +56,19 @@ export function P2POfferCard({
 
   return (
     <>
-      <div className="bg-white dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-4 hover:border-blue-500 dark:hover:border-blue-500 transition-all">
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
+      <div className="bg-white dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 p-3 sm:p-4 hover:border-blue-500 dark:hover:border-blue-500 transition-all">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-4">
           {/* Продавец */}
-          <div className="flex-1 min-w-[180px]">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+          <div className="flex-1 lg:min-w-[180px]">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold shrink-0">
                 {offer.seller_name[0].toUpperCase()}
               </div>
-              <div>
-                <div className="font-medium flex items-center gap-2">
-                  {offer.seller_name}
+              <div className="min-w-0">
+                <div className="font-medium flex items-center gap-2 min-w-0">
+                  <span className="truncate">{offer.seller_name}</span>
                   {isOwnOffer && (
-                    <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded">
+                    <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded shrink-0">
                       {t("p2p.offerCard.myOffer")}
                     </span>
                   )}
@@ -85,52 +85,55 @@ export function P2POfferCard({
             </div>
           </div>
 
-          {/* Цена */}
-          <div className="flex-1 min-w-[140px]">
-            <div className="text-lg font-bold">
-              {offer.price.toLocaleString()} {offer.currency}
+          {/* Цена и количество — в столбик на мобильном/планшете, в ряд на десктопе */}
+          <div className="flex flex-col gap-2 lg:contents">
+            {/* Цена */}
+            <div className="flex-1 lg:min-w-[140px] min-w-0">
+              <div className="text-base sm:text-lg font-bold break-words">
+                {offer.price.toLocaleString()} {offer.currency}
+              </div>
+              <div className="text-xs text-slate-500">
+                {t("p2p.offerCard.per1", { crypto: offer.crypto_currency })}
+              </div>
             </div>
-            <div className="text-xs text-slate-500">
-              {t("p2p.offerCard.per1", { crypto: offer.crypto_currency })}
-            </div>
-          </div>
 
-          {/* Количество */}
-          <div className="flex-1 min-w-[140px]">
-            <div className="text-sm font-medium">
-              {offer.available_amount.toLocaleString()} {offer.crypto_currency}
-            </div>
-            <div className="text-xs text-slate-500">
-              {t("p2p.offerCard.available")}
+            {/* Количество */}
+            <div className="flex-1 lg:min-w-[140px] min-w-0">
+              <div className="text-sm font-medium break-words">
+                {offer.available_amount.toLocaleString()} {offer.crypto_currency}
+              </div>
+              <div className="text-xs text-slate-500">
+                {t("p2p.offerCard.available")}
+              </div>
             </div>
           </div>
 
           {/* Действия */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 lg:shrink-0">
             {isOwnOffer ? (
               <>
                 <button
                   onClick={() => onViewDetails && onViewDetails(offer)}
-                  className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-colors flex items-center gap-2 text-sm"
+                  className="flex-1 lg:flex-none justify-center px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-colors flex items-center gap-2 text-sm"
                 >
-                  <Eye className="w-4 h-4" />
-                  <span className="hidden sm:inline">{t("p2p.offerCard.viewDetails")}</span>
+                  <Eye className="w-4 h-4 shrink-0" />
+                  <span>{t("p2p.offerCard.viewDetails")}</span>
                 </button>
                 <button
                   onClick={handleCancelClick}
                   disabled={isDeleting}
-                  className="px-4 py-2 bg-red-100 dark:bg-red-900/20 hover:bg-red-200 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 rounded-lg font-medium transition-colors flex items-center gap-2 disabled:opacity-50 text-sm"
+                  className="flex-1 lg:flex-none justify-center px-4 py-2 bg-red-100 dark:bg-red-900/20 hover:bg-red-200 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 rounded-lg font-medium transition-colors flex items-center gap-2 disabled:opacity-50 text-sm"
                 >
-                  <X className="w-4 h-4" />
-                  <span className="hidden sm:inline">{t("p2p.offerCard.cancel")}</span>
+                  <X className="w-4 h-4 shrink-0" />
+                  <span>{t("p2p.offerCard.cancel")}</span>
                 </button>
               </>
             ) : (
               <button
                 onClick={() => onBuy(offer)}
-                className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                className="flex-1 lg:flex-none justify-center px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
               >
-                <TrendingUp className="w-4 h-4" />
+                <TrendingUp className="w-4 h-4 shrink-0" />
                 {t("p2p.offerCard.buy")}
               </button>
             )}
@@ -141,7 +144,7 @@ export function P2POfferCard({
       {/* Модалка подтверждения отмены */}
       {showCancelModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md shadow-xl">
+          <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-300 dark:border-slate-800 w-full max-w-md shadow-xl">
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">

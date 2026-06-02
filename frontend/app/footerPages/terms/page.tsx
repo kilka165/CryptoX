@@ -61,7 +61,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               {t("footerPages.terms.s2Title")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-300 dark:border-slate-800">
               <ul className="space-y-3 text-slate-600 dark:text-slate-400">
                 {["s2i1", "s2i2", "s2i3", "s2i4", "s2i5"].map((k) => (
                   <li key={k} className="flex items-start gap-2">
@@ -101,7 +101,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               {t("footerPages.terms.s4Title")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-300 dark:border-slate-800">
               <p className="text-slate-600 dark:text-slate-400 mb-3">
                 {t("footerPages.terms.s4p1")}
               </p>
@@ -162,7 +162,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               {t("footerPages.terms.s7Title")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-lg p-5 border border-slate-300 dark:border-slate-800">
               <p className="text-slate-600 dark:text-slate-400">
                 {t("footerPages.terms.s7p1")}
               </p>

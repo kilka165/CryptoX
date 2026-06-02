@@ -50,7 +50,7 @@ export default function BugBountyPage() {
               {rewards.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-6 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800"
+                  className="flex items-center justify-between p-6 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800"
                 >
                   <div>
                     <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold bg-${item.color}-100 dark:bg-${item.color}-900/30 text-${item.color}-700 dark:text-${item.color}-400 mb-2`}>
@@ -74,7 +74,7 @@ export default function BugBountyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
               {t("footerPages.bugBounty.lookingTitle")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 p-6">
               <ul className="space-y-3 text-slate-600 dark:text-slate-400">
                 <li className="flex items-start gap-2">
                   <span className="text-red-600 dark:text-red-400 mt-1">•</span>
@@ -117,7 +117,7 @@ export default function BugBountyPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
               {t("footerPages.bugBounty.howTitle")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl p-6 border border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl p-6 border border-slate-300 dark:border-slate-800">
               <div className="flex items-start gap-4 mb-6">
                 <AlertCircle className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" size={28} />
                 <div className="flex-1">
@@ -148,7 +148,7 @@ export default function BugBountyPage() {
               {t("footerPages.bugBounty.faqTitle")}
             </h2>
             <div className="space-y-4">
-              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg border border-slate-300 dark:border-slate-800 p-6">
                 <h4 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">
                   {t("footerPages.bugBounty.faq1Q")}
                 </h4>
@@ -156,7 +156,7 @@ export default function BugBountyPage() {
                   {t("footerPages.bugBounty.faq1A")}
                 </p>
               </div>
-              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg border border-slate-300 dark:border-slate-800 p-6">
                 <h4 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">
                   {t("footerPages.bugBounty.faq2Q")}
                 </h4>
@@ -164,7 +164,7 @@ export default function BugBountyPage() {
                   {t("footerPages.bugBounty.faq2A")}
                 </p>
               </div>
-              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+              <div className="bg-slate-50 dark:bg-[#131416] rounded-lg border border-slate-300 dark:border-slate-800 p-6">
                 <h4 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">
                   {t("footerPages.bugBounty.faq3Q")}
                 </h4>

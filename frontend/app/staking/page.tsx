@@ -262,7 +262,7 @@ export default function StakingPage() {
         )}
 
         {/* Табы */}
-        <div className="flex gap-4 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex gap-4 border-b border-slate-300 dark:border-slate-800">
           <button
             onClick={() => setActiveTab("plans")}
             className={`px-6 py-3 font-medium transition-colors border-b-2 ${

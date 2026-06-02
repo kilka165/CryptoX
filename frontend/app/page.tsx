@@ -17,7 +17,7 @@ export default function Home() {
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center max-w-3xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 text-slate-900 dark:text-white">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6 text-slate-900 dark:text-white break-words">
             <Trans
               i18nKey="home.heroTitle"
               components={{
@@ -47,7 +47,7 @@ export default function Home() {
             { title: t('home.feature2Title'), desc: t('home.feature2Desc') },
             { title: t('home.feature3Title'), desc: t('home.feature3Desc') },
           ].map((item, i) => (
-            <div key={i} className="bg-white dark:bg-[#131416]/50 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl hover:border-blue-500 transition-colors shadow-sm dark:shadow-none">
+            <div key={i} className="bg-white dark:bg-[#131416]/50 border border-slate-300 dark:border-slate-800 p-6 rounded-2xl hover:border-blue-500 transition-colors shadow-sm dark:shadow-none">
               <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">{item.title}</h3>
               <p className="text-slate-600 dark:text-slate-400">{item.desc}</p>
             </div>

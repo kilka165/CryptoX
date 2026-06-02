@@ -131,7 +131,7 @@ export default function GlossaryPage() {
                 {groupedTerms[letter].map((item, index) => (
                   <div
                     key={index}
-                    className="bg-slate-50 dark:bg-[#131416] rounded-lg p-6 border border-slate-200 dark:border-slate-800 hover:border-purple-500 dark:hover:border-purple-500 transition-all duration-200"
+                    className="bg-slate-50 dark:bg-[#131416] rounded-lg p-6 border border-slate-300 dark:border-slate-800 hover:border-purple-500 dark:hover:border-purple-500 transition-all duration-200"
                   >
                     <div className="flex items-start justify-between gap-4 mb-2">
                       <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">

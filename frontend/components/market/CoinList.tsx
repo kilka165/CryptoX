@@ -17,7 +17,7 @@ interface CoinListProps {
 export const CoinList: React.FC<CoinListProps> = ({ title, coins, type, userCurrency, onBuy }) => {
   const { t } = useTranslation();
   return (
-    <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm h-full flex flex-col">
+    <div className="bg-white dark:bg-[#131416] rounded-2xl border border-slate-300 dark:border-slate-800 p-5 shadow-sm h-full flex flex-col">
       <h3 className="text-xl font-bold mb-6 text-center">{title}</h3>
 
       <div className="flex-1 w-full">

@@ -33,7 +33,7 @@ export function StakingPositionCard({
   };
 
   return (
-    <div className="bg-white dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+    <div className="bg-white dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 p-6">
       {/* Заголовок */}
       <div className="flex items-start justify-between mb-4">
         <div>

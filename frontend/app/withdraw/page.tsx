@@ -115,7 +115,7 @@ export default function WithdrawPage() {
           <ArrowLeft size={20} /> {t("common.back")}
         </button>
 
-        <div className="bg-white dark:bg-[#131416] rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 p-6 md:p-10">
+        <div className="bg-white dark:bg-[#131416] rounded-3xl shadow-xl border border-slate-300 dark:border-slate-800 p-6 md:p-10">
           <h1 className="text-2xl font-bold mb-6 flex items-center gap-2 text-red-600">
             <CreditCard />
             {t("withdraw.title")}

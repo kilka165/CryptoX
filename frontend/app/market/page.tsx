@@ -5,7 +5,10 @@ import axios from "axios";
 import { Search, Flame, TrendingUp, BarChart3, Zap } from "lucide-react";
 import { Header } from "@/components/Header";
 import { CoinRow } from "@/components/market/CoinRow";
+import { CoinCard } from "@/components/market/CoinCard";
 import { MarketCard } from "@/components/market/MarketCard";
+import { MarketCardsCarousel, MarketCardDef } from "@/components/market/MarketCardsCarousel";
+import { Pagination } from "@/components/market/Pagination";
 import { BuyModal } from "@/components/market/BuyModal";
 import { Footer } from "@/components/Footer";
 import { BinanceAPI } from "@/lib/api/binance";
@@ -47,7 +50,7 @@ export default function MarketPage() {
   const [buySuccess, setBuySuccess] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const perPage = 20;
+  const perPage = 10;
 
   useEffect(() => {
     const fetchCoins = async () => {
@@ -223,82 +226,105 @@ export default function MarketPage() {
   const calculatedUSD = amountUserEntered / exchangeRate;
   const maxBalanceInUserCurrency = userBalance * exchangeRate;
 
+  const marketCards: MarketCardDef[] = [
+    { title: t("market.popular"), icon: Flame, coins, href: "/market/overview" },
+    { title: t("market.topGainers"), icon: TrendingUp, coins: topGainers, href: "/market/overview" },
+    { title: t("market.byVolume"), icon: BarChart3, coins: topVolume, href: "/market/overview" },
+    { title: t("market.new"), icon: Zap, coins: newGems, href: "/market/overview" },
+  ];
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white transition-colors duration-300">
       <Header />
 
       <div className="p-4 md:p-8">
         <div className="max-w-7xl mx-auto mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-6">
-            <h2 className="text-2xl font-bold">{t("market.title")}</h2>
-            <div className="relative w-full md:w-80">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder={t("market.searchCoins")}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-[#131416] outline-none focus:border-blue-500 transition-all"
-              />
-            </div>
-          </div>
+          <h2 className="text-2xl font-bold mb-6">{t("market.title")}</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            {loading ? null : (
-              <>
-                <MarketCard
-                  title={t("market.popular")}
-                  icon={Flame}
-                  coins={coins}
-                  onBuy={setSelectedCoin}
-                  userCurrency={userCurrency}
-                  exchangeRate={exchangeRate}
-                  href="/market/overview"
-                />
-                <MarketCard
-                  title={t("market.topGainers")}
-                  icon={TrendingUp}
-                  coins={topGainers}
-                  onBuy={setSelectedCoin}
-                  userCurrency={userCurrency}
-                  exchangeRate={exchangeRate}
-                  href="/market/overview"
-                />
-                <MarketCard
-                  title={t("market.byVolume")}
-                  icon={BarChart3}
-                  coins={topVolume}
-                  onBuy={setSelectedCoin}
-                  userCurrency={userCurrency}
-                  exchangeRate={exchangeRate}
-                  href="/market/overview"
-                />
-                <MarketCard
-                  title={t("market.new")}
-                  icon={Zap}
-                  coins={newGems}
-                  onBuy={setSelectedCoin}
-                  userCurrency={userCurrency}
-                  exchangeRate={exchangeRate}
-                  href="/market/overview"
-                />
-              </>
-            )}
-          </div>
+          {!loading && (
+            <>
+              {/* Мобильная карусель карточек */}
+              <MarketCardsCarousel
+                cards={marketCards}
+                onBuy={setSelectedCoin}
+                userCurrency={userCurrency}
+                exchangeRate={exchangeRate}
+              />
+
+              {/* Десктопная сетка карточек */}
+              <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                {marketCards.map((c) => (
+                  <MarketCard
+                    key={c.title}
+                    title={c.title}
+                    icon={c.icon}
+                    coins={c.coins}
+                    onBuy={setSelectedCoin}
+                    userCurrency={userCurrency}
+                    exchangeRate={exchangeRate}
+                    href={c.href}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
-        <div className="max-w-7xl mx-auto bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          {/* Поиск — под карточками, над списком */}
+          <div className="relative w-full md:w-80 md:ml-auto mb-4">
+            <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+            <input
+              type="text"
+              placeholder={t("market.searchCoins")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="block w-full pl-10 pr-3 py-2.5 border border-slate-300 dark:border-slate-800 rounded-xl bg-white dark:bg-[#131416] outline-none focus:border-blue-500 transition-all"
+            />
+          </div>
+
+          {/* Подписи колонок (планшет) */}
+          <div className="hidden sm:flex lg:hidden items-center gap-3 px-3 mb-2 text-[11px] font-medium uppercase tracking-wide text-slate-400">
+            <span className="w-5 text-center shrink-0">#</span>
+            <span className="w-9 shrink-0" />
+            <span className="flex-1 min-w-0">{t("market.coin")}</span>
+            <span className="text-right shrink-0">
+              {t("market.priceCur", { currency: userCurrency })} / {t("market.change24h")}
+            </span>
+            <span className="px-3 text-sm invisible shrink-0">{t("market.buy")}</span>
+          </div>
+
+          {/* Мобильный/планшетный список — карточки */}
+          <div className="lg:hidden space-y-2 mb-4">
+            {loading
+              ? [...Array(6)].map((_, i) => (
+                  <div key={i} className="h-16 rounded-xl animate-pulse bg-slate-100 dark:bg-[#131416]" />
+                ))
+              : paginatedCoins.map((coin, idx) => (
+                  <CoinCard
+                    key={coin.id}
+                    coin={coin}
+                    index={(currentPage - 1) * perPage + idx + 1}
+                    userCurrency={userCurrency}
+                    exchangeRate={exchangeRate}
+                    onBuy={setSelectedCoin}
+                  />
+                ))}
+          </div>
+
+          {/* Десктопная таблица */}
+          <div className="hidden lg:block bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-300 dark:border-slate-800 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs uppercase text-slate-500">
                 <tr>
-                  <th className="px-6 py-4">#</th>
-                  <th className="px-6 py-4">{t("market.coin")}</th>
-                  <th className="px-6 py-4 text-right">{t("market.priceCur", { currency: userCurrency })}</th>
-                  <th className="px-6 py-4 text-right">{t("market.change24h")}</th>
-                  <th className="px-6 py-4 text-right hidden md:table-cell">{t("market.volume")}</th>
-                  <th className="px-6 py-4 text-right hidden lg:table-cell">{t("market.marketCap")}</th>
-                  <th className="px-6 py-4 text-right">{t("market.actions")}</th>
+                  <th className="px-3 sm:px-6 py-4 hidden sm:table-cell">#</th>
+                  <th className="px-3 sm:px-6 py-4">{t("market.coin")}</th>
+                  <th className="px-3 sm:px-6 py-4 text-right">{t("market.priceCur", { currency: userCurrency })}</th>
+                  <th className="px-3 sm:px-6 py-4 text-right">{t("market.change24h")}</th>
+                  <th className="px-3 sm:px-6 py-4 text-right hidden lg:table-cell">{t("market.volume")}</th>
+                  <th className="px-3 sm:px-6 py-4 text-right hidden xl:table-cell">{t("market.marketCap")}</th>
+                  <th className="px-3 sm:px-6 py-4 text-right">{t("market.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -322,27 +348,15 @@ export default function MarketPage() {
               </tbody>
             </table>
           </div>
+          </div>
 
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 dark:border-slate-800">
-            <span className="text-sm text-slate-500">
-              {t("market.pageOf", { page: currentPage, total: totalPages })}
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="px-3 py-1 rounded-lg text-sm border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800"
-              >
-                {t("common.back")}
-              </button>
-              <button
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="px-3 py-1 rounded-lg text-sm border border-slate-200 dark:border-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800"
-              >
-                {t("common.next")}
-              </button>
-            </div>
+          {/* Пагинация — видна и на мобильном, и на десктопе */}
+          <div className="flex justify-center py-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onChange={(p) => setCurrentPage(p)}
+            />
           </div>
         </div>
       </div>

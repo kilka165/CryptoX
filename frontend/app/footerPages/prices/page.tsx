@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown, Search, Star } from "lucide-react";
-import { CryptoIcon } from "@/components/CryptoIcon";
+import { CoinIcon } from "@/components/market/CoinIcon";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
@@ -13,6 +13,7 @@ interface CryptoPrice {
   id: string;
   symbol: string;
   name: string;
+  image: string;
   current_price: number;
   price_change_percentage_24h: number;
   market_cap: number;
@@ -36,6 +37,7 @@ export default function PricesPage() {
         id: c.id,
         symbol: c.symbol,
         name: c.name,
+        image: c.image,
         current_price: c.current_price,
         price_change_percentage_24h: c.price_change_percentage_24h,
         market_cap: c.market_cap ?? 0,
@@ -106,7 +108,7 @@ export default function PricesPage() {
             <p className="mt-4 text-slate-600 dark:text-slate-400">{t("footerPages.prices.loadingData")}</p>
           </div>
         ) : (
-          <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+          <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-100 dark:bg-slate-800">
@@ -142,7 +144,7 @@ export default function PricesPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <CryptoIcon symbol={crypto.symbol} size={32} />
+                          <CoinIcon src={crypto.image} symbol={crypto.symbol} className="w-8 h-8" />
                           <div>
                             <div className="font-semibold text-slate-900 dark:text-slate-100">
                               {crypto.name}

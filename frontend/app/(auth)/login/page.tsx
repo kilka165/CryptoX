@@ -55,7 +55,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
       <div className="flex-1 flex items-center justify-center px-4">
-        <div className="w-full max-w-md bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-xl transition-colors">
+        <div className="w-full max-w-md bg-white dark:bg-slate-900/80 border border-slate-300 dark:border-slate-800 rounded-2xl p-8 shadow-xl transition-colors">
           {/* Кнопка назад */}
           <button
             type="button"
