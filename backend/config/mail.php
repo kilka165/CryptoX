@@ -65,6 +65,12 @@ return [
             'transport' => 'resend',
         ],
 
+        // Brevo через HTTP API (порт 443) — обходит блокировку SMTP-портов на хостинге.
+        'brevo' => [
+            'transport' => 'brevo',
+            'key' => env('BREVO_API_KEY'),
+        ],
+
         'sendmail' => [
             'transport' => 'sendmail',
             'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
