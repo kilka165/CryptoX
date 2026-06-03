@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import api from "@/lib/axios";
 import {
@@ -423,6 +424,12 @@ export function SecuritySettings() {
               onChange={(e) => setCurrentPassword(e.target.value)}
               className={inputClass}
             />
+            <Link
+              href="/forgot-password"
+              className="inline-block text-sm font-medium text-blue-600 hover:text-blue-500 mt-1"
+            >
+              {t("settings.security.forgotPassword")}
+            </Link>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">{t("settings.security.newPassword")}</label>

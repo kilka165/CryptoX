@@ -23,24 +23,47 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        // unique:users НЕ ставим: уникальность проверяем вручную, чтобы заброшенная
+        // неподтверждённая регистрация не блокировала повторную попытку.
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255',
             'password' => 'required|string|min:8',
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+        $existing = User::where('email', $validated['email'])->first();
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        if ($existing && $existing->email_verified_at) {
+            // E-mail уже занят подтверждённым аккаунтом.
+            throw ValidationException::withMessages([
+                'email' => ['Пользователь с таким e-mail уже зарегистрирован'],
+            ]);
+        }
+
+        if ($existing) {
+            // Заброшенная неподтверждённая регистрация — переиспользуем строку,
+            // обновляя имя и пароль на свежие значения.
+            $existing->name = $validated['name'];
+            $existing->password = Hash::make($validated['password']);
+            $existing->save();
+            $user = $existing;
+        } else {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
+        }
+
+        // Токен НЕ выдаём — сначала пользователь должен подтвердить e-mail кодом.
+        if ($this->codes->canIssue($user->email, VerificationCodeService::PURPOSE_EMAIL)) {
+            $this->codes->issue($user->email, VerificationCodeService::PURPOSE_EMAIL);
+        }
 
         return response()->json([
-            'message' => 'Пользователь успешно зарегистрирован',
-            'user' => $user,
-            'token' => $token,
+            'message' => 'Мы отправили код подтверждения на ваш e-mail',
+            'verification_required' => true,
+            'email' => $user->email,
         ], 201);
     }
 
@@ -57,6 +80,18 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Неверный email или пароль',
             ], 401);
+        }
+
+        // E-mail не подтверждён (заброшенная регистрация) — токен не выдаём,
+        // повторно шлём код и просим фронт показать экран подтверждения.
+        if (! $user->email_verified_at) {
+            if ($this->codes->canIssue($user->email, VerificationCodeService::PURPOSE_EMAIL)) {
+                $this->codes->issue($user->email, VerificationCodeService::PURPOSE_EMAIL);
+            }
+
+            return response()->json([
+                'verification_required' => true,
+            ], 200);
         }
 
         // Если у пользователя включён 2FA — токен пока не выдаём,
@@ -190,6 +225,59 @@ class AuthController extends Controller
         $user->save();
 
         return response()->json(['message' => 'E-mail подтверждён', 'email_verified' => true]);
+    }
+
+    // ========================================================
+    // ВЕРИФИКАЦИЯ РЕГИСТРАЦИИ (публичная, без токена)
+    // ========================================================
+
+    /**
+     * Подтверждение e-mail при регистрации по коду. При успехе сразу
+     * выдаём токен (автологин) — код из письма доказывает владение e-mail.
+     */
+    public function verifyRegistration(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|string|email',
+            'code' => 'required|string',
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+
+        if (! $user || ! $this->codes->verify($user->email, VerificationCodeService::PURPOSE_EMAIL, trim($validated['code']))) {
+            throw ValidationException::withMessages([
+                'code' => ['Неверный или просроченный код'],
+            ]);
+        }
+
+        if (! $user->email_verified_at) {
+            $user->email_verified_at = now();
+            $user->save();
+        }
+
+        return $this->issueToken($user);
+    }
+
+    /**
+     * Повторная отправка кода подтверждения регистрации.
+     * Ответ всегда одинаковый — чтобы не раскрывать наличие e-mail.
+     */
+    public function resendRegistrationCode(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|string|email',
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+
+        if ($user && ! $user->email_verified_at
+            && $this->codes->canIssue($user->email, VerificationCodeService::PURPOSE_EMAIL)) {
+            $this->codes->issue($user->email, VerificationCodeService::PURPOSE_EMAIL);
+        }
+
+        return response()->json([
+            'message' => 'Если регистрация ещё не подтверждена, мы повторно отправили код на e-mail.',
+        ]);
     }
 
     // ========================================================

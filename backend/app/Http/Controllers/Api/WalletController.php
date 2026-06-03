@@ -74,28 +74,33 @@ class WalletController extends Controller
         $user = $request->user();
         $wallet = $user->wallet;
 
-        if ($wallet->balance < $validated['amount']) {
+        // Сумма вывода + комиссия 1% (как показано на фронтенде в «Итого к списанию»).
+        $amount = round((float) $validated['amount'], 2);
+        $commission = round($amount * 0.01, 2);
+        $totalToDeduct = round($amount + $commission, 2);
+
+        if ($wallet->balance < $totalToDeduct) {
             return response()->json(['message' => 'Недостаточно средств'], 400);
         }
 
         // Дневной лимит вывода зависит от уровня защиты аккаунта:
-        // 2FA — без лимита, e-mail подтверждён — $1000/день, иначе — $100/день.
-        $dailyLimit = $user->two_factor_confirmed_at
-            ? null
-            : ($user->email_verified_at ? 1000 : 100);
+        // 2FA — без лимита, иначе — $1000/день (e-mail всегда подтверждён при регистрации).
+        $dailyLimit = $user->two_factor_confirmed_at ? null : 1000;
 
         if ($dailyLimit !== null) {
+            // Лимит считаем по сумме самого вывода (без комиссии): поле amount
+            // хранит чистую сумму вывода, а total_usd — списание вместе с комиссией.
             $withdrawnToday = (float) Transaction::where('user_id', $user->id)
                 ->where('type', 'withdraw')
                 ->whereDate('created_at', today())
-                ->sum('total_usd');
+                ->sum('amount');
 
-            if ($withdrawnToday + $validated['amount'] > $dailyLimit) {
+            if ($withdrawnToday + $amount > $dailyLimit) {
                 $remaining = max(0, $dailyLimit - $withdrawnToday);
 
                 return response()->json([
                     'message' => "Превышен дневной лимит вывода (\${$dailyLimit}/день). "
-                        . "Доступно сегодня: \${$remaining}. Подтвердите e-mail или включите 2FA, чтобы повысить лимит.",
+                        . "Доступно сегодня: \${$remaining}. Включите 2FA, чтобы снять лимит.",
                     'daily_limit' => $dailyLimit,
                     'withdrawn_today' => $withdrawnToday,
                     'remaining_today' => $remaining,
@@ -105,19 +110,20 @@ class WalletController extends Controller
 
         DB::beginTransaction();
         try {
-            $wallet->balance -= $validated['amount'];
+            $wallet->balance -= $totalToDeduct;
             $wallet->save();
 
-            // Создаём транзакцию без asset_id (для фиатных операций)
+            // Создаём транзакцию без asset_id (для фиатных операций).
+            // amount — чистая сумма вывода, total_usd — фактическое списание с учётом комиссии.
             Transaction::create([
                 'user_id' => $user->id,
                 'asset_id' => null,
                 'type' => 'withdraw',
                 'status' => 'completed',
-                'amount' => $validated['amount'],
+                'amount' => $amount,
                 'price_usd' => 1,
-                'total_usd' => $validated['amount'],
-                'description' => 'Вывод средств из кошелька',
+                'total_usd' => $totalToDeduct,
+                'description' => "Вывод средств из кошелька (комиссия 1%: \${$commission})",
             ]);
 
             DB::commit();

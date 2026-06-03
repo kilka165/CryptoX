@@ -151,6 +151,20 @@
       "submitting": "Checking...",
       "invalidCode": "Invalid code",
       "back": "Back"
+    },
+    "verify": {
+      "title": "Verify your e-mail",
+      "prompt": "We've sent a code to {{email}}. Enter it below.",
+      "codeLabel": "Code from the e-mail",
+      "codePlaceholder": "6-digit code",
+      "submit": "Confirm",
+      "submitting": "Checking...",
+      "resend": "Resend code",
+      "resending": "Sending...",
+      "resent": "Code resent",
+      "invalidCode": "Invalid or expired code",
+      "serverError": "Server error. Please try again later.",
+      "back": "Back"
     }
   },
   "settings": {
@@ -208,6 +222,7 @@
       "changing": "Saving...",
       "passwordChanged": "Password changed!",
       "wrongCurrent": "Current password is incorrect",
+      "forgotPassword": "Forgot your password?",
       "cancel": "Cancel",
       "serverError": "Server error. Please try again later."
     }

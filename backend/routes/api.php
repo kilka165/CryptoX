@@ -18,7 +18,9 @@ use App\Http\Controllers\AssetController;
 // ========================================
 
 // Аутентификация
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+Route::post('/register/verify', [AuthController::class, 'verifyRegistration'])->middleware('throttle:10,1');
+Route::post('/register/verify/resend', [AuthController::class, 'resendRegistrationCode'])->middleware('throttle:6,1');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 Route::post('/login/2fa', [AuthController::class, 'twoFactorChallenge'])->middleware('throttle:10,1');
 
