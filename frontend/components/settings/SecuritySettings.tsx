@@ -7,7 +7,6 @@ import api from "@/lib/axios";
 import {
   ShieldCheck,
   ShieldAlert,
-  Mail,
   KeyRound,
   Lock,
   CheckCircle,
@@ -22,15 +21,7 @@ type TwoFaSetup = { secret: string; otpauth_url: string };
 export function SecuritySettings() {
   const { t } = useTranslation();
 
-  const [emailVerified, setEmailVerified] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-
-  // --- Email verification ---
-  const [showEmailCode, setShowEmailCode] = useState(false);
-  const [emailCode, setEmailCode] = useState("");
-  const [emailMsg, setEmailMsg] = useState("");
-  const [emailErr, setEmailErr] = useState("");
-  const [emailLoading, setEmailLoading] = useState(false);
 
   // --- 2FA ---
   const [twoFaSetup, setTwoFaSetup] = useState<TwoFaSetup | null>(null);
@@ -53,44 +44,10 @@ export function SecuritySettings() {
     api
       .get("/user")
       .then((res) => {
-        setEmailVerified(!!res.data.email_verified);
         setTwoFactorEnabled(!!res.data.two_factor_enabled);
       })
       .catch((err) => console.error(err));
   }, []);
-
-  // ===================== EMAIL =====================
-  const sendEmailCode = async () => {
-    setEmailErr("");
-    setEmailMsg("");
-    setEmailLoading(true);
-    try {
-      await api.post("/email/verify/send");
-      setShowEmailCode(true);
-      setEmailMsg(t("settings.security.codeSent"));
-    } catch (err: any) {
-      setEmailErr(err.response?.data?.message || t("settings.security.serverError"));
-    } finally {
-      setEmailLoading(false);
-    }
-  };
-
-  const verifyEmail = async () => {
-    setEmailErr("");
-    setEmailMsg("");
-    setEmailLoading(true);
-    try {
-      await api.post("/email/verify", { code: emailCode });
-      setEmailVerified(true);
-      setShowEmailCode(false);
-      setEmailCode("");
-      setEmailMsg(t("settings.security.verifiedSuccess"));
-    } catch (err: any) {
-      setEmailErr(t("settings.security.invalidCode"));
-    } finally {
-      setEmailLoading(false);
-    }
-  };
 
   // ===================== 2FA =====================
   const enableTwoFa = async () => {
@@ -189,60 +146,6 @@ export function SecuritySettings() {
 
   return (
     <div className="mt-6 space-y-6">
-      {/* ===================== EMAIL VERIFICATION ===================== */}
-      <div className={cardClass}>
-        <div className="flex items-center justify-between gap-3 mb-2">
-          <h2 className="text-lg font-bold flex items-center gap-2">
-            <Mail size={18} /> {t("settings.security.emailTitle")}
-          </h2>
-          {emailVerified ? (
-            <span className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 font-medium">
-              <ShieldCheck size={16} /> {t("settings.security.emailVerified")}
-            </span>
-          ) : (
-            <span className="flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400 font-medium">
-              <ShieldAlert size={16} /> {t("settings.security.emailNotVerified")}
-            </span>
-          )}
-        </div>
-        <p className="text-xs text-slate-500 mb-4">{t("settings.security.emailHint")}</p>
-
-        {emailMsg && (
-          <p className="text-sm text-green-600 flex items-center gap-1 mb-3">
-            <CheckCircle size={16} /> {emailMsg}
-          </p>
-        )}
-        {emailErr && (
-          <p className="text-sm text-red-500 flex items-center gap-1 mb-3">
-            <AlertCircle size={16} /> {emailErr}
-          </p>
-        )}
-
-        {!emailVerified && (
-          <div className="space-y-3">
-            {!showEmailCode ? (
-              <button onClick={sendEmailCode} disabled={emailLoading} className={primaryBtn}>
-                {emailLoading ? t("settings.security.sending") : t("settings.security.sendCode")}
-              </button>
-            ) : (
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={emailCode}
-                  onChange={(e) => setEmailCode(e.target.value)}
-                  placeholder={t("settings.security.codePlaceholder")}
-                  className={inputClass + " sm:max-w-[200px] tracking-widest"}
-                />
-                <button onClick={verifyEmail} disabled={emailLoading} className={primaryBtn}>
-                  {emailLoading ? t("settings.security.verifying") : t("settings.security.verify")}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
       {/* ===================== 2FA ===================== */}
       <div className={cardClass}>
         <div className="flex items-center justify-between gap-3 mb-2">
@@ -293,21 +196,11 @@ export function SecuritySettings() {
         )}
 
         {/* Состояние: 2FA выключен и не настраивается */}
-        {!twoFactorEnabled && !twoFaSetup && !recoveryCodes &&
-          (emailVerified ? (
-            <button onClick={enableTwoFa} disabled={twoFaLoading} className={primaryBtn}>
-              {twoFaLoading ? t("settings.security.enabling") : t("settings.security.enable")}
-            </button>
-          ) : (
-            <div className="space-y-3">
-              <p className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
-                <ShieldAlert size={16} /> {t("settings.security.verifyEmailFirst")}
-              </p>
-              <button disabled className={primaryBtn + " cursor-not-allowed"}>
-                {t("settings.security.enable")}
-              </button>
-            </div>
-          ))}
+        {!twoFactorEnabled && !twoFaSetup && !recoveryCodes && (
+          <button onClick={enableTwoFa} disabled={twoFaLoading} className={primaryBtn}>
+            {twoFaLoading ? t("settings.security.enabling") : t("settings.security.enable")}
+          </button>
+        )}
 
         {/* Состояние: настройка 2FA (QR + ввод кода) */}
         {twoFaSetup && (

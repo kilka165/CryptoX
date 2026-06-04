@@ -5,6 +5,7 @@ import { X, CheckCircle } from "lucide-react";
 import { Coin } from "@/types/coin";
 import { useTranslation } from "react-i18next";
 import { getCurrencySymbol } from "@/lib/currencies";
+import { useFees } from "@/lib/fees";
 
 interface BuyModalProps {
   isOpen: boolean;
@@ -46,11 +47,22 @@ export function BuyModal({
   onSubmit,
 }: BuyModalProps) {
   const { t } = useTranslation();
+  const { trade: tradeRate } = useFees();
   if (!isOpen || !coin) return null;
 
-  const canBuy = amountUserEntered > 0 && calculatedUSD <= userBalance;
+  // Комиссия начисляется сверху стоимости крипты (расчёт и проверка баланса — в USD).
+  const feeUSD = calculatedUSD * tradeRate;
+  const totalDeductUSD = calculatedUSD + feeUSD;
+  const canBuy = amountUserEntered > 0 && totalDeductUSD <= userBalance;
   const currencySymbol = getCurrencySymbol(userCurrency);
   const convertedPrice = coin.current_price * exchangeRate;
+
+  // Те же суммы в выбранной валюте пользователя — только для отображения.
+  const amountInCurrency = calculatedUSD * exchangeRate;
+  const feeInCurrency = feeUSD * exchangeRate;
+  const totalDeductInCurrency = totalDeductUSD * exchangeRate;
+  const fmt = (v: number) =>
+    v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -109,18 +121,24 @@ export function BuyModal({
 
           <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-slate-600 dark:text-slate-400">{t("market.buyModal.amountUsd")}</span>
-              <span className="font-semibold">${calculatedUSD.toFixed(2)}</span>
+              <span className="text-slate-600 dark:text-slate-400">{t("market.buyModal.amount", { currency: currencySymbol })}</span>
+              <span className="font-semibold">{currencySymbol}{fmt(amountInCurrency)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-600 dark:text-slate-400">{t("market.buyModal.fee")}</span>
+              <span className="font-semibold text-red-500">-{currencySymbol}{fmt(feeInCurrency)}</span>
+            </div>
+            <div className="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
+              <span className="text-slate-600 dark:text-slate-400">{t("market.buyModal.totalDeduct")}</span>
+              <span className={`font-semibold ${totalDeductUSD > userBalance ? "text-red-500" : ""}`}>{currencySymbol}{fmt(totalDeductInCurrency)}</span>
             </div>
             <div className="flex justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
               <span className="text-slate-600 dark:text-slate-400">{t("market.buyModal.availableBalance")}</span>
-              <span className="font-semibold">
-                ${userBalance.toFixed(2)} ({maxBalanceInUserCurrency.toFixed(2)} {currencySymbol})
-              </span>
+              <span className="font-semibold">{currencySymbol}{fmt(maxBalanceInUserCurrency)}</span>
             </div>
           </div>
 
-          {calculatedUSD > userBalance && amountUserEntered > 0 && (
+          {totalDeductUSD > userBalance && amountUserEntered > 0 && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm text-red-700 dark:text-red-400">
               {t("common.insufficientFunds")}
             </div>

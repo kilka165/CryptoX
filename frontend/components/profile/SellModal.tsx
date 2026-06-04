@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
 import { API_BASE } from "@/lib/config";
 import { getCurrencySymbol } from "@/lib/currencies";
+import { useFees } from "@/lib/fees";
 
 interface Asset {
   id: number;
@@ -34,6 +35,7 @@ export function SellModal({
 }: SellModalProps) {
   const { t } = useTranslation();
   const { getRate } = useRates();
+  const { trade: tradeRate } = useFees();
   const [cryptoAmount, setCryptoAmount] = useState("");
   const [fiatAmount, setFiatAmount] = useState("");
   const [isSelling, setIsSelling] = useState(false);
@@ -136,7 +138,9 @@ export function SellModal({
     }
   };
 
-  const totalReceiveFiat = parseFloat(fiatAmount || "0");
+  const grossReceiveFiat = parseFloat(fiatAmount || "0");
+  const feeFiat = grossReceiveFiat * tradeRate;
+  const totalReceiveFiat = grossReceiveFiat - feeFiat;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -242,8 +246,18 @@ export function SellModal({
             />
           </div>
 
-          <div className="bg-slate-100 dark:bg-slate-800 rounded-xl p-4">
-            <div className="flex items-center justify-between">
+          <div className="bg-slate-100 dark:bg-slate-800 rounded-xl p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-slate-600 dark:text-slate-400">{t("profile.sellModal.fee")}</span>
+              <span className="font-semibold text-red-500">
+                -{currencySymbol}
+                {feeFiat.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+            </div>
+            <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
               <span className="text-sm text-slate-600 dark:text-slate-400">{t("profile.sellModal.totalReceive")}</span>
               <span className="text-xl font-bold text-green-600">
                 {currencySymbol}

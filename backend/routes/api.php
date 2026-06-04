@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\WalletController;
+use App\Http\Controllers\Api\ConfigController;
 use App\Http\Controllers\TradeController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CoinsController;
@@ -41,6 +42,9 @@ Route::get('/currency/rates', [CurrencyController::class, 'getRates']);
 
 // Активы (публичный список для фильтров)
 Route::get('/assets', [AssetController::class, 'index']);
+
+// Ставки комиссий (для отображения на фронте; расчёт всегда дублируется на бэке)
+Route::get('/fees', [ConfigController::class, 'fees']);
 
 // P2P (публичные)
 Route::get('/p2p/offers', [P2PController::class, 'getOffers']);

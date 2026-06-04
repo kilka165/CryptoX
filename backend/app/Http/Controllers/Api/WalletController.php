@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\Transaction;
+use App\Services\FeeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -65,7 +66,7 @@ class WalletController extends Controller
         }
     }
 
-    public function withdraw(Request $request)
+    public function withdraw(Request $request, FeeService $fees)
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:0.01',
@@ -74,9 +75,9 @@ class WalletController extends Controller
         $user = $request->user();
         $wallet = $user->wallet;
 
-        // Сумма вывода + комиссия 1% (как показано на фронтенде в «Итого к списанию»).
+        // Сумма вывода + комиссия (ставка из config/fees.php, как в «Итого к списанию» на фронте).
         $amount = round((float) $validated['amount'], 2);
-        $commission = round($amount * 0.01, 2);
+        $commission = $fees->calculate($amount, 'withdraw');
         $totalToDeduct = round($amount + $commission, 2);
 
         if ($wallet->balance < $totalToDeduct) {
@@ -123,8 +124,12 @@ class WalletController extends Controller
                 'amount' => $amount,
                 'price_usd' => 1,
                 'total_usd' => $totalToDeduct,
-                'description' => "Вывод средств из кошелька (комиссия 1%: \${$commission})",
+                'fee' => $commission,
+                'description' => 'Вывод средств из кошелька',
             ]);
+
+            // Комиссия идёт на счёт платформы.
+            $fees->creditPlatform($commission);
 
             DB::commit();
 

@@ -8,11 +8,11 @@ import { Footer } from "@/components/Footer";
 import { ArrowLeft, ArrowUpDown, CheckCircle, X, ChevronDown, AlertTriangle } from "lucide-react";
 import { CurrencySelectModal, CurrencyItem } from "@/components/convert/CurrencySelectModal";
 import { CoinIcon } from "@/components/market/CoinIcon";
-import { getCurrencySymbol } from "@/lib/currencies";
 import { BinanceAPI } from "@/lib/api/binance";
 import { Coin } from "@/types/coin";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "@/lib/config";
+import { useFees } from "@/lib/fees";
 import i18n from "@/lib/i18n";
 
 interface UserAsset {
@@ -70,6 +70,7 @@ const getBinancePrice = async (symbol: string): Promise<number> => {
 export default function ConvertPage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { trade: tradeRate } = useFees();
 
   const [coins, setCoins] = useState<Coin[]>([]);
   const [userAssets, setUserAssets] = useState<UserAsset[]>([]);
@@ -172,10 +173,11 @@ export default function ConvertPage() {
     (c) => !fromCoins.some((fc) => fc.coin.id === c.id)
   );
 
+  // Исключаем обмен монеты самой на себя: в «to» прячем уже выбранные «from», и наоборот.
   const modalCoins =
-    pickerTarget === "from" || pickerTarget === "add-from"
-      ? fromCoinsAsItems
-      : allCoinsAsItems;
+    pickerTarget === "to"
+      ? allCoinsAsItems.filter((c) => !fromCoins.some((fc) => fc.coin.id === c.id))
+      : fromCoinsAsItems.filter((c) => !toCoin || c.id !== toCoin.id);
 
   const openPicker = (target: "from" | "to", index?: number) => {
     setPickerTarget(target);
@@ -235,12 +237,21 @@ export default function ConvertPage() {
   const balanceErrors = validateBalances();
   const hasBalanceError = balanceErrors.some((e) => e);
 
-  const totalInUserCurrency = fromCoins.reduce((sum, fc) => {
+  // Стоимость исходных монет в USD (current_price монет с Binance — в USD).
+  const totalUsdValue = fromCoins.reduce((sum, fc) => {
     const val = parseFloat(fc.amount.replace(",", ".")) || 0;
     return sum + val * fc.coin.current_price;
   }, 0);
 
-  const calculatedToAmount = toCoin ? totalInUserCurrency / toCoin.current_price : 0;
+  // Комиссия берётся в целевой крипте: % от количества монеты, на которую меняем.
+  // В основном поле показываем количество ДО комиссии (совпадает с курсом ниже),
+  // а «К получению» — уже за вычетом комиссии.
+  const grossToAmount = toCoin ? totalUsdValue / toCoin.current_price : 0;
+  const feeToAmount = grossToAmount * tradeRate;
+  const netToAmount = grossToAmount - feeToAmount;
+
+  // Нельзя менять монету саму на себя.
+  const sameCoinSelected = !!toCoin && fromCoins.some((fc) => fc.coin.id === toCoin.id);
 
   const toBalance = toCoin
     ? userAssets.find((a) => a.name === toCoin.id)?.amount || 0
@@ -488,17 +499,33 @@ export default function ConvertPage() {
                     </button>
 
                     <span className="flex-1 min-w-0 text-right text-lg font-semibold text-slate-600 dark:text-slate-400 truncate">
-                      ≈ {calculatedToAmount.toFixed(8)}
+                      ≈ {grossToAmount.toFixed(8)}
                     </span>
                   </div>
                 </div>
 
-                <div className="text-sm text-slate-600 dark:text-slate-400 text-center">
-                  {t("convert.totalSwap")}{" "}
-                  <span className="text-slate-900 dark:text-slate-200 font-semibold">
-                    {totalInUserCurrency.toFixed(2)} {getCurrencySymbol(userCurrency)}
-                  </span>
-                </div>
+                {toCoin && grossToAmount > 0 && (
+                  <div className="space-y-1 text-center">
+                    <div className="text-xs text-slate-500">
+                      {t("convert.fee")}{" "}
+                      <span className="text-red-500 font-semibold">
+                        ≈ -{feeToAmount.toFixed(8)} {toCoin.symbol.toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">
+                      {t("convert.youReceive")}{" "}
+                      <span className="text-slate-900 dark:text-slate-200 font-semibold">
+                        ≈ {netToAmount.toFixed(8)} {toCoin.symbol.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {sameCoinSelected && (
+                  <div className="text-xs text-red-500 text-center">
+                    {t("convert.sameCoin")}
+                  </div>
+                )}
 
                 {toCoin && fromCoins.length > 0 && (
                   <div className="space-y-1">
@@ -526,8 +553,9 @@ export default function ConvertPage() {
                     fromCoins.length === 0 ||
                     !toCoin ||
                     isSwapping ||
-                    totalInUserCurrency === 0 ||
-                    hasBalanceError
+                    totalUsdValue === 0 ||
+                    hasBalanceError ||
+                    sameCoinSelected
                   }
                   className="mt-3 w-full bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-semibold py-3 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all"
                 >

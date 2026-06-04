@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\Transaction;
 use App\Models\Wallet;
+use App\Services\FeeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class TradeController extends Controller
 {
-    public function buy(Request $request)
+    public function buy(Request $request, FeeService $fees)
     {
         $validated = $request->validate([
             'coin_id' => 'required|string',
@@ -24,9 +25,12 @@ class TradeController extends Controller
         $amount = $validated['amount'];
         $priceUsd = $validated['price_usd'];
         $totalCost = $amount * $priceUsd;
+        // Комиссия сверху стоимости крипты: списываем totalCost + fee, крипты начисляем полностью.
+        $fee = $fees->calculate($totalCost, 'trade');
+        $totalToDeduct = $totalCost + $fee;
 
         $wallet = Wallet::where('user_id', $user->id)->first();
-        if (!$wallet || $wallet->balance < $totalCost) {
+        if (!$wallet || $wallet->balance < $totalToDeduct) {
             return response()->json([
                 'success' => false,
                 'message' => 'Недостаточно средств на балансе'
@@ -36,7 +40,7 @@ class TradeController extends Controller
         DB::beginTransaction();
 
         try {
-            $wallet->balance -= $totalCost;
+            $wallet->balance -= $totalToDeduct;
             $wallet->save();
 
             $asset = Asset::firstOrCreate(
@@ -61,7 +65,10 @@ class TradeController extends Controller
                 'amount' => $amount,
                 'price_usd' => $priceUsd,
                 'total_usd' => $totalCost,
+                'fee' => $fee,
             ]);
+
+            $fees->creditPlatform($fee);
 
             DB::commit();
 
@@ -80,7 +87,7 @@ class TradeController extends Controller
         }
     }
 
-    public function sell(Request $request)
+    public function sell(Request $request, FeeService $fees)
     {
         // price_usd должен быть строго > 0: иначе total_usd выйдет 0 и
         // пользователь отдаст актив бесплатно (баг с SellModal до фикса).
@@ -95,6 +102,9 @@ class TradeController extends Controller
         $amount = $validated['amount'];
         $priceUsd = $validated['price_usd'];
         $totalValue = $amount * $priceUsd;
+        // Комиссия удерживается из выручки: на кошелёк приходит totalValue - fee.
+        $fee = $fees->calculate($totalValue, 'trade');
+        $proceeds = $totalValue - $fee;
 
         $asset = Asset::where('user_id', $user->id)
             ->where('name', $coinId)
@@ -125,7 +135,7 @@ class TradeController extends Controller
             }
 
             $wallet = Wallet::firstOrCreate(['user_id' => $user->id], ['balance' => 0]);
-            $wallet->balance += $totalValue;
+            $wallet->balance += $proceeds;
             $wallet->save();
 
             Transaction::create([
@@ -136,7 +146,10 @@ class TradeController extends Controller
                 'amount' => $amount,
                 'price_usd' => $priceUsd,
                 'total_usd' => $totalValue,
+                'fee' => $fee,
             ]);
+
+            $fees->creditPlatform($fee);
 
             DB::commit();
 
@@ -154,7 +167,7 @@ class TradeController extends Controller
         }
     }
 
-    public function multiSwap(Request $request)
+    public function multiSwap(Request $request, FeeService $fees)
     {
         try {
             $validated = $request->validate([
@@ -223,12 +236,18 @@ class TradeController extends Controller
                 $totalWeight += $tc['weight'];
             }
 
+            // Комиссия удерживается из пула: распределяем (totalSoldUSD - totalFee).
+            // fee пишем пропорционально на buy-транзакции, чтобы SUM(fee) сходился.
+            $totalFee = $fees->calculate($totalSoldUSD, 'trade');
+            $allocatableUSD = $totalSoldUSD - $totalFee;
+
             foreach ($toCoins as $tc) {
                 $coinId = $tc['coin_id'];
                 $weight = $tc['weight'];
 
-                $allocatedUSD = ($totalSoldUSD * $weight) / $totalWeight;
+                $allocatedUSD = ($allocatableUSD * $weight) / $totalWeight;
                 $boughtAmount = $allocatedUSD / $toPriceUsd;
+                $feeShare = round(($totalFee * $weight) / $totalWeight, 2);
 
                 $asset = Asset::firstOrCreate(
                     [
@@ -252,8 +271,11 @@ class TradeController extends Controller
                     'amount' => $boughtAmount,
                     'price_usd' => $toPriceUsd,
                     'total_usd' => $allocatedUSD,
+                    'fee' => $feeShare,
                 ]);
             }
+
+            $fees->creditPlatform($totalFee);
 
             DB::commit();
 

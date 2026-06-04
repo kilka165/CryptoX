@@ -16,6 +16,7 @@ class Transaction extends Model
         'amount',
         'price_usd',
         'total_usd',
+        'fee',
         'description',
     ];
 
@@ -23,6 +24,7 @@ class Transaction extends Model
         'amount' => 'decimal:8',
         'price_usd' => 'decimal:2',
         'total_usd' => 'decimal:2',
+        'fee' => 'decimal:2',
         'created_at' => 'datetime',
     ];
 

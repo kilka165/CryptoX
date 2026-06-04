@@ -17,6 +17,7 @@ import { API_BASE } from "@/lib/config";
 import { Coin } from "@/types/coin";
 import { useTranslation } from "react-i18next";
 import { useRates } from "@/components/RatesProvider";
+import { useFees } from "@/lib/fees";
 
 const formatNumber = (num: number) => {
   if (num >= 1.0e12) return (num / 1.0e12).toFixed(2) + "T";
@@ -38,6 +39,7 @@ const cleanInputAmount = (value: string) => value.replace(/,/g, "");
 export default function MarketPage() {
   const { t } = useTranslation();
   const { getRate } = useRates();
+  const { trade: tradeRate } = useFees();
   const [coins, setCoins] = useState<Coin[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -167,7 +169,7 @@ export default function MarketPage() {
         }
       );
 
-      setUserBalance((prev) => prev - amountInUSD);
+      setUserBalance((prev) => prev - amountInUSD * (1 + tradeRate));
       setBuySuccess(true);
       setTimeout(() => {
         setBuySuccess(false);
@@ -396,7 +398,7 @@ export default function MarketPage() {
           }}
           onChangeAmount={handleInputChange}
           onChangeCryptoAmount={handleCryptoInputChange}
-          onSetMax={() => handleInputChange(maxBalanceInUserCurrency.toFixed(2))}
+          onSetMax={() => handleInputChange((maxBalanceInUserCurrency / (1 + tradeRate)).toFixed(2))}
           onSubmit={handleBuySubmit}
         />
       )}

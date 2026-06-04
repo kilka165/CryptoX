@@ -9,19 +9,21 @@ import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { intlLocale } from "@/lib/utils/locale";
 import { API_BASE } from "@/lib/config";
+import { useFees } from "@/lib/fees";
 
 export default function WithdrawPage() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  
+  const { withdraw: withdrawRate } = useFees();
+
   const [balance, setBalance] = useState(0); // Текущий баланс пользователя
   const [amount, setAmount] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const [emailVerified, setEmailVerified] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [profileLoaded, setProfileLoaded] = useState(false); // данные /user получены
 
   // Загружаем баланс при открытии страницы
   useEffect(() => {
@@ -33,10 +35,11 @@ export default function WithdrawPage() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBalance(res.data.wallet?.balance || 0);
-            setEmailVerified(!!res.data.email_verified);
             setTwoFactorEnabled(!!res.data.two_factor_enabled);
         } catch (e) {
             console.error("Error loading balance", e);
+        } finally {
+            setProfileLoaded(true);
         }
     };
     fetchBalance();
@@ -45,19 +48,17 @@ export default function WithdrawPage() {
   // Подсказка о дневном лимите вывода в зависимости от уровня защиты.
   const limitInfo = twoFactorEnabled
     ? { text: t("withdraw.limitNone"), tone: "ok" as const }
-    : emailVerified
-    ? { text: t("withdraw.limitVerified"), tone: "warn" as const }
-    : { text: t("withdraw.limitUnverified"), tone: "warn" as const };
+    : { text: t("withdraw.limitVerified"), tone: "warn" as const };
 
   const withdrawAmount = parseFloat(amount) || 0;
-  const commission = withdrawAmount * 0.01; // 1%
+  const commission = withdrawAmount * withdrawRate;
   const totalToDeduct = withdrawAmount + commission;
 
   // Функция "Вывести ВСЁ"
   const handleMaxClick = () => {
-    // x + 0.01x = balance => 1.01x = balance => x = balance / 1.01
+    // x + rate*x = balance => x = balance / (1 + rate)
     // Округляем вниз до 2 знаков, чтобы точно хватило
-    const maxAmount = Math.floor((balance / 1.01) * 100) / 100;
+    const maxAmount = Math.floor((balance / (1 + withdrawRate)) * 100) / 100;
     if (maxAmount > 0) {
         setAmount(maxAmount.toString());
     }
@@ -221,21 +222,23 @@ export default function WithdrawPage() {
               />
             </div>
 
-            {/* Информация о дневном лимите вывода */}
-            <div
-              className={`p-4 rounded-xl flex items-start gap-3 text-sm border ${
-                limitInfo.tone === "ok"
-                  ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300"
-                  : "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300"
-              }`}
-            >
-              {limitInfo.tone === "ok" ? (
-                <ShieldCheck size={18} className="mt-0.5 flex-shrink-0" />
-              ) : (
-                <Info size={18} className="mt-0.5 flex-shrink-0" />
-              )}
-              <span>{limitInfo.text}</span>
-            </div>
+            {/* Информация о дневном лимите вывода (только после загрузки /user) */}
+            {profileLoaded && (
+              <div
+                className={`p-4 rounded-xl flex items-start gap-3 text-sm border ${
+                  limitInfo.tone === "ok"
+                    ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300"
+                    : "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300"
+                }`}
+              >
+                {limitInfo.tone === "ok" ? (
+                  <ShieldCheck size={18} className="mt-0.5 flex-shrink-0" />
+                ) : (
+                  <Info size={18} className="mt-0.5 flex-shrink-0" />
+                )}
+                <span>{limitInfo.text}</span>
+              </div>
+            )}
 
             <button
               type="submit"
