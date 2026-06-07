@@ -103,6 +103,72 @@ public function getPrice($symbol)
 }
 
 /**
+ * Получить исторические свечи (OHLC) для графика цены.
+ * Проксирует Binance Vision klines; нормализует под lightweight-charts.
+ */
+public function getKlines(Request $request, $symbol)
+{
+    $allowedIntervals = ['1h', '4h', '1d', '1w', '1M'];
+
+    $interval = $request->query('interval', '4h');
+    if (!in_array($interval, $allowedIntervals, true)) {
+        $interval = '4h';
+    }
+
+    $limit = (int) $request->query('limit', 42);
+    $limit = max(1, min($limit, 1000));
+
+    // Intraday data changes often -> short TTL; daily and above cached longer.
+    $ttl = in_array($interval, ['1h', '4h'], true) ? 60 : 300;
+
+    $pair = strtoupper($symbol) . 'USDT';
+    $cacheKey = "klines_{$pair}_{$interval}_{$limit}";
+
+    try {
+        $candles = Cache::get($cacheKey);
+
+        if ($candles === null) {
+            $response = Http::withOptions(['verify' => ! app()->isLocal()])
+                ->timeout(10)
+                ->get('https://data-api.binance.vision/api/v3/klines', [
+                    'symbol' => $pair,
+                    'interval' => $interval,
+                    'limit' => $limit,
+                ]);
+
+            // Unknown symbol -> Binance returns 4xx; do not cache the error.
+            if ($response->clientError()) {
+                return response()->json(['error' => 'Symbol not found'], 404);
+            }
+
+            if (!$response->successful()) {
+                throw new \Exception('Binance klines error: ' . $response->status());
+            }
+
+            // Binance: [openTime, open, high, low, close, volume, closeTime, ...]
+            $candles = array_map(fn($k) => [
+                'time' => intdiv((int) $k[0], 1000),
+                'open' => floatval($k[1]),
+                'high' => floatval($k[2]),
+                'low' => floatval($k[3]),
+                'close' => floatval($k[4]),
+            ], $response->json());
+
+            Cache::put($cacheKey, $candles, $ttl);
+        }
+
+        if (empty($candles)) {
+            return response()->json(['error' => 'Symbol not found'], 404);
+        }
+
+        return response()->json($candles);
+    } catch (\Exception $e) {
+        \Log::error('CoinsController klines error: ' . $e->getMessage());
+        return response()->json(['error' => 'Server error'], 500);
+    }
+}
+
+/**
  * Получить статистику за 24 часа
  */
 public function get24hStats($symbol)

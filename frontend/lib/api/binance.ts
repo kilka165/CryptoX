@@ -1,6 +1,16 @@
 // frontend/lib/api/binance.ts
 import axios from 'axios';
 import { API_BASE } from '@/lib/config';
+import { Candle, ChartRange } from '@/types/coin';
+
+// Диапазон графика → параметры Binance klines (интервал свечи + кол-во свечей).
+const KLINE_RANGE_PARAMS: Record<ChartRange, { interval: string; limit: number }> = {
+  '24h': { interval: '1h', limit: 24 },
+  '7d': { interval: '4h', limit: 42 },
+  '30d': { interval: '1d', limit: 30 },
+  '1y': { interval: '1w', limit: 52 },
+  all: { interval: '1M', limit: 1000 },
+};
 
 interface Coin24hData {
   id: string;
@@ -62,6 +72,22 @@ export const BinanceAPI = {
     } catch (error: any) {
       console.error(`Error fetching price for ${symbol}:`, error.message);
       throw error;
+    }
+  },
+
+  /**
+   * Получает исторические свечи (OHLC) для графика цены за выбранный диапазон
+   */
+  async getKlines(symbol: string, range: ChartRange = '7d'): Promise<Candle[]> {
+    try {
+      const { interval, limit } = KLINE_RANGE_PARAMS[range] ?? KLINE_RANGE_PARAMS['7d'];
+      const response = await axios.get(`${API_BASE}/coins/klines/${symbol.toLowerCase()}`, {
+        params: { interval, limit },
+      });
+      return response.data as Candle[];
+    } catch (error: any) {
+      console.error(`Error fetching klines for ${symbol}:`, error.message);
+      return [];
     }
   },
 

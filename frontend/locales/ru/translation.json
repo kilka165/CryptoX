@@ -309,8 +309,13 @@
     "actions": "Действия",
     "pageOf": "Страница {{page}} из {{total}}",
     "buy": "Купить",
+    "sell": "Продать",
+    "trade": "Торговать",
+    "details": "Подробнее",
     "buyError": "Ошибка при покупке",
     "buyModal": {
+      "buyTab": "Покупка",
+      "sellTab": "Продажа",
       "currentPrice": "Текущая цена 1 {{symbol}}",
       "amount": "Сумма ({{currency}})",
       "amountCrypto": "Количество ({{symbol}})",
@@ -320,7 +325,21 @@
       "totalDeduct": "Итого к списанию",
       "youReceive": "Вы получите",
       "availableBalance": "Доступный баланс",
+      "availableToSell": "Доступно для продажи",
+      "totalReceive": "Итого к получению",
+      "holdings": "Доступно: {{amount}} {{symbol}}",
+      "selling": "Продажа...",
       "buying": "Покупка..."
+    },
+    "chart": {
+      "range24h": "24ч",
+      "range7d": "7д",
+      "range30d": "30д",
+      "range1y": "1г",
+      "rangeAll": "Всё",
+      "loading": "Загрузка графика...",
+      "error": "Не удалось загрузить график",
+      "noData": "Нет данных"
     },
     "overview": {
       "title": "Обзор крипто-рынка",

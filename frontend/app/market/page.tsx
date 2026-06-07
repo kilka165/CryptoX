@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
-import { Search, Flame, TrendingUp, BarChart3, Zap } from "lucide-react";
+import { Search, Flame, TrendingUp, BarChart3, Zap, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { Header } from "@/components/Header";
 import { CoinRow } from "@/components/market/CoinRow";
 import { CoinCard } from "@/components/market/CoinCard";
@@ -13,44 +12,23 @@ import { getCurrencySymbol } from "@/lib/currencies";
 import { BuyModal } from "@/components/market/BuyModal";
 import { Footer } from "@/components/Footer";
 import { BinanceAPI } from "@/lib/api/binance";
-import { API_BASE } from "@/lib/config";
+import { formatNumber } from "@/lib/format";
 import { Coin } from "@/types/coin";
 import { useTranslation } from "react-i18next";
-import { useRates } from "@/components/RatesProvider";
-import { useFees } from "@/lib/fees";
+import { useBuyFlow } from "@/hooks/useBuyFlow";
 
-const formatNumber = (num: number) => {
-  if (num >= 1.0e12) return (num / 1.0e12).toFixed(2) + "T";
-  if (num >= 1.0e9) return (num / 1.0e9).toFixed(2) + "B";
-  if (num >= 1.0e6) return (num / 1.0e6).toFixed(2) + "M";
-  if (num >= 1.0e3) return (num / 1.0e3).toFixed(2) + "K";
-  return num.toFixed(2);
-};
-
-const formatInputAmount = (value: string) => {
-  if (!value) return "";
-  const parts = value.split(".");
-  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  return parts.join(".");
-};
-
-const cleanInputAmount = (value: string) => value.replace(/,/g, "");
+type SortKey = "current_price" | "price_change_percentage_24h" | "total_volume" | "market_cap";
 
 export default function MarketPage() {
   const { t } = useTranslation();
-  const { getRate } = useRates();
-  const { trade: tradeRate } = useFees();
   const [coins, setCoins] = useState<Coin[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [userCurrency, setUserCurrency] = useState<string>("USD");
-  const [userBalance, setUserBalance] = useState<number>(0);
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-  const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
-  const [displayAmount, setDisplayAmount] = useState("");
-  const [displayCryptoAmount, setDisplayCryptoAmount] = useState("");
-  const [isBuying, setIsBuying] = useState(false);
-  const [buySuccess, setBuySuccess] = useState(false);
+  const flow = useBuyFlow();
+  const { userCurrency, exchangeRate, openBuy, selectedCoin } = flow;
 
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 10;
@@ -59,7 +37,7 @@ export default function MarketPage() {
     const fetchCoins = async () => {
       try {
         const binancePrices = await BinanceAPI.get24hPrices();
-        
+
         const coinsData: Coin[] = binancePrices.map(bp => ({
           id: bp.id,
           symbol: bp.symbol,
@@ -82,117 +60,6 @@ export default function MarketPage() {
     fetchCoins();
   }, []);
 
-  useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    if (!token) return;
-
-    axios
-      .get(`${API_BASE}/user`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        if (res.data.currency) setUserCurrency(res.data.currency);
-        const balance = res.data.wallet?.balance ?? res.data.balance ?? 0;
-        setUserBalance(Number(balance));
-      })
-      .catch((e) => console.error(e));
-  }, []);
-
-  const exchangeRate = getRate(userCurrency);
-
-  const trimZeros = (s: string) => {
-    if (!s.includes(".")) return s;
-    return s.replace(/0+$/, "").replace(/\.$/, "");
-  };
-
-  const handleInputChange = (raw: string) => {
-    let val = raw.replace(/[^0-9.]/g, "");
-    if ((val.match(/\./g) || []).length > 1) return;
-    setDisplayAmount(formatInputAmount(val));
-
-    const moneyNum = parseFloat(val || "0");
-    if (selectedCoin && selectedCoin.current_price > 0 && exchangeRate > 0 && moneyNum > 0) {
-      const cryptoNum = moneyNum / exchangeRate / selectedCoin.current_price;
-      setDisplayCryptoAmount(trimZeros(cryptoNum.toFixed(8)));
-    } else {
-      setDisplayCryptoAmount("");
-    }
-  };
-
-  const handleCryptoInputChange = (raw: string) => {
-    let val = raw.replace(/[^0-9.]/g, "");
-    if ((val.match(/\./g) || []).length > 1) return;
-    setDisplayCryptoAmount(val);
-
-    const cryptoNum = parseFloat(val || "0");
-    if (selectedCoin && selectedCoin.current_price > 0 && cryptoNum > 0) {
-      const moneyNum = cryptoNum * selectedCoin.current_price * exchangeRate;
-      setDisplayAmount(formatInputAmount(moneyNum.toFixed(2)));
-    } else {
-      setDisplayAmount("");
-    }
-  };
-
-  const handleBuySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedCoin) return;
-
-    setIsBuying(true);
-    const pureAmount = parseFloat(cleanInputAmount(displayAmount) || "0");
-    const amountInUSD = pureAmount / exchangeRate;
-
-    try {
-      const token = localStorage.getItem("auth_token");
-      if (!token) {
-        alert(t("common.authRequired"));
-        window.location.href = "/login";
-        return;
-      }
-
-      // Используем ту же цену, что показывали в модалке (selectedCoin.current_price),
-      // а не отдельный /coins/price/{symbol} — иначе из-за рассинхрона между
-      // кэшированным списком и live-эндпоинтом сумма в истории отличалась на ~0.01%.
-      const coinPrice = selectedCoin.current_price;
-      const cryptoAmountToBuy = amountInUSD / coinPrice;
-
-      const payload = {
-        coin_id: selectedCoin.id,
-        amount: cryptoAmountToBuy,
-        price_usd: coinPrice,
-      };
-
-      const response = await axios.post(
-        `${API_BASE}/trade/buy`,
-        payload,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      setUserBalance((prev) => prev - amountInUSD * (1 + tradeRate));
-      setBuySuccess(true);
-      setTimeout(() => {
-        setBuySuccess(false);
-        setSelectedCoin(null);
-        setDisplayAmount("");
-        setDisplayCryptoAmount("");
-      }, 2000);
-    } catch (error: any) {
-      console.error("=== ОШИБКА ПОКУПКИ ===");
-      console.error("Полная ошибка:", error);
-      console.error("Ответ сервера:", error.response?.data);
-      
-      alert(
-        error.response?.data?.message ||
-        JSON.stringify(error.response?.data) ||
-        t("market.buyError")
-      );
-    } finally {
-      setIsBuying(false);
-    }
-  };
-
-
   const filteredCoins = useMemo(
     () =>
       coins.filter(
@@ -203,15 +70,38 @@ export default function MarketPage() {
     [coins, search]
   );
 
-  const totalPages = Math.max(1, Math.ceil(filteredCoins.length / perPage));
-  const paginatedCoins = filteredCoins.slice(
+  // Сортировка по выбранной колонке в три такта: убывание → возрастание → сброс.
+  const handleSort = (key: SortKey) => {
+    if (sortKey !== key) {
+      setSortKey(key);
+      setSortDir("desc");
+    } else if (sortDir === "desc") {
+      setSortDir("asc");
+    } else {
+      // Третье нажатие — сбрасываем сортировку.
+      setSortKey(null);
+      setSortDir("desc");
+    }
+  };
+
+  const sortedCoins = useMemo(() => {
+    if (!sortKey) return filteredCoins;
+    return [...filteredCoins].sort((a, b) => {
+      const av = a[sortKey] ?? 0;
+      const bv = b[sortKey] ?? 0;
+      return sortDir === "desc" ? bv - av : av - bv;
+    });
+  }, [filteredCoins, sortKey, sortDir]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedCoins.length / perPage));
+  const paginatedCoins = sortedCoins.slice(
     (currentPage - 1) * perPage,
     currentPage * perPage
   );
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search]);
+  }, [search, sortKey, sortDir]);
 
   const topGainers = useMemo(
     () =>
@@ -238,16 +128,21 @@ export default function MarketPage() {
     [coins]
   );
 
-  const amountUserEntered = parseFloat(cleanInputAmount(displayAmount) || "0") || 0;
-  const calculatedUSD = amountUserEntered / exchangeRate;
-  const maxBalanceInUserCurrency = userBalance * exchangeRate;
-
   const marketCards: MarketCardDef[] = [
     { title: t("market.popular"), icon: Flame, coins, href: "/market/overview" },
     { title: t("market.topGainers"), icon: TrendingUp, coins: topGainers, href: "/market/overview" },
     { title: t("market.byVolume"), icon: BarChart3, coins: topVolume, href: "/market/overview" },
     { title: t("market.new"), icon: Zap, coins: newGems, href: "/market/overview" },
   ];
+
+  const sortIcon = (key: SortKey) =>
+    sortKey !== key ? (
+      <ChevronsUpDown className="w-3.5 h-3.5 opacity-40" />
+    ) : sortDir === "desc" ? (
+      <ChevronDown className="w-3.5 h-3.5" />
+    ) : (
+      <ChevronUp className="w-3.5 h-3.5" />
+    );
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white transition-colors duration-300">
@@ -262,7 +157,7 @@ export default function MarketPage() {
               {/* Мобильная карусель карточек */}
               <MarketCardsCarousel
                 cards={marketCards}
-                onBuy={setSelectedCoin}
+                onBuy={openBuy}
                 userCurrency={userCurrency}
                 exchangeRate={exchangeRate}
               />
@@ -275,7 +170,7 @@ export default function MarketPage() {
                     title={c.title}
                     icon={c.icon}
                     coins={c.coins}
-                    onBuy={setSelectedCoin}
+                    onBuy={openBuy}
                     userCurrency={userCurrency}
                     exchangeRate={exchangeRate}
                     href={c.href}
@@ -301,7 +196,6 @@ export default function MarketPage() {
 
           {/* Подписи колонок (планшет) */}
           <div className="hidden sm:flex lg:hidden items-center gap-3 px-3 mb-2 text-[11px] font-medium uppercase tracking-wide text-slate-400">
-            <span className="w-5 text-center shrink-0">#</span>
             <span className="w-9 shrink-0" />
             <span className="flex-1 min-w-0">{t("market.coin")}</span>
             <span className="text-right shrink-0">
@@ -316,14 +210,13 @@ export default function MarketPage() {
               ? [...Array(6)].map((_, i) => (
                   <div key={i} className="h-16 rounded-xl animate-pulse bg-slate-100 dark:bg-[#131416]" />
                 ))
-              : paginatedCoins.map((coin, idx) => (
+              : paginatedCoins.map((coin) => (
                   <CoinCard
                     key={coin.id}
                     coin={coin}
-                    index={(currentPage - 1) * perPage + idx + 1}
                     userCurrency={userCurrency}
                     exchangeRate={exchangeRate}
-                    onBuy={setSelectedCoin}
+                    onBuy={openBuy}
                   />
                 ))}
           </div>
@@ -331,34 +224,65 @@ export default function MarketPage() {
           {/* Десктопная таблица */}
           <div className="hidden lg:block bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-300 dark:border-slate-800 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full text-left table-fixed">
               <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs uppercase text-slate-500">
                 <tr>
-                  <th className="px-3 sm:px-6 py-4 hidden sm:table-cell">#</th>
-                  <th className="px-3 sm:px-6 py-4">{t("market.coin")}</th>
-                  <th className="px-3 sm:px-6 py-4 text-right">{t("market.priceCur", { currency: getCurrencySymbol(userCurrency) })}</th>
-                  <th className="px-3 sm:px-6 py-4 text-right">{t("market.change24h")}</th>
-                  <th className="px-3 sm:px-6 py-4 text-right hidden lg:table-cell">{t("market.volume")}</th>
-                  <th className="px-3 sm:px-6 py-4 text-right hidden xl:table-cell">{t("market.marketCap")}</th>
-                  <th className="px-3 sm:px-6 py-4 text-right">{t("market.actions")}</th>
+                  <th className="w-[18%] pl-[68px] pr-6 py-4">{t("market.coin")}</th>
+                  <th className="px-3 sm:px-6 py-4 text-right w-[20%]">
+                    <button
+                      onClick={() => handleSort("current_price")}
+                      className="inline-flex items-center gap-1 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                    >
+                      {t("market.priceCur", { currency: getCurrencySymbol(userCurrency) })}
+                      {sortIcon("current_price")}
+                    </button>
+                  </th>
+                  <th className="px-3 sm:px-6 py-4 text-right w-[11%]">
+                    <button
+                      onClick={() => handleSort("price_change_percentage_24h")}
+                      className="inline-flex items-center gap-1 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                    >
+                      {t("market.change24h")}
+                      {sortIcon("price_change_percentage_24h")}
+                    </button>
+                  </th>
+                  <th className="px-3 sm:px-6 py-4 text-right hidden lg:table-cell w-[14%]">
+                    <button
+                      onClick={() => handleSort("total_volume")}
+                      className="inline-flex items-center gap-1 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                    >
+                      {t("market.volume")}
+                      {sortIcon("total_volume")}
+                    </button>
+                  </th>
+                  <th className="px-3 sm:px-6 py-4 text-right hidden xl:table-cell w-[14%]">
+                    <button
+                      onClick={() => handleSort("market_cap")}
+                      className="inline-flex items-center gap-1 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                    >
+                      {t("market.marketCap")}
+                      {sortIcon("market_cap")}
+                    </button>
+                  </th>
+                  <th className="px-3 sm:px-6 py-4 text-center w-[23%]">{t("market.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                 {loading
                   ? [...Array(5)].map((_, i) => (
                       <tr key={i} className="h-16 animate-pulse bg-slate-50 dark:bg-[#131416]">
-                        <td colSpan={7}></td>
+                        <td colSpan={6}></td>
                       </tr>
                     ))
-                  : paginatedCoins.map((coin, idx) => (
+                  : paginatedCoins.map((coin) => (
                       <CoinRow
                         key={coin.id}
                         coin={coin}
-                        index={(currentPage - 1) * perPage + idx + 1}
                         userCurrency={userCurrency}
                         exchangeRate={exchangeRate}
-                        onBuy={setSelectedCoin}
+                        onBuy={openBuy}
                         formatNumber={formatNumber}
+                        interactive
                       />
                     ))}
               </tbody>
@@ -377,31 +301,7 @@ export default function MarketPage() {
         </div>
       </div>
 
-      {selectedCoin && (
-        <BuyModal
-          isOpen={!!selectedCoin}
-          coin={selectedCoin}
-          userCurrency={userCurrency}
-          userBalance={userBalance}
-          exchangeRate={exchangeRate}
-          displayAmount={displayAmount}
-          displayCryptoAmount={displayCryptoAmount}
-          amountUserEntered={amountUserEntered}
-          calculatedUSD={calculatedUSD}
-          maxBalanceInUserCurrency={maxBalanceInUserCurrency}
-          isBuying={isBuying}
-          buySuccess={buySuccess}
-          onClose={() => {
-            setSelectedCoin(null);
-            setDisplayAmount("");
-            setDisplayCryptoAmount("");
-          }}
-          onChangeAmount={handleInputChange}
-          onChangeCryptoAmount={handleCryptoInputChange}
-          onSetMax={() => handleInputChange((maxBalanceInUserCurrency / (1 + tradeRate)).toFixed(2))}
-          onSubmit={handleBuySubmit}
-        />
-      )}
+      {selectedCoin && <BuyModal flow={flow} />}
 
       <Footer />
     </div>

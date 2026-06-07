@@ -33,6 +33,7 @@ Route::post('/password/reset', [AuthController::class, 'resetPassword'])->middle
 Route::get('/coins', [CoinsController::class, 'index']);
 Route::get('/coins/price/{symbol}', [CoinsController::class, 'getPrice']);
 Route::get('/coins/stats/{symbol}', [CoinsController::class, 'get24hStats']);
+Route::get('/coins/klines/{symbol}', [CoinsController::class, 'getKlines']);
 Route::get('/coins/{coinId}', [CoinsController::class, 'show']);
 
 // Валюты

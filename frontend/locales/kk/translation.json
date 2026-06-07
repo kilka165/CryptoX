@@ -309,8 +309,13 @@
     "actions": "Әрекеттер",
     "pageOf": "{{total}} ішінен {{page}} бет",
     "buy": "Сатып алу",
+    "sell": "Сату",
+    "trade": "Сауда",
+    "details": "Толығырақ",
     "buyError": "Сатып алу кезінде қате",
     "buyModal": {
+      "buyTab": "Сатып алу",
+      "sellTab": "Сату",
       "currentPrice": "1 {{symbol}} ағымдағы бағасы",
       "amount": "Сома ({{currency}})",
       "amountCrypto": "Саны ({{symbol}})",
@@ -320,7 +325,21 @@
       "totalDeduct": "Барлығы шегеріледі",
       "youReceive": "Сіз аласыз",
       "availableBalance": "Қолжетімді баланс",
+      "availableToSell": "Сатуға қолжетімді",
+      "totalReceive": "Барлығы алынады",
+      "holdings": "Қолжетімді: {{amount}} {{symbol}}",
+      "selling": "Сатылуда...",
       "buying": "Сатып алынуда..."
+    },
+    "chart": {
+      "range24h": "24с",
+      "range7d": "7к",
+      "range30d": "30к",
+      "range1y": "1ж",
+      "rangeAll": "Барлығы",
+      "loading": "График жүктелуде...",
+      "error": "Графикті жүктеу мүмкін болмады",
+      "noData": "Деректер жоқ"
     },
     "overview": {
       "title": "Крипто нарығына шолу",

@@ -309,8 +309,13 @@
     "actions": "Actions",
     "pageOf": "Page {{page}} of {{total}}",
     "buy": "Buy",
+    "sell": "Sell",
+    "trade": "Trade",
+    "details": "Details",
     "buyError": "Error during purchase",
     "buyModal": {
+      "buyTab": "Buy",
+      "sellTab": "Sell",
       "currentPrice": "Current price 1 {{symbol}}",
       "amount": "Amount ({{currency}})",
       "amountCrypto": "Quantity ({{symbol}})",
@@ -320,7 +325,21 @@
       "totalDeduct": "Total to deduct",
       "youReceive": "You receive",
       "availableBalance": "Available balance",
+      "availableToSell": "Available to sell",
+      "totalReceive": "Total to receive",
+      "holdings": "Available: {{amount}} {{symbol}}",
+      "selling": "Selling...",
       "buying": "Buying..."
+    },
+    "chart": {
+      "range24h": "24h",
+      "range7d": "7d",
+      "range30d": "30d",
+      "range1y": "1y",
+      "rangeAll": "All",
+      "loading": "Loading chart...",
+      "error": "Failed to load chart",
+      "noData": "No data"
     },
     "overview": {
       "title": "Crypto market overview",
