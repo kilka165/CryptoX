@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CoinPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -74,7 +75,124 @@ private function fetchBinanceCoinsList(): array
 
     usort($result, fn($a, $b) => $b['total_volume'] <=> $a['total_volume']);
 
+    // Сохраняем последние цены ВСЕХ монет (а не только топ-300) в БД.
+    // Это снимок-fallback: монета, выпавшая из топ-300, сохранит свежую
+    // цену и не обнулится в активах пользователя.
+    $this->persistPrices($result);
+
     return array_slice($result, 0, 300);
+}
+
+/**
+ * Upsert последних цен монет в таблицу coin_prices (снимок-fallback).
+ * Ошибки БД не должны ломать эндпоинт цен — логируем и продолжаем.
+ */
+private function persistPrices(array $coins): void
+{
+    if (empty($coins)) {
+        return;
+    }
+
+    try {
+        $now = now();
+        // Дедуп по coin_id: разные тикеры иногда дают один id, а Postgres
+        // ON CONFLICT не может задеть строку дважды в одном запросе. Список
+        // отсортирован по объёму ↓, поэтому unique() оставляет самый ликвидный.
+        $rows = collect($coins)
+            ->unique(fn($c) => strtolower((string) $c['id']))
+            ->map(fn($c) => [
+                'coin_id' => $c['id'],
+                'symbol' => $c['symbol'],
+                'name' => $c['name'],
+                'image' => $c['image'],
+                'price' => $c['current_price'],
+                'price_change_24h' => $c['price_change_percentage_24h'],
+                'created_at' => $now,
+                'updated_at' => $now,
+            ])
+            ->values()
+            ->all();
+
+        CoinPrice::upsert(
+            $rows,
+            ['coin_id'],
+            ['symbol', 'name', 'image', 'price', 'price_change_24h', 'updated_at']
+        );
+    } catch (\Throwable $e) {
+        \Log::warning('Failed to persist coin prices: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Цены для конкретных монет (по их id/символам), с fallback в БД.
+ *
+ * Используется страницей профиля: монеты в активах могут выпасть из
+ * живого топ-300 списка, и без fallback их цена обнулялась бы.
+ * Источник: живой список (топ-300, свежий) → последняя цена из coin_prices.
+ * Возвращает массив в том же формате, что и GET /coins.
+ */
+public function getPrices(Request $request)
+{
+    $ids = collect(explode(',', (string) $request->query('ids', '')))
+        ->map(fn($s) => strtolower(trim($s)))
+        ->filter()
+        ->unique()
+        ->take(100) // защита от слишком больших запросов
+        ->values();
+
+    if ($ids->isEmpty()) {
+        return response()->json([]);
+    }
+
+    // Прогреваем живой список (заодно обновляется снимок в БД).
+    try {
+        $coins = Cache::remember('binance_coins_list', 60, fn() => $this->fetchBinanceCoinsList());
+    } catch (\Exception $e) {
+        \Log::error('CoinsController getPrices live fetch failed: ' . $e->getMessage());
+        $coins = Cache::get('binance_coins_list', []);
+    }
+
+    $byId = collect($coins)->keyBy(fn($c) => strtolower((string) ($c['id'] ?? '')));
+    $bySymbol = collect($coins)->keyBy(fn($c) => strtolower((string) ($c['symbol'] ?? '')));
+
+    $result = [];
+    $missing = [];
+    foreach ($ids as $id) {
+        $coin = $byId->get($id) ?? $bySymbol->get($id);
+        if ($coin) {
+            $result[$id] = $coin;
+        } else {
+            $missing[] = $id;
+        }
+    }
+
+    // Для не найденных в живом списке — последняя известная цена из БД.
+    if (!empty($missing)) {
+        $rows = CoinPrice::query()
+            ->whereIn('coin_id', $missing)
+            ->orWhereIn('symbol', $missing)
+            ->get();
+
+        foreach ($rows as $row) {
+            foreach ([strtolower((string) $row->coin_id), strtolower((string) $row->symbol)] as $key) {
+                if (in_array($key, $missing, true) && !isset($result[$key])) {
+                    $result[$key] = [
+                        'id' => $row->coin_id,
+                        'symbol' => $row->symbol,
+                        'name' => $row->name ?: strtoupper((string) $row->symbol),
+                        'image' => $row->image ?? '',
+                        'current_price' => (float) $row->price,
+                        'price_change_percentage_24h' => (float) $row->price_change_24h,
+                        'market_cap' => 0,
+                        'total_volume' => 0,
+                        'stale' => true, // цена из снимка, не из живого списка
+                    ];
+                }
+            }
+        }
+    }
+
+    return response()->json(array_values($result));
 }
 
 /**

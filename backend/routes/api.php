@@ -31,6 +31,9 @@ Route::post('/password/reset', [AuthController::class, 'resetPassword'])->middle
 
 // Список монет (ПУБЛИЧНЫЕ - доступны всем!)
 Route::get('/coins', [CoinsController::class, 'index']);
+// Цены для конкретных монет с fallback в БД (для активов профиля).
+// Должен идти ДО /coins/{coinId}, иначе перехватится wildcard-роутом.
+Route::get('/coins/prices', [CoinsController::class, 'getPrices']);
 Route::get('/coins/price/{symbol}', [CoinsController::class, 'getPrice']);
 Route::get('/coins/stats/{symbol}', [CoinsController::class, 'get24hStats']);
 Route::get('/coins/klines/{symbol}', [CoinsController::class, 'getKlines']);

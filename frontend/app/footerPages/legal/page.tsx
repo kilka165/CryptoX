@@ -30,7 +30,7 @@ export default function LegalPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <a
-                href="/legal/terms"
+                href="/footerPages/terms"
                 className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
               >
                 <FileText className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1 group-hover:scale-110 transition-transform" size={28} />
@@ -45,7 +45,7 @@ export default function LegalPage() {
               </a>
 
               <a
-                href="/legal/privacy"
+                href="/footerPages/privacy"
                 className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
               >
                 <Shield className="text-green-600 dark:text-green-400 flex-shrink-0 mt-1 group-hover:scale-110 transition-transform" size={28} />
@@ -60,7 +60,7 @@ export default function LegalPage() {
               </a>
 
               <a
-                href="/legal/aml"
+                href="/footerPages/cookies"
                 className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
               >
                 <AlertCircle className="text-orange-600 dark:text-orange-400 flex-shrink-0 mt-1 group-hover:scale-110 transition-transform" size={28} />
@@ -75,7 +75,7 @@ export default function LegalPage() {
               </a>
 
               <a
-                href="/legal/risk"
+                href="/footerPages/terms"
                 className="flex items-start gap-4 p-5 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all group"
               >
                 <Scale className="text-red-600 dark:text-red-400 flex-shrink-0 mt-1 group-hover:scale-110 transition-transform" size={28} />
@@ -103,10 +103,6 @@ export default function LegalPage() {
                   <p>CryptoX</p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">{t("footerPages.legal.regNumber")}</h3>
-                  <p>88005353535</p>
-                </div>
-                <div>
                   <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">{t("footerPages.legal.legalAddress")}</h3>
                   <p>{t("footerPages.legal.legalAddressValue")}</p>
                 </div>
@@ -115,36 +111,6 @@ export default function LegalPage() {
                   <p>Crypto.x.kilka@gmail.com</p>
                 </div>
               </div>
-            </div>
-          </section>
-
-          {/* Лицензии */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              {t("footerPages.legal.licensesTitle")}
-            </h2>
-            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 rounded-xl border border-blue-200 dark:border-slate-700 p-6">
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                {t("footerPages.legal.licensesIntro")}
-              </p>
-              <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
-                  <span>{t("footerPages.legal.license1")}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
-                  <span>{t("footerPages.legal.license2")}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
-                  <span>{t("footerPages.legal.license3")}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 dark:text-blue-400 mt-0.5">•</span>
-                  <span>{t("footerPages.legal.license4")}</span>
-                </li>
-              </ul>
             </div>
           </section>
 

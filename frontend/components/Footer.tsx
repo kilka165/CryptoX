@@ -83,11 +83,11 @@ export const Footer = () => {
                     </div>
                     <div className="flex items-start gap-2">
                       <Phone className="text-green-500 mt-0.5 flex-shrink-0" size={16} />
-                      <a 
-                        href="tel:+77172000000" 
+                      <a
+                        href="tel:+77473841410"
                         className="text-slate-600 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400"
                       >
-                        +7 (7172) 00-00-00
+                        +7 (747) 384-14-10
                       </a>
                     </div>
                     <div className="flex items-start gap-2">
@@ -215,7 +215,6 @@ export const Footer = () => {
             </h4>
             <nav className="space-y-2.5">
               <FooterLink href="/footerPages/support">{t("footer.helpCenter")}</FooterLink>
-              <FooterLink href="/footerPages/chat">{t("footer.chat")}</FooterLink>
               <FooterLink href="/footerPages/fees">{t("footer.fees")}</FooterLink>
               <FooterLink href="/footerPages/security">{t("footer.security")}</FooterLink>
               <FooterLink href="/footerPages/verify">{t("footer.verify")}</FooterLink>

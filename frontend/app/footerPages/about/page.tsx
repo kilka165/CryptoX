@@ -9,10 +9,10 @@ export default function AboutPage() {
   const { t } = useTranslation();
 
   const stats = [
-    { value: "2M+", label: t("footerPages.about.statUsers"), icon: Users },
-    { value: "$50B+", label: t("footerPages.about.statVolume"), icon: TrendingUp },
-    { value: "150+", label: t("footerPages.about.statCountries"), icon: Globe },
-    { value: "500+", label: t("footerPages.about.statCryptos"), icon: Award }
+    { value: "Binance", label: t("footerPages.about.statSource"), icon: TrendingUp },
+    { value: "24/7", label: t("footerPages.about.statRealtime"), icon: Zap },
+    { value: "3", label: t("footerPages.about.statLanguages"), icon: Globe },
+    { value: "4", label: t("footerPages.about.statProducts"), icon: Award }
   ];
 
   const values = [

@@ -23,6 +23,19 @@ interface Coin24hData {
   total_volume?: number;
 }
 
+// Разобранный 24h-тикер Binance (числа вместо строк) для страницы монеты.
+export interface Ticker24h {
+  high: number;
+  low: number;
+  open: number;
+  weightedAvg: number;
+  priceChange: number;
+  priceChangePercent: number;
+  volume: number; // объём в самой монете (base)
+  quoteVolume: number; // объём в USDT (quote)
+  trades: number; // число сделок (count)
+}
+
 // Кэш на уровне модуля: get24hPrices вызывается многими методами ниже, без
 // него каждый делал бы отдельный полный запрос /coins. TTL синхронен с
 // бэкенд-кэшем; coinsInFlight дедуплицирует параллельные вызовы.
@@ -60,6 +73,26 @@ export const BinanceAPI = {
       });
 
     return coinsInFlight;
+  },
+
+  /**
+   * Получает цены для конкретных монет (по их id) с fallback в БД.
+   * Нужен для активов профиля: монета может выпасть из живого топ-300
+   * списка, тогда бэкенд отдаёт последнюю известную цену из снимка.
+   */
+  async getAssetPrices(ids: string[]): Promise<Coin24hData[]> {
+    const unique = Array.from(new Set(ids.map((s) => s.toLowerCase()).filter(Boolean)));
+    if (unique.length === 0) return [];
+
+    try {
+      const response = await axios.get(`${API_BASE}/coins/prices`, {
+        params: { ids: unique.join(',') },
+      });
+      return response.data as Coin24hData[];
+    } catch (error: any) {
+      console.error('Error fetching asset prices:', error.message);
+      return [];
+    }
   },
 
   /**
@@ -101,6 +134,31 @@ export const BinanceAPI = {
     } catch (error: any) {
       console.error(`Error fetching 24h change for ${symbol}:`, error.message);
       return 0;
+    }
+  },
+
+  /**
+   * Получает полную статистику за 24 часа (high/low/open/объёмы/число сделок).
+   * Источник — тот же эндпоинт, что и get24hChange, но возвращаем все нужные поля.
+   */
+  async get24hStats(symbol: string): Promise<Ticker24h | null> {
+    try {
+      const response = await axios.get(`${API_BASE}/coins/stats/${symbol.toLowerCase()}`);
+      const d = response.data ?? {};
+      return {
+        high: parseFloat(d.highPrice),
+        low: parseFloat(d.lowPrice),
+        open: parseFloat(d.openPrice),
+        weightedAvg: parseFloat(d.weightedAvgPrice),
+        priceChange: parseFloat(d.priceChange),
+        priceChangePercent: parseFloat(d.priceChangePercent),
+        volume: parseFloat(d.volume),
+        quoteVolume: parseFloat(d.quoteVolume),
+        trades: Number(d.count ?? 0),
+      };
+    } catch (error: any) {
+      console.error(`Error fetching 24h stats for ${symbol}:`, error.message);
+      return null;
     }
   },
 

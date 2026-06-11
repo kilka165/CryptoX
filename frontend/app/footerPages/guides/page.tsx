@@ -1,84 +1,41 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { BookOpen, TrendingUp, Shield, Wallet, ArrowRight, Clock, User } from "lucide-react";
+import { BookOpen, ArrowRight, Clock, User } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
+import { guidesMeta, colorMap } from "@/lib/guidesContent";
 
 export default function GuidesPage() {
   const { t } = useTranslation();
 
-  const guides = [
-    {
-      id: 1,
-      title: t("footerPages.guides.g1Title"),
-      description: t("footerPages.guides.g1Desc"),
-      category: t("footerPages.guides.catBeginner"),
-      readTime: t("footerPages.guides.minutes", { n: 10 }),
-      author: t("footerPages.guides.author"),
-      icon: TrendingUp,
-      color: "blue"
-    },
-    {
-      id: 2,
-      title: t("footerPages.guides.g2Title"),
-      description: t("footerPages.guides.g2Desc"),
-      category: t("footerPages.guides.catSecurity"),
-      readTime: t("footerPages.guides.minutes", { n: 8 }),
-      author: t("footerPages.guides.author"),
-      icon: Shield,
-      color: "green"
-    },
-    {
-      id: 3,
-      title: t("footerPages.guides.g3Title"),
-      description: t("footerPages.guides.g3Desc"),
-      category: t("footerPages.guides.catAdvanced"),
-      readTime: t("footerPages.guides.minutes", { n: 15 }),
-      author: t("footerPages.guides.author"),
-      icon: TrendingUp,
-      color: "purple"
-    },
-    {
-      id: 4,
-      title: t("footerPages.guides.g4Title"),
-      description: t("footerPages.guides.g4Desc"),
-      category: t("footerPages.guides.catBeginner"),
-      readTime: t("footerPages.guides.minutes", { n: 7 }),
-      author: t("footerPages.guides.author"),
-      icon: Wallet,
-      color: "yellow"
-    },
-    {
-      id: 5,
-      title: t("footerPages.guides.g5Title"),
-      description: t("footerPages.guides.g5Desc"),
-      category: t("footerPages.guides.catIntermediate"),
-      readTime: t("footerPages.guides.minutes", { n: 12 }),
-      author: t("footerPages.guides.author"),
-      icon: TrendingUp,
-      color: "red"
-    },
-    {
-      id: 6,
-      title: t("footerPages.guides.g6Title"),
-      description: t("footerPages.guides.g6Desc"),
-      category: t("footerPages.guides.catAdvanced"),
-      readTime: t("footerPages.guides.minutes", { n: 13 }),
-      author: t("footerPages.guides.author"),
-      icon: Shield,
-      color: "orange"
-    }
-  ];
+  const guides = guidesMeta.map((meta) => ({
+    id: meta.id,
+    title: t(meta.titleKey),
+    description: t(meta.descKey),
+    category: t(meta.categoryKey),
+    readTime: t("footerPages.guides.minutes", { n: meta.minutes }),
+    author: t("footerPages.guides.author"),
+    icon: meta.icon,
+    color: meta.color,
+  }));
+
+  const allCat = t("footerPages.guides.catAll");
+  const [selectedCategory, setSelectedCategory] = useState(allCat);
 
   const categories = [
-    t("footerPages.guides.catAll"),
+    allCat,
     t("footerPages.guides.catBeginner"),
     t("footerPages.guides.catIntermediate"),
     t("footerPages.guides.catAdvanced"),
     t("footerPages.guides.catSecurity")
   ];
+
+  const filteredGuides = selectedCategory === allCat
+    ? guides
+    : guides.filter((guide) => guide.category === selectedCategory);
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#0d0d0d]">
@@ -103,7 +60,13 @@ export default function GuidesPage() {
             {categories.map((category) => (
               <button
                 key={category}
-                className="px-6 py-2.5 rounded-lg bg-slate-100 dark:bg-[#131416] text-slate-700 dark:text-slate-300 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-all duration-200 font-medium"
+                type="button"
+                onClick={() => setSelectedCategory(category)}
+                className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                  selectedCategory === category
+                    ? "bg-blue-600 text-white"
+                    : "bg-slate-100 dark:bg-[#131416] text-slate-700 dark:text-slate-300 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600"
+                }`}
               >
                 {category}
               </button>
@@ -113,21 +76,22 @@ export default function GuidesPage() {
 
         {/* Сетка гайдов */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {guides.map((guide) => {
+          {filteredGuides.map((guide) => {
             const Icon = guide.icon;
+            const c = colorMap[guide.color];
             return (
               <Link
                 key={guide.id}
-                href={`/guides/${guide.id}`}
+                href={`/footerPages/guides/${guide.id}`}
                 className="group bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 hover:shadow-lg overflow-hidden"
               >
                 <div className="p-6">
                   {/* Иконка и категория */}
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`p-3 rounded-lg bg-${guide.color}-100 dark:bg-${guide.color}-900/30`}>
-                      <Icon className={`text-${guide.color}-600`} size={24} />
+                    <div className={`p-3 rounded-lg ${c.box}`}>
+                      <Icon className={c.icon} size={24} />
                     </div>
-                    <span className={`text-xs font-semibold px-3 py-1 rounded-full bg-${guide.color}-100 dark:bg-${guide.color}-900/30 text-${guide.color}-700 dark:text-${guide.color}-400`}>
+                    <span className={`text-xs font-semibold px-3 py-1 rounded-full ${c.badge}`}>
                       {guide.category}
                     </span>
                   </div>
@@ -171,7 +135,7 @@ export default function GuidesPage() {
             {t("footerPages.guides.notFoundText")}
           </p>
           <Link
-            href="/support"
+            href="/footerPages/support"
             className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
           >
             {t("footer.contactUs")}

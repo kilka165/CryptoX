@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Search, Star } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { TrendingUp, TrendingDown, Search, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { CoinIcon } from "@/components/market/CoinIcon";
+import { Pagination } from "@/components/market/Pagination";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
@@ -20,11 +22,18 @@ interface CryptoPrice {
   total_volume: number;
 }
 
+type SortKey = "name" | "current_price" | "price_change_percentage_24h" | "market_cap" | "total_volume";
+
 export default function PricesPage() {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
   const [cryptos, setCryptos] = useState<CryptoPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const perPage = 10;
 
   useEffect(() => {
     fetchCryptoPrices();
@@ -51,11 +60,58 @@ export default function PricesPage() {
     }
   };
 
-  const filteredCryptos = cryptos.filter(
-    (crypto) =>
-      crypto.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      crypto.symbol.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCryptos = useMemo(
+    () =>
+      cryptos.filter(
+        (crypto) =>
+          crypto.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          crypto.symbol.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    [cryptos, searchTerm]
   );
+
+  // Сортировка в три такта: убывание → возрастание → сброс.
+  const handleSort = (key: SortKey) => {
+    if (sortKey !== key) {
+      setSortKey(key);
+      setSortDir("desc");
+    } else if (sortDir === "desc") {
+      setSortDir("asc");
+    } else {
+      setSortKey(null);
+      setSortDir("desc");
+    }
+  };
+
+  const sortedCryptos = useMemo(() => {
+    if (!sortKey) return filteredCryptos;
+    return [...filteredCryptos].sort((a, b) => {
+      if (sortKey === "name") {
+        const cmp = a.name.localeCompare(b.name);
+        return sortDir === "desc" ? -cmp : cmp;
+      }
+      const av = a[sortKey] ?? 0;
+      const bv = b[sortKey] ?? 0;
+      return sortDir === "desc" ? bv - av : av - bv;
+    });
+  }, [filteredCryptos, sortKey, sortDir]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedCryptos.length / perPage));
+  const paginatedCryptos = sortedCryptos.slice((currentPage - 1) * perPage, currentPage * perPage);
+
+  // Сбрасываем страницу при поиске/смене сортировки.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortKey, sortDir]);
+
+  const sortIcon = (key: SortKey) =>
+    sortKey !== key ? (
+      <ChevronsUpDown className="w-3.5 h-3.5 opacity-40" />
+    ) : sortDir === "desc" ? (
+      <ChevronDown className="w-3.5 h-3.5" />
+    ) : (
+      <ChevronUp className="w-3.5 h-3.5" />
+    );
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat(intlLocale(i18n.language), {
@@ -109,6 +165,7 @@ export default function PricesPage() {
             <p className="mt-4 text-slate-600 dark:text-slate-400">{t("footerPages.prices.loadingData")}</p>
           </div>
         ) : (
+          <>
           <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -118,30 +175,61 @@ export default function PricesPage() {
                       #
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                      {t("footerPages.prices.colName")}
+                      <button
+                        onClick={() => handleSort("name")}
+                        className="inline-flex items-center gap-1 hover:text-slate-900 dark:hover:text-slate-200 transition-colors uppercase tracking-wider"
+                      >
+                        {t("footerPages.prices.colName")}
+                        {sortIcon("name")}
+                      </button>
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                      {t("market.price")}
+                      <button
+                        onClick={() => handleSort("current_price")}
+                        className="inline-flex items-center gap-1 hover:text-slate-900 dark:hover:text-slate-200 transition-colors uppercase tracking-wider"
+                      >
+                        {t("market.price")}
+                        {sortIcon("current_price")}
+                      </button>
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                      {t("footerPages.prices.col24h")}
+                      <button
+                        onClick={() => handleSort("price_change_percentage_24h")}
+                        className="inline-flex items-center gap-1 hover:text-slate-900 dark:hover:text-slate-200 transition-colors uppercase tracking-wider"
+                      >
+                        {t("footerPages.prices.col24h")}
+                        {sortIcon("price_change_percentage_24h")}
+                      </button>
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                      {t("market.marketCap")}
+                      <button
+                        onClick={() => handleSort("market_cap")}
+                        className="inline-flex items-center gap-1 hover:text-slate-900 dark:hover:text-slate-200 transition-colors uppercase tracking-wider"
+                      >
+                        {t("market.marketCap")}
+                        {sortIcon("market_cap")}
+                      </button>
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                      {t("footerPages.prices.colVolume")}
+                      <button
+                        onClick={() => handleSort("total_volume")}
+                        className="inline-flex items-center gap-1 hover:text-slate-900 dark:hover:text-slate-200 transition-colors uppercase tracking-wider"
+                      >
+                        {t("footerPages.prices.colVolume")}
+                        {sortIcon("total_volume")}
+                      </button>
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                  {filteredCryptos.map((crypto, index) => (
+                  {paginatedCryptos.map((crypto, index) => (
                     <tr
                       key={crypto.id}
+                      onClick={() => router.push(`/market/${crypto.id}`)}
                       className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400">
-                        {index + 1}
+                        {(currentPage - 1) * perPage + index + 1}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
@@ -183,10 +271,27 @@ export default function PricesPage() {
                       </td>
                     </tr>
                   ))}
+                  {paginatedCryptos.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-16 text-center text-slate-500 dark:text-slate-400">
+                        {t("common.notFound")}
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
+
+          {/* Пагинация */}
+          <div className="flex justify-center py-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onChange={(p) => setCurrentPage(p)}
+            />
+          </div>
+          </>
         )}
       </div>
         <Footer />

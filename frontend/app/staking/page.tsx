@@ -19,7 +19,7 @@ export default function StakingPage() {
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<StakingPlan | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"plans" | "positions">("plans");
+  const [activeTab, setActiveTab] = useState<"plans" | "active" | "completed">("plans");
 
   // Состояния для диалога подтверждения
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -192,7 +192,9 @@ export default function StakingPage() {
     .filter((p) => p.status === "active")
     .reduce((sum, p) => sum + p.earned_rewards, 0);
 
-  const activePositions = positions.filter((p) => p.status === "active").length;
+  const activePositionsList = positions.filter((p) => p.status === "active");
+  const completedPositions = positions.filter((p) => p.status !== "active");
+  const activePositions = activePositionsList.length;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0d0d0d] text-slate-900 dark:text-white transition-colors">
@@ -274,17 +276,32 @@ export default function StakingPage() {
             {t("staking.tabPlans")}
           </button>
           <button
-            onClick={() => setActiveTab("positions")}
+            onClick={() => setActiveTab("active")}
             className={`px-6 py-3 font-medium transition-colors border-b-2 ${
-              activeTab === "positions"
+              activeTab === "active"
                 ? "border-blue-600 text-blue-600 dark:text-blue-400"
                 : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
             }`}
           >
-            {t("staking.tabPositions")}
+            {t("staking.tabActive")}
             {activePositions > 0 && (
               <span className="ml-2 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs rounded-full">
                 {activePositions}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab("completed")}
+            className={`px-6 py-3 font-medium transition-colors border-b-2 ${
+              activeTab === "completed"
+                ? "border-blue-600 text-blue-600 dark:text-blue-400"
+                : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+            }`}
+          >
+            {t("staking.tabCompleted")}
+            {completedPositions.length > 0 && (
+              <span className="ml-2 px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded-full">
+                {completedPositions.length}
               </span>
             )}
           </button>
@@ -310,9 +327,9 @@ export default function StakingPage() {
               />
             ))}
           </div>
-        ) : positions.length > 0 ? (
+        ) : (activeTab === "active" ? activePositionsList : completedPositions).length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {positions.map((position) => (
+            {(activeTab === "active" ? activePositionsList : completedPositions).map((position) => (
               <StakingPositionCard
                 key={position.id}
                 position={position}

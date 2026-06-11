@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, HelpCircle, MessageCircle, Mail, Phone, ChevronDown, ChevronUp } from "lucide-react";
-import Link from "next/link";
+import { Search, HelpCircle, Mail, Phone, ChevronDown, ChevronUp } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
@@ -92,18 +91,7 @@ export default function SupportPage() {
           </div>
 
           {/* Быстрые ссылки */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <Link
-              href="/footerPages/chat"
-              className="flex items-center gap-3 p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-slate-900 dark:to-slate-800 rounded-lg border border-blue-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-all group"
-            >
-              <MessageCircle className="text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" size={28} />
-              <div>
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">{t("footerPages.support.chatTitle")}</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400">{t("footerPages.support.chatSubtitle")}</p>
-              </div>
-            </Link>
-
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <a
               href="mailto:crypto.x.kilka@gmail.com"
               className="flex items-center gap-3 p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-slate-900 dark:to-slate-800 rounded-lg border border-green-200 dark:border-slate-700 hover:border-green-400 dark:hover:border-green-500 transition-all group"
@@ -116,13 +104,13 @@ export default function SupportPage() {
             </a>
 
             <a
-              href="tel:+77172000000"
+              href="tel:+77473841410"
               className="flex items-center gap-3 p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-slate-900 dark:to-slate-800 rounded-lg border border-purple-200 dark:border-slate-700 hover:border-purple-400 dark:hover:border-purple-500 transition-all group"
             >
               <Phone className="text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform" size={28} />
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">{t("footerPages.support.phoneTitle")}</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400">+7 (7172) 00-00-00</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400">+7 (747) 384-14-10</p>
               </div>
             </a>
           </div>
@@ -208,13 +196,6 @@ export default function SupportPage() {
               {t("footerPages.support.ctaSubtitle")}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/footerPages/chat"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors text-base"
-              >
-                <MessageCircle size={22} />
-                {t("footerPages.support.openChat")}
-              </Link>
               <a
                 href="mailto:crypto.x.kilka@gmail.com"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-2 border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-lg font-semibold transition-colors text-base"

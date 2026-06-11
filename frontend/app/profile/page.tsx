@@ -13,8 +13,10 @@ import { BalanceCard } from "@/components/profile/BalanceCard";
 import { PortfolioValue } from "@/components/profile/PortfolioValue";
 import { AssetsTable } from "@/components/profile/AssetsTable";
 import { TransactionHistory } from "@/components/profile/TransactionHistory";
-import { SellModal } from "@/components/profile/SellModal";
+import { BuyModal } from "@/components/market/BuyModal";
 import { Footer } from "@/components/Footer";
+import { useBuyFlow } from "@/hooks/useBuyFlow";
+import { Coin } from "@/types/coin";
 
 // Типы
 interface Asset {
@@ -46,6 +48,9 @@ interface BinanceTicker {
   // Правильный символ и картинка сопоставленной монеты (у активов символы бывают «битые»)
   coinSymbol: string;
   image: string;
+  // id и отображаемое имя монеты — для открытия торговой модалки.
+  coinId: string;
+  coinName: string;
 }
 
 interface EnrichedAsset extends Asset {
@@ -54,6 +59,7 @@ interface EnrichedAsset extends Asset {
   currentPriceUSD: number;
   iconSymbol?: string;
   iconSrc?: string;
+  coinName?: string;
 }
 
 export default function ProfilePage() {
@@ -62,7 +68,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [prices, setPrices] = useState<Record<string, BinanceTicker>>({});
   const [pricesLoading, setPricesLoading] = useState(true);
-  const [selectedAsset, setSelectedAsset] = useState<EnrichedAsset | null>(null);
+  const flow = useBuyFlow();
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -86,7 +92,10 @@ export default function ProfilePage() {
 
     const loadPrices = async () => {
       try {
-        const coins = await BinanceAPI.get24hPrices();
+        // Грузим цены строго по активам пользователя (id монеты хранится в
+        // asset.name). Эндпоинт делает fallback в БД, если монета выпала из
+        // живого топ-300 списка — иначе её цена обнулялась бы.
+        const coins = await BinanceAPI.getAssetPrices(assets.map((a) => a.name));
         if (!active) return;
 
         const priceMap: Record<string, BinanceTicker> = {};
@@ -107,6 +116,8 @@ export default function ProfilePage() {
               priceChangePercent: String(coin.price_change_percentage_24h ?? 0),
               coinSymbol: coin.symbol,
               image: coin.image,
+              coinId: coin.id,
+              coinName: coin.name,
             };
           }
         });
@@ -144,6 +155,14 @@ export default function ProfilePage() {
       });
   };
 
+  // После успешной сделки в модалке обновляем профиль (баланс и активы).
+  useEffect(() => {
+    if (!flow.buySuccess && !flow.sellSuccess) return;
+    const token = localStorage.getItem("auth_token");
+    if (token) loadUserData(token);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flow.buySuccess, flow.sellSuccess]);
+
   const handleLogout = () => {
     clearAuthToken();
     window.location.href = "/login";
@@ -163,8 +182,26 @@ export default function ProfilePage() {
         currentPriceUSD,
         iconSymbol: ticker?.coinSymbol,
         iconSrc: ticker?.image,
+        coinName: ticker?.coinName,
       };
     }) || [];
+
+  // Открытие торговой модалки (та же, что на рынке) на вкладке «Продажа».
+  // Цена обязательна — без неё график/расчёты бессмысленны.
+  const handleTrade = (asset: EnrichedAsset) => {
+    if (!asset.currentPriceUSD) return;
+    const coin: Coin = {
+      id: asset.name, // name актива равен Coin.id
+      symbol: asset.iconSymbol ?? asset.symbol,
+      name: asset.coinName ?? asset.name,
+      image: asset.iconSrc ?? "",
+      current_price: asset.currentPriceUSD,
+      price_change_percentage_24h: asset.change24h,
+      market_cap: 0,
+      total_volume: 0,
+    };
+    flow.openSell(coin);
+  };
 
   const totalPortfolioUSD = assetsList.reduce(
     (sum, asset) => sum + asset.valueUSD,
@@ -217,7 +254,7 @@ export default function ProfilePage() {
               <AssetsTable
                 assets={assetsList}
                 userCurrency={userCurrency}
-                onSellClick={(asset) => setSelectedAsset(asset as EnrichedAsset)}
+                onTradeClick={(asset) => handleTrade(asset as EnrichedAsset)}
               />
             )}
           </div>
@@ -229,15 +266,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <SellModal
-        selectedAsset={selectedAsset}
-        onClose={() => setSelectedAsset(null)}
-        userCurrency={userCurrency}
-        onSellSuccess={() => {
-          const token = localStorage.getItem("auth_token");
-          if (token) loadUserData(token);
-        }}
-      />
+      {flow.selectedCoin && <BuyModal flow={flow} />}
 
       <Footer />
     </div>

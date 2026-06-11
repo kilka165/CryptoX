@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "next-themes";
 import { BinanceAPI } from "@/lib/api/binance";
 import { formatNumber } from "@/lib/format";
-import { ChartRange } from "@/types/coin";
+import { ChartRange, Candle } from "@/types/coin";
 
 const RANGES: { key: ChartRange; labelKey: string }[] = [
   { key: "24h", labelKey: "market.chart.range24h" },
@@ -65,6 +65,8 @@ interface PriceChartProps {
   priceMultiplier?: number;
   /** Символ валюты для подписей оси цены. */
   currencySymbol?: string;
+  /** Сообщает наверх загруженные свечи (в USD) и выбранный диапазон — для статистики. */
+  onData?: (candles: Candle[], range: ChartRange) => void;
 }
 
 // Свечной график цены монеты (Binance klines через бэкенд). Переиспользуется
@@ -75,6 +77,7 @@ export function PriceChart({
   height = 320,
   priceMultiplier = 1,
   currencySymbol = "",
+  onData,
 }: PriceChartProps) {
   const { t } = useTranslation();
   const { resolvedTheme } = useTheme();
@@ -83,6 +86,12 @@ export function PriceChart({
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+
+  // Свежий колбэк без перезапуска эффекта загрузки.
+  const onDataRef = useRef(onData);
+  useEffect(() => {
+    onDataRef.current = onData;
+  });
 
   const [range, setRange] = useState<ChartRange>(defaultRange);
   const [status, setStatus] = useState<"loading" | "ready" | "empty" | "error">("loading");
@@ -141,6 +150,7 @@ export function PriceChart({
     BinanceAPI.getKlines(symbol, range)
       .then((candles) => {
         if (!active) return;
+        onDataRef.current?.(candles, range);
         const series = seriesRef.current;
         if (!series) return;
         if (!candles.length) {

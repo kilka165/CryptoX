@@ -151,7 +151,7 @@ export default function PrivacyPage() {
                 ))}
               </ul>
               <p className="text-slate-600 dark:text-slate-400 mt-3">
-                {t("footerPages.privacy.s5contactPre")}<strong>privacy@cryptox.com</strong>
+                {t("footerPages.privacy.s5contactPre")}<strong>crypto.x.kilka@gmail.com</strong>
               </p>
             </div>
           </section>

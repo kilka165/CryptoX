@@ -1,19 +1,12 @@
 "use client";
 
-import { Bug, DollarSign, Mail, AlertCircle } from "lucide-react";
+import { Bug, Mail, AlertCircle } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 
 export default function BugBountyPage() {
   const { t } = useTranslation();
-
-  const rewards = [
-    { severity: t("footerPages.bugBounty.sevCritical"), reward: "$5,000 - $10,000", color: "red" },
-    { severity: t("footerPages.bugBounty.sevHigh"), reward: "$1,000 - $5,000", color: "orange" },
-    { severity: t("footerPages.bugBounty.sevMedium"), reward: "$500 - $1,000", color: "yellow" },
-    { severity: t("footerPages.bugBounty.sevLow"), reward: "$100 - $500", color: "blue" }
-  ];
 
   return (
     <>
@@ -23,7 +16,7 @@ export default function BugBountyPage() {
         <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white py-16">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <Bug className="mx-auto mb-4" size={48} />
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Bug Bounty Program</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t("footerPages.bugBounty.title")}</h1>
             <p className="text-xl text-green-100">
               {t("footerPages.bugBounty.subtitle")}
             </p>
@@ -39,34 +32,6 @@ export default function BugBountyPage() {
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
               {t("footerPages.bugBounty.whatText")}
             </p>
-          </section>
-
-          {/* Вознаграждения */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-              {t("footerPages.bugBounty.rewardsTitle")}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {rewards.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-6 bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800"
-                >
-                  <div>
-                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold bg-${item.color}-100 dark:bg-${item.color}-900/30 text-${item.color}-700 dark:text-${item.color}-400 mb-2`}>
-                      {item.severity}
-                    </span>
-                    <div className="text-sm text-slate-500 dark:text-slate-500">{t("footerPages.bugBounty.vulnerability")}</div>
-                  </div>
-                  <div className="text-right">
-                    <DollarSign className="inline-block text-green-600 dark:text-green-400 mb-1" size={20} />
-                    <div className="text-xl font-bold text-green-600 dark:text-green-400">
-                      {item.reward}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </section>
 
           {/* Примеры уязвимостей */}

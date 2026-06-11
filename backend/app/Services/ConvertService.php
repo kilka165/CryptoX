@@ -108,6 +108,17 @@ class ConvertService
             }
         }
 
+        // Fallback: монета выпала из живого топ-300 списка — берём последнюю
+        // известную цену из снимка БД, иначе свопы такой монеты считались бы по 0.
+        if ($priceUsd <= 0) {
+            $row = \App\Models\CoinPrice::where('coin_id', $needle)
+                ->orWhere('symbol', $needle)
+                ->first();
+            if ($row) {
+                $priceUsd = (float) $row->price;
+            }
+        }
+
         if ($priceUsd <= 0 || strtoupper($currency) === 'USD') {
             return $priceUsd;
         }

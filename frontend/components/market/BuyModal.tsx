@@ -83,7 +83,7 @@ export function BuyModal({ flow }: BuyModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-2xl w-full max-w-2xl border border-slate-300 dark:border-slate-800 max-h-[90vh] flex flex-col">
+      <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-2xl w-full max-w-2xl border border-slate-300 dark:border-slate-800 max-h-[95vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-300 dark:border-slate-800 shrink-0">
           <h2 className="text-xl font-bold">
             {coin.name} ({coin.symbol.toUpperCase()})
@@ -242,6 +242,15 @@ export function BuyModal({ flow }: BuyModalProps) {
                   <span className="font-semibold text-green-600">{currencySymbol}{fmt(sellNetInCurrency)}</span>
                 </div>
               </div>
+
+              {sellCryptoNum > ownedAmount && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm text-red-700 dark:text-red-400">
+                  {t("market.buyModal.insufficientCrypto", {
+                    symbol: coin.symbol.toUpperCase(),
+                    amount: ownedAmount.toLocaleString(undefined, { maximumFractionDigits: 8 }),
+                  })}
+                </div>
+              )}
 
               <button type="submit" disabled={!canSell || isSelling} className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
                 {sellSuccess ? (

@@ -73,33 +73,6 @@ export default function CookiesPage() {
                 </ul>
               </div>
 
-              <div className="bg-purple-50 dark:bg-[#131416] rounded-lg p-5 border border-purple-200 dark:border-slate-700">
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-2">
-                  {t("footerPages.cookies.type3Title")}
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
-                  {t("footerPages.cookies.type3Desc")}
-                </p>
-                <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
-                  <li>{t("footerPages.cookies.type3i1")}</li>
-                  <li>{t("footerPages.cookies.type3i2")}</li>
-                  <li>{t("footerPages.cookies.type3i3")}</li>
-                </ul>
-              </div>
-
-              <div className="bg-orange-50 dark:bg-[#131416] rounded-lg p-5 border border-orange-200 dark:border-slate-700">
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-2">
-                  {t("footerPages.cookies.type4Title")}
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
-                  {t("footerPages.cookies.type4Desc")}
-                </p>
-                <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
-                  <li>{t("footerPages.cookies.type4i1")}</li>
-                  <li>{t("footerPages.cookies.type4i2")}</li>
-                  <li>{t("footerPages.cookies.type4i3")}</li>
-                </ul>
-              </div>
             </div>
           </section>
 
@@ -129,12 +102,6 @@ export default function CookiesPage() {
                   </thead>
                   <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                     <tr className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                      <td className="px-4 py-3 font-mono text-xs">session_id</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.tNecessary")}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.durSession")}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.purpose1")}</td>
-                    </tr>
-                    <tr className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                       <td className="px-4 py-3 font-mono text-xs">auth_token</td>
                       <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.tNecessary")}</td>
                       <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.dur7days")}</td>
@@ -151,12 +118,6 @@ export default function CookiesPage() {
                       <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.tFunctional")}</td>
                       <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.dur1year")}</td>
                       <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.purpose4")}</td>
-                    </tr>
-                    <tr className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                      <td className="px-4 py-3 font-mono text-xs">_ga</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.tAnalytics")}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.dur2years")}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.purpose5")}</td>
                     </tr>
                   </tbody>
                 </table>
