@@ -1,273 +1,250 @@
-# CryptoX 🚀
+# CryptoX
 
-Современная платформа для обмена криптовалют, построенная на стеке **Laravel (Backend)** и **Next.js (Frontend)**. Приложение позволяет пользователям регистрироваться, управлять своим кошельком, просматривать курсы валют в реальном времени и совершать сделки по покупке и продаже криптоактивов.
+Учебная платформа для обмена криптовалют на стеке **Laravel (Backend)** и **Next.js (Frontend)**. Пользователи регистрируются с подтверждением e-mail, управляют кошельком и активами, смотрят курсы и графики в реальном времени, торгуют, конвертируют, стейкают и обмениваются через P2P. Интерфейс адаптивный, с тёмной/светлой темой и поддержкой трёх языков (русский, английский, казахский).
 
-## 📋 Основные возможности
+## Основные возможности
 
-- 🔐 **Аутентификация**: Безопасная регистрация и вход пользователей (Laravel Sanctum)
-- 💰 **Кошелек**: Просмотр баланса в фиатной валюте и криптовалютах
-- 📈 **Торговля**:
-  - Покупка криптовалюты по текущему курсу
-  - Продажа активов с мгновенным зачислением средств
-  - Валидация баланса и защита от ошибочных транзакций
-- 📊 **Портфолио**: Отображение списка активов пользователя с их текущей стоимостью
-- 📜 **История транзакций**: Полный лог операций (покупки, продажи, депозиты)
-- 🎨 **UI/UX**: Адаптивный интерфейс с поддержкой темной/светлой темы (Tailwind CSS)
-- 🔄 **Реальные данные**: Интеграция с Binance API для актуальных курсов
+- **Аутентификация и безопасность**
+  - Регистрация с подтверждением e-mail по 6-значному коду
+  - Вход с поддержкой двухфакторной аутентификации (TOTP, Google Authenticator)
+  - Восстановление пароля по коду на e-mail, смена пароля из настроек
+  - Токены Laravel Sanctum (Bearer), троттлинг на чувствительных эндпоинтах
+- **Кошелёк**: баланс в выбранной фиатной валюте, пополнение и вывод средств
+- **Торговля**: покупка и продажа криптовалюты по текущему курсу с валидацией баланса
+- **Конвертация (Swap)**: обмен одного актива на другой, в том числе мульти-своп
+- **P2P**: создание объявлений, сделки между пользователями, подтверждение и отмена
+- **Стейкинг**: гибкие и фиксированные планы, просмотр и закрытие позиций
+- **Портфолио и история**: список активов с текущей стоимостью, полный лог операций и статистика
+- **Рынок**: список монет, страница монеты, графики цен (свечи) и статистика за 24 часа
+- **Мультивалютность**: отображение стоимости в разных фиатных валютах по актуальным курсам
+- **Комиссии**: прозрачная комиссия 1% на сделки и вывод (рассчитывается на бэкенде)
+- **Профиль**: загрузка и редактирование аватара, пользовательские настройки
+- **Локализация**: русский, английский, казахский (react-i18next)
+- **Темы**: тёмная и светлая (next-themes)
 
-## 🛠 Технический стек
+## Технический стек
 
 ### Backend (API)
-- **PHP**: 8.3+
-- **Framework**: Laravel 10/11
-- **Database**: MySQL
+- **PHP**: 8.2+ (на проде зафиксирован 8.4, см. `backend/Dockerfile`)
+- **Framework**: Laravel 12
+- **База данных**: PostgreSQL
 - **Auth**: Laravel Sanctum
-- **API**: RESTful API
-- **Интеграции**: Binance API
+- **2FA**: pragmarx/google2fa
+- **API**: RESTful
 
 ### Frontend (Client)
-- **Framework**: Next.js (React)
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **HTTP Client**: Axios
-- **State Management**: React Hooks
-- **TypeScript**: Для типизации и безопасности кода
+- **Framework**: Next.js 16 (App Router), React 19
+- **Язык**: TypeScript
+- **Стили**: Tailwind CSS 4
+- **Графики**: lightweight-charts
+- **Иконки**: Lucide React
+- **HTTP-клиент**: Axios
+- **Локализация**: i18next / react-i18next
+- **Темы**: next-themes
+- **QR для 2FA**: qrcode.react
 
 ---
 
-## 🚀 Установка и запуск
-
-Следуйте этим инструкциям, чтобы запустить проект локально.
+## Установка и запуск
 
 ### Предварительные требования
-
-- PHP >= 8.3
+- PHP >= 8.2
 - Composer
 - Node.js >= 18
-- MySQL
+- PostgreSQL
 - Git
 
-### 1. Настройка Backend (Laravel)
+### 1. Backend (Laravel)
 
-Клонируйте репозиторий
-git clone https://github.com/kilka165/CryptoX.git
-cd CryptoX/backend
+Клонируйте репозиторий:
 
-Установите зависимости
-composer install
+    git clone https://github.com/kilka165/CryptoX.git
+    cd CryptoX/backend
 
-Создайте файл окружения
-cp .env.example .env
+Установите зависимости:
 
-Сгенерируйте ключ приложения
-php artisan key:generate
+    composer install
 
-Настройте базу данных в .env файле
-DB_DATABASE=crypto_exchange
-DB_USERNAME=root
-DB_PASSWORD=
+Создайте файл окружения и сгенерируйте ключ:
 
-Запустите миграции
-php artisan migrate
+    cp .env.example .env
+    php artisan key:generate
 
-(Опционально) Заполните базу тестовыми данными
-php artisan db:seed
+Настройте подключение к PostgreSQL в `.env`:
 
-Запустите локальный сервер
-php artisan serve
+    DB_CONNECTION=pgsql
+    DB_HOST=127.0.0.1
+    DB_PORT=5432
+    DB_DATABASE=cryptox
+    DB_USERNAME=postgres
+    DB_PASSWORD=
 
-Backend будет доступен по адресу: `http://127.0.0.1:8000`
+Примените миграции (и при необходимости заполните тестовыми данными):
 
-### 2. Настройка Frontend (Next.js)
+    php artisan migrate
+    php artisan db:seed
 
+Запустите сервер:
 
-Откройте новый терминал и перейдите в папку frontend
-cd CryptoX/frontend
+    php artisan serve
 
-Установите зависимости
-npm install
-или
-yarn install
+Backend будет доступен по адресу `http://127.0.0.1:8000`.
 
-Создайте файл .env.local (если требуется) и укажите API URL
-NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api
+> Отправка кодов на e-mail по умолчанию пишется в лог (`MAIL_MAILER=log`). Для реальной отправки настройте SMTP в `.env` (пример с Gmail SMTP есть в `.env.example`).
 
-Запустите режим разработки
-npm run dev
-или
-yarn dev
+### 2. Frontend (Next.js)
 
-Frontend будет доступен по адресу: `http://localhost:3000`
+В новом терминале:
 
----
+    cd CryptoX/frontend
 
-## 📊 Структура базы данных
+Установите зависимости:
 
-Проект использует следующие основные таблицы:
+    npm install
 
-- `users` - Данные пользователей (email, password, timestamps)
-- `wallets` - Фиатный баланс пользователя (user_id, balance)
-- `assets` - Криптовалютные активы пользователя (user_id, symbol, amount)
-- `transactions` - История операций (user_id, type, amount, symbol, price, timestamps)
+При необходимости укажите URL API в `.env.local` (по умолчанию используется `http://localhost:8000/api`):
 
-### Диаграмма связей
+    NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api
 
+Запустите режим разработки:
 
-users (1) ─── (1) wallets
-users (1) ─── (*) assets
-users (1) ─── (*) transactions
+    npm run dev
 
-
-
-
-## 🔧 Конфигурация
-
-### CORS настройки
-
-Убедитесь, что настроили **CORS** в Laravel (`config/cors.php`), чтобы разрешить запросы с `http://localhost:3000`:
-
-
-'allowed_origins' => ['http://localhost:3000'],
-'supports_credentials' => true,
-
-
-### API ключи
-
-Для работы с внешними API добавьте в `.env`:
-
-
-BINANCE_API_KEY=your_binance_api_key
-BINANCE_API_SECRET=your_binance_api_secret
-
+Frontend будет доступен по адресу `http://localhost:3000`.
 
 ---
 
-## 📡 API Endpoints
+## Конфигурация
 
-Некоторые ключевые эндпоинты:
+### CORS
 
-### Аутентификация
-- `POST /api/register` - Регистрация нового пользователя
-- `POST /api/login` - Вход в систему
-- `POST /api/logout` - Выход из системы
-- `GET /api/user` - Получение данных профиля (требует auth)
+В `config/cors.php` разрешены запросы с фронтенда. Для локальной разработки это `http://localhost:3000`. Для прода адрес фронта задаётся переменной `FRONTEND_URL`.
 
-### Торговля
-- `POST /api/trade/buy` - Покупка актива
-- `POST /api/trade/sell` - Продажа актива
+### Комиссии
 
-### Данные пользователя
-- `GET /api/assets` - Получение портфолио
-- `GET /api/transactions` - История транзакций
-- `GET /api/wallet` - Баланс кошелька
+Ставки задаются в `.env` и доступны на публичном эндпоинте `GET /api/fees`:
 
-### Рынок
-- `GET /api/market/prices` - Актуальные курсы криптовалют
+    FEE_TRADE_PERCENT=0.01     # 1% на сделки
+    FEE_WITHDRAW_PERCENT=0.01  # 1% на вывод
+
+Итоговая сумма комиссии всегда пересчитывается на бэкенде.
 
 ---
 
-## 🧪 Тестирование
+## API Endpoints
 
-### Backend тесты
+### Аутентификация и безопасность
+- `POST /api/register` — регистрация
+- `POST /api/register/verify` — подтверждение регистрации кодом
+- `POST /api/register/verify/resend` — повторная отправка кода
+- `POST /api/login` — вход
+- `POST /api/login/2fa` — подтверждение входа по 2FA
+- `POST /api/password/forgot` — запрос кода для сброса пароля
+- `POST /api/password/reset` — сброс пароля по коду
+- `POST /api/logout` — выход (auth)
+- `POST /api/email/verify/send`, `POST /api/email/verify` — верификация e-mail (auth)
+- `POST /api/password/change` — смена пароля (auth)
+- `POST /api/2fa/enable`, `/api/2fa/confirm`, `/api/2fa/disable` — управление 2FA (auth)
 
-cd backend
-php artisan test
+### Пользователь и настройки
+- `GET /api/user` — профиль (auth)
+- `GET /api/user/settings`, `PUT /api/user/settings` — настройки (auth)
+- `PUT /api/user/settings/currency` — смена валюты отображения (auth)
+- `POST /api/user/avatar`, `DELETE /api/user/avatar` — аватар (auth)
+- `GET /api/exchange-rate` — курс для конвертации (auth)
 
+### Кошелёк
+- `GET /api/wallet/balance` — баланс (auth)
+- `POST /api/wallet/deposit` — пополнение (auth)
+- `POST /api/wallet/withdraw` — вывод (auth)
+- `GET /api/user/assets` — активы пользователя (auth)
 
-### Frontend тесты
+### Торговля и конвертация
+- `POST /api/trade/buy` — покупка (auth)
+- `POST /api/trade/sell` — продажа (auth)
+- `POST /api/trade/swap` — обмен актива (auth)
+- `POST /api/trade/multi-swap` — мульти-своп (auth)
+- `POST /api/trade/calculate-rates` — расчёт курсов (auth)
 
-cd frontend
-npm run test
+### Транзакции
+- `GET /api/transactions` — список (auth)
+- `GET /api/transactions/history` — история (auth)
+- `GET /api/transactions/stats` — статистика (auth)
 
----
+### P2P
+- `GET /api/p2p/offers`, `GET /api/p2p/offers/{id}` — объявления (публичные)
+- `POST /api/p2p/offers`, `DELETE /api/p2p/offers/{id}` — управление объявлениями (auth)
+- `POST /api/p2p/trades` — создать сделку (auth)
+- `GET /api/p2p/trades/my` — мои сделки (auth)
+- `POST /api/p2p/trades/{id}/confirm`, `/cancel` — подтверждение и отмена (auth)
 
-## 📂 Структура проекта
+### Стейкинг
+- `GET /api/staking/plans` — планы (публичный)
+- `GET /api/staking/assets`, `GET /api/staking/my` — доступные активы и позиции (auth)
+- `POST /api/staking/stake` — застейкать (auth)
+- `POST /api/staking/unstake/{id}`, `POST /api/staking/cancel/{id}` — закрытие позиции (auth)
 
-CryptoX/
-
-├── backend/              # Laravel API
-
-│   ├── app/
-
-│   │   ├── Http/
-
-│   │   │   └── Controllers/  # API контроллеры
-
-│   │   └── Models/           # Eloquent модели
-
-│   ├── config/               # Конфигурация Laravel
-
-│   ├── database/
-
-│   │   ├── migrations/       # Миграции БД
-
-│   │   └── seeders/          # Сидеры
-
-│   └── routes/
-
-│       └── api.php           # API маршруты
-
-├── frontend/             # Next.js приложение
-
-│   ├── components/           # React компоненты
-
-│   ├── pages/                # Страницы Next.js
-
-│   ├── public/               # Статические файлы
-
-│   └── styles/               # Tailwind CSS
-
-└── README.md
-
-
-## 🤝 Вклад в проект (Contributing)
-
-Мы приветствуем вклад сообщества! Следуйте этим шагам:
-
-1. Форкните репозиторий
-2. Создайте ветку для новой фичи (`git checkout -b feature/AmazingFeature`)
-3. Закоммитьте изменения (`git commit -m 'Add some AmazingFeature'`)
-4. Запушьте ветку (`git push origin feature/AmazingFeature`)
-5. Откройте Pull Request
-
----
-
-## 📝 Roadmap
-
-- [ ] Добавление двухфакторной аутентификации (2FA)
-- [ ] Интеграция с дополнительными биржами (Kraken, Coinbase)
-- [ ] Реализация P2P обмена
-- [ ] Мобильное приложение (React Native)
-- [ ] Расширенная аналитика портфолио
-- [ ] Уведомления о изменении цен (WebSocket)
+### Рынок и валюты
+- `GET /api/coins` — список монет
+- `GET /api/coins/prices`, `GET /api/coins/price/{symbol}` — цены
+- `GET /api/coins/stats/{symbol}` — статистика за 24ч
+- `GET /api/coins/klines/{symbol}` — свечи для графика
+- `GET /api/coins/{coinId}` — детали монеты
+- `GET /api/currencies`, `/api/currencies/all`, `/api/currency/rates` — валюты и курсы
+- `GET /api/assets` — список активов
+- `GET /api/fees` — текущие ставки комиссий
 
 ---
 
-## 🐛 Известные проблемы
+## Тестирование
 
-- Обновление цен в реальном времени требует настройки WebSocket
-- Лимиты API бирж могут вызывать временные задержки
+### Backend
 
----
+    cd backend
+    php artisan test
 
-## 📄 Лицензия
+### Frontend
 
-Распространяется под лицензией **MIT**. Подробнее см. [LICENSE](LICENSE).
-
----
-
-
-## 🙏 Благодарности
-
-- [Laravel](https://laravel.com/) - За мощный PHP фреймворк
-- [Next.js](https://nextjs.org/) - За React фреймворк
-- [Tailwind CSS](https://tailwindcss.com/) - За utility-first CSS
-- [Binance API](https://binance-docs.github.io/apidocs/) - За данные о криптовалютах
+    cd frontend
+    npm run lint
 
 ---
 
-⭐ Если проект был полезен, поставьте звезду на GitHub!
-```
+## Локализация
 
+Словари переводов лежат в `frontend/locales/{ru,en,kk}/translation.json`. Все три языка держатся в паритете по ключам — при добавлении строки обновляйте все три файла.
 
+---
 
+## Деплой
+
+Схема развёртывания: фронтенд (Next.js) на **Vercel**, бэкенд (Laravel) и **PostgreSQL** на **Railway**. Пошаговая инструкция со списком переменных окружения — в [DEPLOY.md](DEPLOY.md).
+
+---
+
+## Структура проекта
+
+    CryptoX/
+    ├── backend/                 # Laravel API
+    │   ├── app/
+    │   │   ├── Http/Controllers/  # API-контроллеры
+    │   │   └── Models/            # Eloquent-модели
+    │   ├── config/               # Конфигурация (cors, fees и т.д.)
+    │   ├── database/
+    │   │   ├── migrations/       # Миграции БД
+    │   │   └── seeders/          # Сидеры
+    │   ├── routes/api.php        # API-маршруты
+    │   └── Dockerfile            # Образ для Railway
+    ├── frontend/                # Next.js (App Router)
+    │   ├── app/                  # Маршруты и страницы
+    │   ├── components/           # React-компоненты
+    │   ├── locales/              # Переводы ru / en / kk
+    │   └── lib/                  # Конфиг и утилиты
+    ├── DEPLOY.md                # Инструкция по деплою
+    └── README.md
+
+---
+
+## Лицензия
+
+Распространяется под лицензией **MIT**.
