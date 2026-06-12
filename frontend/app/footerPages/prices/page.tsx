@@ -166,7 +166,8 @@ export default function PricesPage() {
           </div>
         ) : (
           <>
-          <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 overflow-hidden">
+          {/* Десктоп: таблица */}
+          <div className="hidden lg:block bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-100 dark:bg-slate-800">
@@ -281,6 +282,69 @@ export default function PricesPage() {
                 </tbody>
               </table>
             </div>
+          </div>
+
+          {/* Мобайл/планшет: карточки */}
+          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {paginatedCryptos.map((crypto, index) => {
+              const up = crypto.price_change_percentage_24h >= 0;
+              return (
+                <div
+                  key={crypto.id}
+                  onClick={() => router.push(`/market/${crypto.id}`)}
+                  className="rounded-xl border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-[#131416] p-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                >
+                  {/* Шапка: монета + изменение за 24ч */}
+                  <div className="flex items-center justify-between mb-3 gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-xs font-medium text-slate-400 dark:text-slate-500 w-5 shrink-0">
+                        {(currentPage - 1) * perPage + index + 1}
+                      </span>
+                      <CoinIcon src={crypto.image} symbol={crypto.symbol} className="w-9 h-9" />
+                      <div className="min-w-0">
+                        <div className="font-semibold text-slate-900 dark:text-slate-100 truncate">
+                          {crypto.name}
+                        </div>
+                        <div className="text-xs text-slate-500 dark:text-slate-500 uppercase">
+                          {crypto.symbol}
+                        </div>
+                      </div>
+                    </div>
+                    <span
+                      className={`inline-flex items-center gap-1 text-sm font-semibold shrink-0 ${
+                        up ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                      }`}
+                    >
+                      {up ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                      {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
+                    </span>
+                  </div>
+
+                  {/* Остальная информация */}
+                  <div className="grid grid-cols-2 gap-y-2 text-sm">
+                    <span className="text-slate-500 dark:text-slate-400">{t("market.price")}</span>
+                    <span className="text-right font-semibold text-slate-900 dark:text-slate-100">
+                      {formatPrice(crypto.current_price)}
+                    </span>
+
+                    <span className="text-slate-500 dark:text-slate-400">{t("market.marketCap")}</span>
+                    <span className="text-right text-slate-700 dark:text-slate-300">
+                      {formatNumber(crypto.market_cap)}
+                    </span>
+
+                    <span className="text-slate-500 dark:text-slate-400">{t("footerPages.prices.colVolume")}</span>
+                    <span className="text-right text-slate-700 dark:text-slate-300">
+                      {formatNumber(crypto.total_volume)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+            {paginatedCryptos.length === 0 && (
+              <div className="col-span-full py-16 text-center text-slate-500 dark:text-slate-400">
+                {t("common.notFound")}
+              </div>
+            )}
           </div>
 
           {/* Пагинация */}

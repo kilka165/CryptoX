@@ -65,10 +65,16 @@ export default function DepositPage() {
           return;
       }
       
+      // Маска карты для истории (3333********3333). Полный номер на сервер не шлём.
+      const digits = cardNumber.replace(/\D/g, "");
+      const cardMask =
+        digits.length >= 8 ? `${digits.slice(0, 4)}********${digits.slice(-4)}` : undefined;
+
       // Отправляем запрос на сервер с полем currency
       await axios.post(`${API_BASE}/wallet/deposit`, {
         amount: depositAmount,
-        currency: "USD" // <-- ДОБАВЛЕНО ОБЯЗАТЕЛЬНОЕ ПОЛЕ
+        currency: "USD", // <-- ДОБАВЛЕНО ОБЯЗАТЕЛЬНОЕ ПОЛЕ
+        card_mask: cardMask,
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });

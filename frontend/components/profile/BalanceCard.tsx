@@ -21,22 +21,10 @@ export function BalanceCard({ balance, currency }: BalanceCardProps) {
 
       <div className="relative z-10">
         <p className="text-blue-100 mb-1">{t("profile.balance.total")}</p>
-        <div className="flex flex-wrap items-end gap-x-3 gap-y-2 mb-6">
+        <div className="mb-6">
           <h1 className="text-3xl sm:text-4xl font-bold break-all leading-tight">
             {ratesLoading ? "..." : convertedAmount}
           </h1>
-
-          <span className="bg-white/20 px-2 py-1 rounded-lg text-xs sm:text-sm font-medium flex items-center gap-1 shrink-0">
-            <ArrowUpRight size={14} /> 12.5%
-          </span>
-
-          {currency !== "USD" && (
-            <span className="text-xs sm:text-sm opacity-70 font-mono w-full sm:w-auto">
-              (${Number(balance).toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-              })} USD)
-            </span>
-          )}
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">

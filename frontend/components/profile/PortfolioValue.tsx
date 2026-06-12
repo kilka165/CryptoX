@@ -42,15 +42,12 @@ export function PortfolioValue({
         <span className="text-sm opacity-90">{t("profile.portfolio.value")}</span>
         <TrendingUp size={20} className="opacity-80" />
       </div>
-      <div className="text-3xl font-bold mb-1">
+      <div className="text-3xl font-bold">
         {valueInUserCurrency.toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })}{" "}
         {currencySymbol}
-      </div>
-      <div className="text-sm opacity-75">
-        {t("profile.portfolio.inUsd", { amount: totalValueUSD.toFixed(2) })}
       </div>
     </div>
   );

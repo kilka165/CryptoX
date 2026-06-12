@@ -94,6 +94,7 @@ class P2PController extends Controller
                     'id' => $offer->id,
                     'seller_id' => $offer->seller_id,
                     'seller_name' => $offer->seller->name,
+                    'seller_avatar' => $offer->seller->avatar,
                     'orders_count' => $completedTrades,
                     'completion_rate' => $completionRate,
                     'price' => (float) $offer->price,

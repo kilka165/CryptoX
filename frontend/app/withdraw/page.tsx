@@ -77,9 +77,15 @@ export default function WithdrawPage() {
 
     try {
       const token = localStorage.getItem("auth_token");
-      
+
+      // Маска карты получателя для истории (3333********3333). Полный номер не шлём.
+      const digits = cardNumber.replace(/\D/g, "");
+      const cardMask =
+        digits.length >= 8 ? `${digits.slice(0, 4)}********${digits.slice(-4)}` : undefined;
+
       await axios.post(`${API_BASE}/wallet/withdraw`, {
         amount: withdrawAmount,
+        card_mask: cardMask,
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });

@@ -30,6 +30,8 @@ class WalletController extends Controller
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:0.01',
+            // Маска карты (3333********3333). Полный номер не принимаем — фронт маскирует сам.
+            'card_mask' => ['nullable', 'string', 'regex:/^\d{4}\*{8}\d{4}$/'],
         ]);
 
         $user = $request->user();
@@ -50,6 +52,7 @@ class WalletController extends Controller
                 'price_usd' => 1,
                 'total_usd' => $validated['amount'],
                 'description' => 'Пополнение кошелька',
+                'card_mask' => $validated['card_mask'] ?? null,
             ]);
 
             DB::commit();
@@ -70,6 +73,8 @@ class WalletController extends Controller
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:0.01',
+            // Маска карты получателя (3333********3333). Полный номер не принимаем.
+            'card_mask' => ['nullable', 'string', 'regex:/^\d{4}\*{8}\d{4}$/'],
         ]);
 
         $user = $request->user();
@@ -126,6 +131,7 @@ class WalletController extends Controller
                 'total_usd' => $totalToDeduct,
                 'fee' => $commission,
                 'description' => 'Вывод средств из кошелька',
+                'card_mask' => $validated['card_mask'] ?? null,
             ]);
 
             // Комиссия идёт на счёт платформы.

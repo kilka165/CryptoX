@@ -18,6 +18,7 @@ class Transaction extends Model
         'total_usd',
         'fee',
         'description',
+        'card_mask',
     ];
 
     protected $casts = [

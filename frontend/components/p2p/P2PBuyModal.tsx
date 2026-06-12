@@ -12,6 +12,7 @@ import { getCurrencySymbol } from "@/lib/currencies";
 import { sanitizeDecimalInput } from "@/lib/utils/number";
 import axios from "axios";
 import { API_BASE } from "@/lib/config";
+import { SellerAvatar } from "./SellerAvatar";
 
 interface P2PBuyModalProps {
   isOpen: boolean;
@@ -295,9 +296,7 @@ export function P2PBuyModal({
         <div className="p-6 space-y-6">
           {/* Информация о продавце */}
           <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
-              {offer.seller_name[0].toUpperCase()}
-            </div>
+            <SellerAvatar name={offer.seller_name} avatar={offer.seller_avatar} className="w-12 h-12 text-lg" />
             <div>
               <div className="font-medium">{offer.seller_name}</div>
               <div className="text-sm text-slate-500">

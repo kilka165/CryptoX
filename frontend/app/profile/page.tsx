@@ -32,6 +32,7 @@ interface AuthUser {
   email: string;
   created_at: string;
   currency?: string;
+  avatar?: string | null;
   balance?: number;
   email_verified?: boolean;
   two_factor_enabled?: boolean;
@@ -236,6 +237,7 @@ export default function ProfilePage() {
             <UserCard
               name={authUser.name}
               email={authUser.email}
+              avatar={authUser.avatar}
               emailVerified={authUser.email_verified}
               twoFactorEnabled={authUser.two_factor_enabled}
             />
@@ -243,7 +245,8 @@ export default function ProfilePage() {
           </div>
 
           {/* ПРАВАЯ КОЛОНКА */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* id-якорь для пункта «Обзор кошелька»; scroll-mt — отступ под липкую шапку */}
+          <div id="wallet-overview" className="lg:col-span-2 space-y-6 scroll-mt-24">
             <BalanceCard balance={rawBalance} currency={userCurrency} />
             <PortfolioValue
               totalValueUSD={totalPortfolioUSD}
@@ -261,7 +264,8 @@ export default function ProfilePage() {
         </div>
 
         {/* ТРАНЗАКЦИИ НА ВСЮ ШИРИНУ */}
-        <div className="mt-6">
+        {/* id-якорь для пункта «История операций» */}
+        <div id="transaction-history" className="mt-6 scroll-mt-24">
           <TransactionHistory userCurrency={userCurrency} />
         </div>
       </div>

@@ -86,7 +86,8 @@ export default function FeesPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               {t("footerPages.fees.feesTableTitle")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 overflow-hidden">
+            {/* Десктоп: таблица */}
+            <div className="hidden md:block bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-100 dark:bg-slate-800">
@@ -119,6 +120,28 @@ export default function FeesPage() {
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            {/* Мобайл: карточки */}
+            <div className="md:hidden space-y-3">
+              {feeRows.map((row, index) => (
+                <div
+                  key={index}
+                  className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 p-4"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <span className="text-slate-900 dark:text-slate-100 font-medium">
+                      {row.operation}
+                    </span>
+                    <span className="text-orange-600 dark:text-orange-400 font-semibold whitespace-nowrap">
+                      {row.fee}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    {row.details}
+                  </p>
+                </div>
+              ))}
             </div>
             <div className="mt-3 flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 bg-blue-50 dark:bg-[#131416] p-3 rounded-lg">
               <Info className="flex-shrink-0 mt-0.5 text-blue-600 dark:text-blue-400" size={14} />

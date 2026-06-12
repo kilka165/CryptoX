@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { SUPPORTED_LANGUAGES } from "@/lib/i18n";
 import { API_BASE } from "@/lib/config";
 import { SecuritySettings } from "@/components/settings/SecuritySettings";
+import { AvatarSettings } from "@/components/settings/AvatarSettings";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function SettingsPage() {
 
   const [name, setName] = useState("");
   const [currency, setCurrency] = useState("USD");
+  const [avatar, setAvatar] = useState<string | null>(null);
   
   // Состояния для модального окна выбора валюты
   const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
@@ -39,6 +41,7 @@ export default function SettingsPage() {
     .then(res => {
       setName(res.data.name);
       setCurrency(res.data.currency || "USD");
+      setAvatar(res.data.avatar || null);
       setLoading(false);
     })
     .catch(err => {
@@ -94,7 +97,15 @@ export default function SettingsPage() {
 
         <div className="bg-white dark:bg-[#131416] rounded-2xl shadow-sm border border-slate-300 dark:border-slate-800 p-6 md:p-8">
           <form onSubmit={handleSave} className="space-y-6">
-            
+
+            {/* Аватар */}
+            <div>
+              <label className="block text-sm font-medium mb-3 flex items-center gap-2">
+                <User size={16} /> {t("settings.avatar.title")}
+              </label>
+              <AvatarSettings avatar={avatar} onChange={setAvatar} />
+            </div>
+
             {/* Имя */}
             <div>
               <label className="block text-sm font-medium mb-2 flex items-center gap-2">

@@ -7,6 +7,28 @@ import { useTranslation } from "react-i18next";
 
 export default function CookiesPage() {
   const { t } = useTranslation();
+
+  const cookieRows = [
+    {
+      name: "auth_token",
+      type: t("footerPages.cookies.tNecessary"),
+      duration: t("footerPages.cookies.dur7days"),
+      purpose: t("footerPages.cookies.purpose2"),
+    },
+    {
+      name: "theme",
+      type: t("footerPages.cookies.tFunctional"),
+      duration: t("footerPages.cookies.dur1year"),
+      purpose: t("footerPages.cookies.purpose3"),
+    },
+    {
+      name: "language",
+      type: t("footerPages.cookies.tFunctional"),
+      duration: t("footerPages.cookies.dur1year"),
+      purpose: t("footerPages.cookies.purpose4"),
+    },
+  ];
+
   return (
     <>
       <Header />
@@ -81,7 +103,8 @@ export default function CookiesPage() {
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               {t("footerPages.cookies.tableTitle")}
             </h2>
-            <div className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 overflow-hidden">
+            {/* Десктоп: таблица */}
+            <div className="hidden md:block bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-100 dark:bg-slate-800">
@@ -101,27 +124,45 @@ export default function CookiesPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                    <tr className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                      <td className="px-4 py-3 font-mono text-xs">auth_token</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.tNecessary")}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.dur7days")}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.purpose2")}</td>
-                    </tr>
-                    <tr className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                      <td className="px-4 py-3 font-mono text-xs">theme</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.tFunctional")}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.dur1year")}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.purpose3")}</td>
-                    </tr>
-                    <tr className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                      <td className="px-4 py-3 font-mono text-xs">language</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.tFunctional")}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.dur1year")}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{t("footerPages.cookies.purpose4")}</td>
-                    </tr>
+                    {cookieRows.map((row) => (
+                      <tr key={row.name} className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <td className="px-4 py-3 font-mono text-xs">{row.name}</td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{row.type}</td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{row.duration}</td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{row.purpose}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            {/* Мобайл: карточки */}
+            <div className="md:hidden space-y-3">
+              {cookieRows.map((row) => (
+                <div
+                  key={row.name}
+                  className="bg-slate-50 dark:bg-[#131416] rounded-xl border border-slate-300 dark:border-slate-800 p-4"
+                >
+                  <div className="font-mono text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3 break-all">
+                    {row.name}
+                  </div>
+                  <dl className="space-y-2 text-sm">
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-slate-500 dark:text-slate-500">{t("footerPages.cookies.colType")}</dt>
+                      <dd className="text-right text-slate-700 dark:text-slate-300">{row.type}</dd>
+                    </div>
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-slate-500 dark:text-slate-500">{t("footerPages.cookies.colDuration")}</dt>
+                      <dd className="text-right text-slate-700 dark:text-slate-300">{row.duration}</dd>
+                    </div>
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-slate-500 dark:text-slate-500">{t("footerPages.cookies.colPurpose")}</dt>
+                      <dd className="text-right text-slate-700 dark:text-slate-300">{row.purpose}</dd>
+                    </div>
+                  </dl>
+                </div>
+              ))}
             </div>
           </section>
 

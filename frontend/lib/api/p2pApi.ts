@@ -6,6 +6,7 @@ export interface P2POffer {
   id: number;
   seller_id: number;
   seller_name: string;
+  seller_avatar?: string | null;
   orders_count: number;
   completion_rate: number;
   price: number;

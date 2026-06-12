@@ -264,10 +264,10 @@ export default function StakingPage() {
         )}
 
         {/* Табы */}
-        <div className="flex gap-4 border-b border-slate-300 dark:border-slate-800">
+        <div className="flex gap-2 md:gap-4 border-b border-slate-300 dark:border-slate-800 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <button
             onClick={() => setActiveTab("plans")}
-            className={`px-6 py-3 font-medium transition-colors border-b-2 ${
+            className={`px-4 md:px-6 py-3 font-medium whitespace-nowrap transition-colors border-b-2 ${
               activeTab === "plans"
                 ? "border-blue-600 text-blue-600 dark:text-blue-400"
                 : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
@@ -277,7 +277,7 @@ export default function StakingPage() {
           </button>
           <button
             onClick={() => setActiveTab("active")}
-            className={`px-6 py-3 font-medium transition-colors border-b-2 ${
+            className={`px-4 md:px-6 py-3 font-medium whitespace-nowrap transition-colors border-b-2 ${
               activeTab === "active"
                 ? "border-blue-600 text-blue-600 dark:text-blue-400"
                 : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
@@ -292,7 +292,7 @@ export default function StakingPage() {
           </button>
           <button
             onClick={() => setActiveTab("completed")}
-            className={`px-6 py-3 font-medium transition-colors border-b-2 ${
+            className={`px-4 md:px-6 py-3 font-medium whitespace-nowrap transition-colors border-b-2 ${
               activeTab === "completed"
                 ? "border-blue-600 text-blue-600 dark:text-blue-400"
                 : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"

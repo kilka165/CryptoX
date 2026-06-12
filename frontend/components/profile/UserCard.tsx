@@ -6,16 +6,22 @@ import { useTranslation } from "react-i18next";
 interface UserCardProps {
   name: string;
   email: string;
+  avatar?: string | null;
   emailVerified?: boolean;
   twoFactorEnabled?: boolean;
 }
 
-export function UserCard({ name, email, emailVerified = false, twoFactorEnabled = false }: UserCardProps) {
+export function UserCard({ name, email, avatar, emailVerified = false, twoFactorEnabled = false }: UserCardProps) {
   const { t } = useTranslation();
   return (
     <div className="bg-white dark:bg-[#131416] p-6 rounded-2xl shadow-sm border border-slate-300 dark:border-slate-800 text-center">
-      <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400">
-        <UserIcon size={40} />
+      <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+        {avatar ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={avatar} alt={name} className="w-full h-full object-cover" />
+        ) : (
+          <UserIcon size={48} />
+        )}
       </div>
       <h2 className="text-xl font-bold truncate">{name}</h2>
       <p className="text-sm text-slate-500 truncate">{email}</p>

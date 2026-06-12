@@ -73,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
             'name' => $user->name,
             'email' => $user->email,
             'currency' => $user->currency ?? 'USD',
+            'avatar' => $user->avatar,
             'wallet' => $user->wallet,
             'assets' => $user->assets,
             'balance' => $user->wallet->balance ?? 0,
@@ -98,6 +99,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/settings', [UserSettingsController::class, 'getSettings']);
     Route::put('/user/settings', [AuthController::class, 'updateSettings']);
     Route::put('/user/settings/currency', [UserSettingsController::class, 'updateCurrency']);
+    Route::post('/user/avatar', [UserSettingsController::class, 'updateAvatar']);
+    Route::delete('/user/avatar', [UserSettingsController::class, 'deleteAvatar']);
     Route::get('/exchange-rate', [UserSettingsController::class, 'getExchangeRate']);
 
     // ========== КОШЕЛЁК ==========

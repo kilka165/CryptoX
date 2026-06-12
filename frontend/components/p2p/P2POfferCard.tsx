@@ -8,6 +8,7 @@ import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "@/lib/config";
 import { getCurrencySymbol } from "@/lib/currencies";
+import { SellerAvatar } from "./SellerAvatar";
 
 interface P2POfferCardProps {
   offer: P2POffer;
@@ -64,9 +65,7 @@ export function P2POfferCard({
           {/* Продавец */}
           <div className="flex-1 lg:min-w-[180px]">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold shrink-0">
-                {offer.seller_name[0].toUpperCase()}
-              </div>
+              <SellerAvatar name={offer.seller_name} avatar={offer.seller_avatar} className="w-10 h-10 text-base" />
               <div className="min-w-0">
                 <div className="font-medium flex items-center gap-2 min-w-0">
                   <span className="truncate">{offer.seller_name}</span>
