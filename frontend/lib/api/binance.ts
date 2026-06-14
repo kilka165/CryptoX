@@ -109,6 +109,34 @@ export const BinanceAPI = {
   },
 
   /**
+   * Возвращает цену монеты в USD по любому её идентификатору: id ("usd-coin"),
+   * символу ("USDC") или имени ("USDC"). Активы хранят name = id монеты, а список
+   * /coins матчился раньше только по name — поэтому у usd-coin/ripple/binancecoin
+   * и т.п. цена «терялась». Здесь сверяем нормализованно по всем трём полям, а если
+   * монеты нет в живом списке (топ-300) — пробуем тикер напрямую.
+   */
+  async getPriceUSDByIdentifier(identifier: string): Promise<number | null> {
+    const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const target = norm(identifier);
+    if (!target) return null;
+
+    const coins = await this.get24hPrices();
+    const coin = coins.find(
+      (c) => norm(c.name) === target || norm(c.symbol) === target || norm(c.id) === target
+    );
+    if (coin && coin.current_price > 0) return coin.current_price;
+
+    // Fallback: монеты нет в топ-300 — берём цену тикера напрямую (работает,
+    // когда идентификатор совпадает с биржевым символом, напр. "1000sats").
+    try {
+      const price = await this.getPrice(identifier);
+      return price > 0 ? price : null;
+    } catch {
+      return null;
+    }
+  },
+
+  /**
    * Получает исторические свечи (OHLC) для графика цены за выбранный диапазон
    */
   async getKlines(symbol: string, range: ChartRange = '7d'): Promise<Candle[]> {

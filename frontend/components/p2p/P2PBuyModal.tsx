@@ -94,15 +94,11 @@ export function P2PBuyModal({
     let active = true;
     setLoadingMarketPrice(true);
 
-    BinanceAPI.get24hPrices()
-      .then((coins) => {
+    BinanceAPI.getPriceUSDByIdentifier(offer.crypto_currency)
+      .then((priceUSD) => {
         if (!active) return;
-        const coin = coins.find(
-          (c) => c.name.toLowerCase() === offer.crypto_currency.toLowerCase()
-        );
-        if (coin && coin.current_price) {
-          const priceInCurrency = convert(coin.current_price, "USD", offer.currency);
-          setMarketPrice(priceInCurrency);
+        if (priceUSD != null && priceUSD > 0) {
+          setMarketPrice(convert(priceUSD, "USD", offer.currency));
         } else {
           setMarketPrice(null);
         }
@@ -120,27 +116,19 @@ export function P2PBuyModal({
     };
   }, [isOpen, offer, convert]);
 
-  // Рассчитываем минимальное количество криптовалюты на основе цены
-  const getMinCryptoAmount = (price: number) => {
-    if (price < 1000) {
-      return 0.1;
-    } else if (price < 10000) {
-      return 0.01;
-    } else if (price < 100000) {
-      return 0.001;
-    } else {
-      return 0.0001;
-    }
-  };
-
   if (!isOpen || !offer) return null;
 
   const fiat = getCurrencySymbol(offer.currency);
   const isBuying = offer.type === "sell";
   const isSelling = offer.type === "buy";
 
-  const minCryptoAmount = getMinCryptoAmount(offer.price);
-  const minFiatAmount = minCryptoAmount * offer.price;
+  // Минимальная сумма сделки — лимит заявки (заявки создаются с min_limit ≈ $0.1,
+  // поэтому покупать можно от $0.1). Если лимит не задан — берём эквивалент $0.1.
+  const minFiatAmount =
+    offer.min_limit && offer.min_limit > 0
+      ? offer.min_limit
+      : convert(0.1, "USD", offer.currency);
+  const minCryptoAmount = offer.price > 0 ? minFiatAmount / offer.price : 0;
 
   // Рассчитываем разницу с рынком
   const priceDifference = marketPrice ? ((offer.price - marketPrice) / marketPrice) * 100 : null;
@@ -300,7 +288,7 @@ export function P2PBuyModal({
             <div>
               <div className="font-medium">{offer.seller_name}</div>
               <div className="text-sm text-slate-500">
-                {t("p2p.buyModal.tradesAndCompletion", { orders: offer.orders_count, rate: offer.completion_rate })}
+                {t("p2p.offerCard.tradesCount", { n: offer.orders_count })}
               </div>
             </div>
           </div>

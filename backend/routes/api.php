@@ -15,7 +15,7 @@ use App\Http\Controllers\StakingController;
 use App\Http\Controllers\AssetController;
 
 // ========================================
-// 🔓 ПУБЛИЧНЫЕ РОУТЫ (БЕЗ АВТОРИЗАЦИИ)
+//  ПУБЛИЧНЫЕ РОУТЫ (БЕЗ АВТОРИЗАЦИИ)
 // ========================================
 
 // Аутентификация
@@ -58,7 +58,7 @@ Route::get('/p2p/offers/{id}', [P2PController::class, 'getOffer']);
 Route::get('/staking/plans', [StakingController::class, 'getPlans']);
 
 // ========================================
-// 🔐 ЗАЩИЩЁННЫЕ РОУТЫ (ТРЕБУЮТ АВТОРИЗАЦИИ)
+//  ЗАЩИЩЁННЫЕ РОУТЫ (ТРЕБУЮТ АВТОРИЗАЦИИ)
 // ========================================
 
 Route::middleware('auth:sanctum')->group(function () {

@@ -61,15 +61,13 @@ export function P2PCreateOfferModal({
   const convertToUSD = (amount: number, fromCurrency: string): number =>
     convert(amount, fromCurrency, "USD");
 
-  // Получаем рыночную цену криптовалюты
+  // Получаем рыночную цену криптовалюты (по id/символу/имени — см. getPriceUSDByIdentifier)
   const fetchMarketPrice = async (cryptoName: string, currency: string) => {
     setLoadingMarketPrice(true);
     try {
-      const coins = await BinanceAPI.get24hPrices();
-      const coin = coins.find(c => c.name.toLowerCase() === cryptoName.toLowerCase());
-      
-      if (coin && coin.current_price) {
-        const priceInUSD = coin.current_price;
+      const priceInUSD = await BinanceAPI.getPriceUSDByIdentifier(cryptoName);
+
+      if (priceInUSD != null && priceInUSD > 0) {
         const priceInCurrency = convertFromUSD(priceInUSD, currency);
         setMarketPrice(priceInCurrency);
         setPricePerCrypto(priceInCurrency.toFixed(2));
@@ -232,8 +230,10 @@ export function P2PCreateOfferModal({
       }
     }
 
-    const minLimit = parseFloat((totalInDisplayCurrency * 0.01).toFixed(2));
     const maxLimit = parseFloat(totalInDisplayCurrency.toFixed(2));
+    // Минимальный лимит сделки — эквивалент $0.1 в выбранной валюте (но не больше
+    // всей суммы заявки), чтобы по заявке можно было торговать от $0.1.
+    const minLimit = parseFloat(Math.min(convertFromUSD(0.1, displayCurrency), maxLimit).toFixed(2));
 
     setIsProcessing(true);
     try {

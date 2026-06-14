@@ -31,7 +31,6 @@ export default function P2PPage() {
   const [amountMin, setAmountMin] = useState("");
   const [amountMax, setAmountMax] = useState("");
   const [ordersMin, setOrdersMin] = useState("");
-  const [completionMin, setCompletionMin] = useState("");
   const [hideMine, setHideMine] = useState(false);
   const [onlyMine, setOnlyMine] = useState(false);
   const [cryptoOptions, setCryptoOptions] = useState<string[]>([]);
@@ -105,13 +104,11 @@ export default function P2PPage() {
       const aMin = parseFloat(amountMin.replace(",", "."));
       const aMax = parseFloat(amountMax.replace(",", "."));
       const oMin = parseFloat(ordersMin.replace(",", "."));
-      const cMin = parseFloat(completionMin.replace(",", "."));
       if (!isNaN(pMin) && offer.price < pMin) return false;
       if (!isNaN(pMax) && offer.price > pMax) return false;
       if (!isNaN(aMin) && offer.available_amount < aMin) return false;
       if (!isNaN(aMax) && offer.available_amount > aMax) return false;
       if (!isNaN(oMin) && offer.orders_count < oMin) return false;
-      if (!isNaN(cMin) && offer.completion_rate < cMin) return false;
       return true;
     })
     .filter((offer) => {
@@ -123,8 +120,7 @@ export default function P2PPage() {
     .sort((a, b) => {
       let cmp = 0;
       if (sortBy === "price") cmp = a.price - b.price;
-      else if (sortBy === "orders") cmp = a.orders_count - b.orders_count;
-      else cmp = a.completion_rate - b.completion_rate;
+      else cmp = a.orders_count - b.orders_count;
       return sortDir === "asc" ? cmp : -cmp;
     });
 
@@ -134,7 +130,6 @@ export default function P2PPage() {
     setAmountMin("");
     setAmountMax("");
     setOrdersMin("");
-    setCompletionMin("");
     setHideMine(false);
     setSearchQuery("");
     setSortBy("price");
@@ -235,7 +230,6 @@ export default function P2PPage() {
           amountMin={amountMin}
           amountMax={amountMax}
           ordersMin={ordersMin}
-          completionMin={completionMin}
           hideMine={hideMine}
           onlyMine={onlyMine}
           onTradeTypeChange={setTradeType}
@@ -249,7 +243,6 @@ export default function P2PPage() {
           onAmountMinChange={setAmountMin}
           onAmountMaxChange={setAmountMax}
           onOrdersMinChange={setOrdersMin}
-          onCompletionMinChange={setCompletionMin}
           onHideMineChange={setHideMine}
           onReset={handleResetFilters}
           onCryptoOptionsLoaded={handleCryptoOptionsLoaded}

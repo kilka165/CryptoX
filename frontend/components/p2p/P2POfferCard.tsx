@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import { P2POffer } from "@/lib/api/p2pApi";
-import { TrendingUp, TrendingDown, CheckCircle, X, Eye, AlertTriangle } from "lucide-react";
+import { TrendingUp, TrendingDown, X, Eye, AlertTriangle } from "lucide-react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "@/lib/config";
@@ -75,13 +75,8 @@ export function P2POfferCard({
                     </span>
                   )}
                 </div>
-                <div className="text-xs text-slate-500 flex items-center gap-2">
-                  <span>{t("p2p.offerCard.tradesCount", { n: offer.orders_count })}</span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3 text-green-500" />
-                    {offer.completion_rate}%
-                  </span>
+                <div className="text-xs text-slate-500">
+                  {t("p2p.offerCard.tradesCount", { n: offer.orders_count })}
                 </div>
               </div>
             </div>

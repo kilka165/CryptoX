@@ -361,9 +361,11 @@ class P2PController extends Controller
 
         DB::beginTransaction();
         try {
-            // Проверяем баланс покупателя
+            // Мгновенный расчёт: проверяем баланс, переводим средства и сразу
+            // помечаем сделку завершённой (counterparty-подтверждение не требуется).
             if ($offer->type === 'sell') {
-                // Продавец продает крипту, покупателю нужны USD
+                // Продавец продаёт крипту (уже заблокирована при создании заявки),
+                // покупатель платит USD.
                 $buyerWallet = Wallet::where('user_id', $user->id)->first();
 
                 if (!$buyerWallet || $buyerWallet->balance < $fiatAmountUSD) {
@@ -374,29 +376,68 @@ class P2PController extends Controller
                         'available_usd' => $buyerWallet ? round($buyerWallet->balance, 2) : 0,
                     ], 400);
                 }
+
+                // USD: покупатель → продавец
+                $buyerWallet->balance -= $fiatAmountUSD;
+                $buyerWallet->save();
+
+                $sellerWallet = Wallet::firstOrCreate(
+                    ['user_id' => $offer->seller_id],
+                    ['balance' => 0]
+                );
+                $sellerWallet->balance += $fiatAmountUSD;
+                $sellerWallet->save();
+
+                // Крипта → покупателю
+                $buyerCrypto = Asset::firstOrCreate(
+                    ['user_id' => $user->id, 'name' => $offer->crypto_currency],
+                    ['symbol' => strtoupper(substr($offer->crypto_currency, 0, 3)), 'amount' => 0]
+                );
+                $buyerCrypto->amount += $cryptoAmount;
+                $buyerCrypto->save();
             } else {
-                // Продавец покупает крипту, покупателю нужна крипта
-                $buyerCrypto = Asset::where('user_id', $user->id)
+                // Заявка на покупку: владелец заявки покупает крипту (USD заблокирован
+                // при создании), текущий пользователь продаёт свою крипту за USD.
+                $sellerCryptoAsset = Asset::where('user_id', $user->id)
                     ->where('name', $offer->crypto_currency)
                     ->first();
 
-                if (!$buyerCrypto || $buyerCrypto->amount < $cryptoAmount) {
+                if (!$sellerCryptoAsset || $sellerCryptoAsset->amount < $cryptoAmount) {
                     DB::rollBack();
                     return response()->json([
                         'message' => "Недостаточно {$offer->crypto_currency} на балансе",
                         'required' => $cryptoAmount,
-                        'available' => $buyerCrypto ? $buyerCrypto->amount : 0,
+                        'available' => $sellerCryptoAsset ? $sellerCryptoAsset->amount : 0,
                     ], 400);
                 }
+
+                // Крипта: текущий пользователь → владельцу заявки
+                $sellerCryptoAsset->amount -= $cryptoAmount;
+                $sellerCryptoAsset->save();
+
+                $ownerCrypto = Asset::firstOrCreate(
+                    ['user_id' => $offer->seller_id, 'name' => $offer->crypto_currency],
+                    ['symbol' => strtoupper(substr($offer->crypto_currency, 0, 3)), 'amount' => 0]
+                );
+                $ownerCrypto->amount += $cryptoAmount;
+                $ownerCrypto->save();
+
+                // USD (заблокирован владельцем заявки при создании) → текущему пользователю
+                $sellerWallet = Wallet::firstOrCreate(
+                    ['user_id' => $user->id],
+                    ['balance' => 0]
+                );
+                $sellerWallet->balance += $fiatAmountUSD;
+                $sellerWallet->save();
             }
 
-            // Создаём сделку
+            // Создаём сделку сразу как завершённую
             $trade = P2PTrade::create([
                 'offer_id' => $offer->id,
                 'buyer_id' => $user->id,
                 'amount' => $fiatAmount, // Фиатная сумма
                 'crypto_amount' => $cryptoAmount, // Количество крипты
-                'status' => 'pending',
+                'status' => 'completed',
             ]);
 
             // Уменьшаем доступное количество в заявке
@@ -410,7 +451,7 @@ class P2PController extends Controller
 
             DB::commit();
 
-            Log::info('P2P Trade Created', [
+            Log::info('P2P Trade Completed', [
                 'trade_id' => $trade->id,
                 'buyer_id' => $user->id,
                 'seller_id' => $offer->seller_id,
@@ -420,7 +461,7 @@ class P2PController extends Controller
             ]);
 
             return response()->json([
-                'message' => 'Сделка создана',
+                'message' => 'Сделка успешно завершена',
                 'trade' => $trade,
             ], 201);
 

@@ -15,7 +15,7 @@ import { BinanceAPI } from "@/lib/api/binance";
 import { currencies } from "@/lib/currencies";
 import { SearchableSelect } from "./SearchableSelect";
 
-export type SortKey = "price" | "orders" | "completion";
+export type SortKey = "price" | "orders";
 export type SortDir = "asc" | "desc";
 
 interface P2PFiltersProps {
@@ -30,7 +30,6 @@ interface P2PFiltersProps {
   amountMin: string;
   amountMax: string;
   ordersMin: string;
-  completionMin: string;
   hideMine: boolean;
   onlyMine: boolean;
   onTradeTypeChange: (type: "buy" | "sell") => void;
@@ -44,7 +43,6 @@ interface P2PFiltersProps {
   onAmountMinChange: (value: string) => void;
   onAmountMaxChange: (value: string) => void;
   onOrdersMinChange: (value: string) => void;
-  onCompletionMinChange: (value: string) => void;
   onHideMineChange: (value: boolean) => void;
   onReset: () => void;
   onCryptoOptionsLoaded?: (options: string[]) => void;
@@ -132,7 +130,6 @@ export function P2PFilters({
   amountMin,
   amountMax,
   ordersMin,
-  completionMin,
   hideMine,
   onlyMine,
   onTradeTypeChange,
@@ -146,7 +143,6 @@ export function P2PFilters({
   onAmountMinChange,
   onAmountMaxChange,
   onOrdersMinChange,
-  onCompletionMinChange,
   onHideMineChange,
   onReset,
   onCryptoOptionsLoaded,
@@ -177,7 +173,7 @@ export function P2PFilters({
   }, []);
 
   const activeRangeCount =
-    [priceMin, priceMax, amountMin, amountMax, ordersMin, completionMin].filter(
+    [priceMin, priceMax, amountMin, amountMax, ordersMin].filter(
       (v) => v.trim() !== ""
     ).length + (hideMine ? 1 : 0);
 
@@ -284,9 +280,6 @@ export function P2PFilters({
             >
               <option value="price">{t("p2p.filters.price")}</option>
               <option value="orders">{t("p2p.filters.sortOrders")}</option>
-              <option value="completion">
-                {t("p2p.filters.sortCompletion")}
-              </option>
             </select>
             <button
               type="button"
@@ -364,38 +357,18 @@ export function P2PFilters({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-slate-500 mb-1">
-                  {t("p2p.filters.minTrades")}
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={ordersMin}
-                  onChange={(e) => onOrdersMinChange(e.target.value)}
-                  placeholder={t("p2p.filters.min")}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-slate-500 mb-1">
-                  {t("p2p.filters.minCompletion")}
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={completionMin}
-                    onChange={(e) => onCompletionMinChange(e.target.value)}
-                    placeholder={t("p2p.filters.min")}
-                    className="w-full px-3 py-2 pr-8 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">
-                    %
-                  </span>
-                </div>
-              </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">
+                {t("p2p.filters.minTrades")}
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={ordersMin}
+                onChange={(e) => onOrdersMinChange(e.target.value)}
+                placeholder={t("p2p.filters.min")}
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              />
             </div>
 
             <label className="flex items-center gap-2 cursor-pointer select-none w-fit">
