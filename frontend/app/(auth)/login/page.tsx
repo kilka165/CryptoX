@@ -56,7 +56,10 @@ export default function LoginPage() {
       }
 
       setAuthToken(response.data.token);
-      router.push("/profile");
+      // Жёсткий переход (а не router.push): перезапускает middleware уже с
+      // выставленной cookie и сбрасывает кэш роутера, иначе навигация упирается
+      // в закэшированный редирект на /login из разлогиненного состояния.
+      window.location.href = "/profile";
     } catch (err: any) {
       console.error("Login error:", err);
       if (err.response && err.response.status === 401) {
@@ -82,7 +85,10 @@ export default function LoginPage() {
       });
 
       setAuthToken(response.data.token);
-      router.push("/profile");
+      // Жёсткий переход (а не router.push): перезапускает middleware уже с
+      // выставленной cookie и сбрасывает кэш роутера, иначе навигация упирается
+      // в закэшированный редирект на /login из разлогиненного состояния.
+      window.location.href = "/profile";
     } catch (err: any) {
       console.error("2FA error:", err);
       if (err.response && (err.response.status === 422 || err.response.status === 401)) {
@@ -108,7 +114,10 @@ export default function LoginPage() {
       });
 
       setAuthToken(response.data.token);
-      router.push("/profile");
+      // Жёсткий переход (а не router.push): перезапускает middleware уже с
+      // выставленной cookie и сбрасывает кэш роутера, иначе навигация упирается
+      // в закэшированный редирект на /login из разлогиненного состояния.
+      window.location.href = "/profile";
     } catch (err: any) {
       console.error("Email verify error:", err);
       if (err.response && err.response.status === 422) {

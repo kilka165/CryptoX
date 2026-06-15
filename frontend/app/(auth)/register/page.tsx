@@ -101,7 +101,9 @@ export default function RegisterPage() {
       // На случай старого поведения: если токен всё же пришёл — логиним.
       if (response.data?.token) {
         setAuthToken(response.data.token);
-        router.push("/profile");
+        // Жёсткий переход: middleware перезапустится с cookie, кэш роутера
+        // сбросится (см. комментарий на странице входа).
+        window.location.href = "/profile";
       }
     } catch (error: any) {
       console.error("Ошибка регистрации:", error);
@@ -134,7 +136,9 @@ export default function RegisterPage() {
       });
 
       setAuthToken(response.data.token);
-      router.push("/profile");
+      // Жёсткий переход: middleware перезапустится с cookie, кэш роутера
+      // сбросится (см. комментарий на странице входа).
+      window.location.href = "/profile";
     } catch (error: any) {
       console.error("Ошибка подтверждения:", error);
       if (error.response?.status === 422) {

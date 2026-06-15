@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { SUPPORTED_LANGUAGES } from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
+import { AUTH_EVENT, getAuthToken } from "@/lib/auth";
 
 
 export function Header() {
@@ -14,10 +15,19 @@ export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Проверяем авторизацию при загрузке (только на клиенте)
+  // Реактивно отслеживаем авторизацию: при загрузке, при входе/выходе в этой
+  // вкладке (событие auth-change) и при изменениях в других вкладках (storage).
+  // Раньше токен читался один раз при монтировании, поэтому шапка «зависала»
+  // в старом состоянии до полной перезагрузки страницы.
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    setIsLoggedIn(!!token); // Если токен есть -> true, нет -> false
+    const sync = () => setIsLoggedIn(!!getAuthToken());
+    sync();
+    window.addEventListener(AUTH_EVENT, sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener(AUTH_EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
   }, []);
 
   // Блокируем прокрутку body, когда открыто мобильное меню

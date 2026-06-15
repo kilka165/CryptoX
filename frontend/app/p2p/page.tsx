@@ -9,6 +9,7 @@ import { P2PTableHeader } from "@/components/p2p/P2PTableHeader";
 import { P2POfferCard } from "@/components/p2p/P2POfferCard";
 import { P2PBuyModal } from "@/components/p2p/P2PBuyModal";
 import { P2PCreateOfferModal } from "@/components/p2p/P2PCreateOfferModal";
+import { AuthRequiredModal } from "@/components/AuthRequiredModal";
 import { p2pApi, P2POffer } from "@/lib/api/p2pApi";
 import { Plus, User } from "lucide-react";
 import axios from "axios";
@@ -40,6 +41,7 @@ export default function P2PPage() {
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Получаем текущего пользователя ОДИН РАЗ
   useEffect(() => {
@@ -137,8 +139,20 @@ export default function P2PPage() {
   };
 
   const handleBuyClick = (offer: P2POffer) => {
+    if (!localStorage.getItem("auth_token")) {
+      setIsAuthModalOpen(true);
+      return;
+    }
     setSelectedOffer(offer);
     setIsBuyModalOpen(true);
+  };
+
+  const handleCreateOfferClick = () => {
+    if (!localStorage.getItem("auth_token")) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    setIsCreateModalOpen(true);
   };
 
   const handleViewDetails = (offer: P2POffer) => {
@@ -153,8 +167,8 @@ export default function P2PPage() {
   const handleConfirmBuy = async (amount: number, cryptoAmount: number) => {
     const token = localStorage.getItem("auth_token");
     if (!token) {
-      alert(t("common.authRequired"));
-      window.location.href = "/login";
+      setIsBuyModalOpen(false);
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -209,7 +223,7 @@ export default function P2PPage() {
               <span className="hidden sm:inline">{t("p2p.myOffers")}</span>
             </button>
             <button
-              onClick={() => setIsCreateModalOpen(true)}
+              onClick={handleCreateOfferClick}
               className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
             >
               <Plus className="w-5 h-5" />
@@ -300,6 +314,11 @@ export default function P2PPage() {
         onClose={() => setIsCreateModalOpen(false)}
         onSuccess={handleOfferCreated}
         cryptoOptions={cryptoOptions}
+      />
+
+      <AuthRequiredModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
 
       {/* Модалка с подробностями */}

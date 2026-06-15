@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// P2P, конвертация и стейкинг открыты для всех — авторизация проверяется
+// только в момент самой транзакции (модалкой со ссылкой на вход).
 const protectedRoutes = [
     '/profile',
-    '/p2p',
-    '/staking',
     '/deposit',
     '/withdraw',
-    '/convert',
     '/settings',
 ];
 
@@ -35,11 +34,8 @@ export function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         '/profile/:path*',
-        '/p2p/:path*',
-        '/staking/:path*',
         '/deposit/:path*',
         '/withdraw/:path*',
-        '/convert/:path*',
         '/settings/:path*',
         '/login',
         '/register',

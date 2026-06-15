@@ -7,6 +7,7 @@ import { Coin } from "@/types/coin";
 import { useRates } from "@/components/RatesProvider";
 import { useFees } from "@/lib/fees";
 import { useTranslation } from "react-i18next";
+import { AUTH_EVENT, getAuthToken } from "@/lib/auth";
 
 const formatInputAmount = (value: string) => {
   if (!value) return "";
@@ -42,6 +43,20 @@ export function useBuyFlow() {
   const [userCurrency, setUserCurrency] = useState<string>("USD");
   const [userBalance, setUserBalance] = useState<number>(0);
   const [assets, setAssets] = useState<OwnedAsset[]>([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Реактивно отслеживаем авторизацию, чтобы модалка покупки показывала
+  // «войдите в аккаунт» вместо «недостаточно средств» для гостя.
+  useEffect(() => {
+    const sync = () => setIsAuthenticated(!!getAuthToken());
+    sync();
+    window.addEventListener(AUTH_EVENT, sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener(AUTH_EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
 
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const [mode, setMode] = useState<TradeMode>("buy");
@@ -311,6 +326,7 @@ export function useBuyFlow() {
     userCurrency,
     userBalance,
     exchangeRate,
+    isAuthenticated,
     selectedCoin,
     mode,
     setMode,

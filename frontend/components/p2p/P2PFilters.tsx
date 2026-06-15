@@ -311,28 +311,38 @@ export function P2PFilters({
       </div>
 
       {!onlyMine && (
-        <>
-      {/* Ряд 3: расширенные фильтры */}
-      <div className="border-t border-slate-300 dark:border-slate-800 pt-3">
-        <button
-          type="button"
-          onClick={() => setAdvancedOpen((v) => !v)}
-          className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-        >
-          {advancedOpen ? (
-            <ChevronUp className="w-4 h-4" />
-          ) : (
-            <ChevronDown className="w-4 h-4" />
-          )}
-          <span>{t("p2p.filters.advanced")}</span>
-          {activeRangeCount > 0 && (
-            <span className="ml-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-full text-xs">
-              {t("p2p.filters.advancedCount", { count: activeRangeCount })}
-            </span>
-          )}
-        </button>
+        /* Ряд 3: «Расширенные фильтры» и «Сбросить» на одной линии */
+        <div className="border-t border-slate-300 dark:border-slate-800 pt-3">
+          <div className="flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => setAdvancedOpen((v) => !v)}
+              className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+              {advancedOpen ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+              <span>{t("p2p.filters.advanced")}</span>
+              {activeRangeCount > 0 && (
+                <span className="ml-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-full text-xs">
+                  {t("p2p.filters.advancedCount", { count: activeRangeCount })}
+                </span>
+              )}
+            </button>
 
-        {advancedOpen && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="flex shrink-0 items-center gap-2 px-3 py-1.5 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>{t("p2p.filters.reset")}</span>
+            </button>
+          </div>
+
+          {advancedOpen && (
           <div className="mt-3 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <RangeInput
@@ -385,19 +395,6 @@ export function P2PFilters({
           </div>
         )}
       </div>
-
-      {/* Ряд 4: кнопка сброса */}
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={onReset}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-        >
-          <RotateCcw className="w-4 h-4" />
-          <span>{t("p2p.filters.reset")}</span>
-        </button>
-      </div>
-        </>
       )}
     </div>
   );

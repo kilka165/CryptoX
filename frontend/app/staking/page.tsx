@@ -8,9 +8,12 @@ import { StakingPlanCard } from "@/components/staking/StakingPlanCard";
 import { StakingPositionCard } from "@/components/staking/StakingPositionCard";
 import { StakingModal } from "@/components/staking/StakingModal";
 import { ConfirmDialog } from "@/components/staking/ConfirmDialog";
+import { AuthRequiredModal } from "@/components/AuthRequiredModal";
 import { stakingApi, StakingPlan, StakingPosition } from "@/lib/api/stakingApi";
-import { TrendingUp, Wallet, Lock } from "lucide-react";
+import { TrendingUp, Wallet, Lock, LogIn } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import Link from "next/link";
+import { AUTH_EVENT, getAuthToken } from "@/lib/auth";
 
 export default function StakingPage() {
   const { t } = useTranslation();
@@ -19,7 +22,22 @@ export default function StakingPage() {
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<StakingPlan | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<"plans" | "active" | "completed">("plans");
+
+  // Реактивно отслеживаем авторизацию: на вкладках «Активные»/«Завершённые»
+  // гостю показываем приглашение войти, а не пустой список позиций.
+  useEffect(() => {
+    const sync = () => setIsAuthenticated(!!getAuthToken());
+    sync();
+    window.addEventListener(AUTH_EVENT, sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener(AUTH_EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
 
   // Состояния для диалога подтверждения
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -81,7 +99,7 @@ export default function StakingPage() {
   const handlePlanSelect = (plan: StakingPlan) => {
     const token = localStorage.getItem("auth_token");
     if (!token) {
-      window.location.href = "/login";
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -113,7 +131,7 @@ export default function StakingPage() {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        window.location.href = "/login";
+        setIsAuthModalOpen(true);
         return;
       }
 
@@ -153,7 +171,7 @@ export default function StakingPage() {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        window.location.href = "/login";
+        setIsAuthModalOpen(true);
         return;
       }
 
@@ -327,6 +345,24 @@ export default function StakingPage() {
               />
             ))}
           </div>
+        ) : !isAuthenticated ? (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 dark:bg-[#131416] rounded-full flex items-center justify-center">
+              <LogIn className="w-8 h-8 text-slate-400" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">
+              {t("common.authRequiredTitle")}
+            </h3>
+            <p className="text-slate-500 mb-4">
+              {t("common.authRequiredText")}
+            </p>
+            <Link
+              href="/login"
+              className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            >
+              {t("common.authRequiredLogin")}
+            </Link>
+          </div>
         ) : (activeTab === "active" ? activePositionsList : completedPositions).length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {(activeTab === "active" ? activePositionsList : completedPositions).map((position) => (
@@ -368,6 +404,11 @@ export default function StakingPage() {
           setSelectedPlan(null);
         }}
         onSuccess={fetchData}
+      />
+
+      <AuthRequiredModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
 
             {/* Диалог подтверждения с результатом */}

@@ -16,6 +16,9 @@
     "max": "Макс",
     "insufficientFunds": "Недостаточно средств",
     "authRequired": "Необходима авторизация",
+    "authRequiredTitle": "Вы не авторизованы",
+    "authRequiredText": "Войдите в аккаунт, чтобы совершить эту операцию.",
+    "authRequiredLogin": "Войти в аккаунт",
     "emailPlaceholder": "you@example.com",
     "toTop": "Наверх",
     "toggleTheme": "Переключить тему"
@@ -540,7 +543,10 @@
     "insufficientCoin": "Недостаточно {{symbol}}",
     "errorForCoin": "Ошибка для {{symbol}}: {{message}}",
     "priceError": "Не удалось получить цену для {{symbol}}",
-    "selectCoin": "Выберите монету"
+    "selectCoin": "Выберите монету",
+    "authPrompt": "Авторизуйтесь, чтобы обменивать криптовалюту",
+    "noCryptoPrompt": "У вас пока нет криптовалюты для обмена",
+    "goToMarket": "Купить криптовалюту"
   },
   "profile": {
     "verified": "Верифицирован",

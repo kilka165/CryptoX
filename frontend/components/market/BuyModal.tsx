@@ -1,6 +1,7 @@
 "use client";
 
-import { X, CheckCircle } from "lucide-react";
+import Link from "next/link";
+import { X, CheckCircle, LogIn } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getCurrencySymbol } from "@/lib/currencies";
 import { useFees } from "@/lib/fees";
@@ -20,6 +21,7 @@ export function BuyModal({ flow }: BuyModalProps) {
     userCurrency,
     userBalance,
     exchangeRate,
+    isAuthenticated,
     mode,
     setMode,
     // покупка
@@ -80,6 +82,24 @@ export function BuyModal({ flow }: BuyModalProps) {
 
   const inputClass =
     "w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 outline-none focus:border-blue-500 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed";
+
+  // Для гостя вместо «недостаточно средств» и кнопки сделки показываем
+  // уведомление о необходимости входа и ссылку на страницу входа.
+  const authNotice = (
+    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 text-sm text-blue-700 dark:text-blue-300">
+      {t("common.authRequiredText")}
+    </div>
+  );
+
+  const loginButton = (
+    <Link
+      href="/login"
+      className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+    >
+      <LogIn size={20} />
+      {t("common.authRequiredLogin")}
+    </Link>
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
@@ -175,24 +195,30 @@ export function BuyModal({ flow }: BuyModalProps) {
                 </div>
               </div>
 
-              {totalDeductUSD > userBalance && amountUserEntered > 0 && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm text-red-700 dark:text-red-400">
-                  {t("common.insufficientFunds")}
-                </div>
-              )}
+              {!isAuthenticated
+                ? authNotice
+                : totalDeductUSD > userBalance && amountUserEntered > 0 && (
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm text-red-700 dark:text-red-400">
+                      {t("common.insufficientFunds")}
+                    </div>
+                  )}
 
-              <button type="submit" disabled={!canBuy || isBuying} className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
-                {buySuccess ? (
-                  <>
-                    <CheckCircle size={20} />
-                    {t("common.success")}
-                  </>
-                ) : isBuying ? (
-                  t("market.buyModal.buying")
-                ) : (
-                  t("market.buy")
-                )}
-              </button>
+              {!isAuthenticated ? (
+                loginButton
+              ) : (
+                <button type="submit" disabled={!canBuy || isBuying} className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+                  {buySuccess ? (
+                    <>
+                      <CheckCircle size={20} />
+                      {t("common.success")}
+                    </>
+                  ) : isBuying ? (
+                    t("market.buyModal.buying")
+                  ) : (
+                    t("market.buy")
+                  )}
+                </button>
+              )}
             </form>
           ) : (
             <form onSubmit={handleSellSubmit} className="space-y-4">
@@ -243,27 +269,33 @@ export function BuyModal({ flow }: BuyModalProps) {
                 </div>
               </div>
 
-              {sellCryptoNum > ownedAmount && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm text-red-700 dark:text-red-400">
-                  {t("market.buyModal.insufficientCrypto", {
-                    symbol: coin.symbol.toUpperCase(),
-                    amount: ownedAmount.toLocaleString(undefined, { maximumFractionDigits: 8 }),
-                  })}
-                </div>
-              )}
+              {!isAuthenticated
+                ? authNotice
+                : sellCryptoNum > ownedAmount && (
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm text-red-700 dark:text-red-400">
+                      {t("market.buyModal.insufficientCrypto", {
+                        symbol: coin.symbol.toUpperCase(),
+                        amount: ownedAmount.toLocaleString(undefined, { maximumFractionDigits: 8 }),
+                      })}
+                    </div>
+                  )}
 
-              <button type="submit" disabled={!canSell || isSelling} className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
-                {sellSuccess ? (
-                  <>
-                    <CheckCircle size={20} />
-                    {t("common.success")}
-                  </>
-                ) : isSelling ? (
-                  t("market.buyModal.selling")
-                ) : (
-                  t("market.sell")
-                )}
-              </button>
+              {!isAuthenticated ? (
+                loginButton
+              ) : (
+                <button type="submit" disabled={!canSell || isSelling} className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+                  {sellSuccess ? (
+                    <>
+                      <CheckCircle size={20} />
+                      {t("common.success")}
+                    </>
+                  ) : isSelling ? (
+                    t("market.buyModal.selling")
+                  ) : (
+                    t("market.sell")
+                  )}
+                </button>
+              )}
             </form>
           )}
         </div>

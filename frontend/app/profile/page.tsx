@@ -152,7 +152,9 @@ export default function ProfilePage() {
       .catch((error) => {
         console.error("Ошибка авторизации", error);
         clearAuthToken();
-        router.push("/login");
+        // Жёсткий переход, чтобы middleware/кэш роутера не вернул нас обратно
+        // на /profile по устаревшему редиректу авторизованного состояния.
+        window.location.href = "/login";
       });
   };
 

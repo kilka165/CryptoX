@@ -5,8 +5,10 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ArrowLeft, ArrowUpDown, CheckCircle, X, ChevronDown, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ArrowUpDown, CheckCircle, X, ChevronDown, AlertTriangle, LogIn, Coins } from "lucide-react";
+import { AUTH_EVENT, getAuthToken } from "@/lib/auth";
 import { CurrencySelectModal, CurrencyItem } from "@/components/convert/CurrencySelectModal";
+import { AuthRequiredModal } from "@/components/AuthRequiredModal";
 import { CoinIcon } from "@/components/market/CoinIcon";
 import { BinanceAPI } from "@/lib/api/binance";
 import { Coin } from "@/types/coin";
@@ -86,6 +88,21 @@ export default function ConvertPage() {
 
   const [isSwapping, setIsSwapping] = useState(false);
   const [swapSuccess, setSwapSuccess] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Реактивно отслеживаем авторизацию: гостю в блоке «Из» предлагаем войти,
+  // а авторизованному без активов — купить криптовалюту на рынке.
+  useEffect(() => {
+    const sync = () => setIsAuthenticated(!!getAuthToken());
+    sync();
+    window.addEventListener(AUTH_EVENT, sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener(AUTH_EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -258,6 +275,12 @@ export default function ConvertPage() {
     : 0;
 
   const handleSwapSubmit = async () => {
+    // Гость жмёт «Обменять» — показываем модалку «вы не авторизованы».
+    if (!getAuthToken()) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
     if (fromCoins.length === 0 || !toCoin) {
       alert(t("convert.selectCoinsToSwap"));
       return;
@@ -269,8 +292,7 @@ export default function ConvertPage() {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        alert(t("common.authRequired"));
-        router.push("/login");
+        setIsAuthModalOpen(true);
         return;
       }
 
@@ -395,6 +417,35 @@ export default function ConvertPage() {
                       </button>
                     )}
                   </div>
+
+                  {fromCoins.length === 0 && (!isAuthenticated || userAssets.length === 0) && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        isAuthenticated ? router.push("/market") : setIsAuthModalOpen(true)
+                      }
+                      className="w-full flex items-center gap-2 min-w-0 bg-slate-50 dark:bg-[#0d0d0d] rounded-xl px-3 py-4 border border-slate-300 dark:border-slate-700 hover:border-blue-500 transition-colors"
+                    >
+                      <div className="w-7 h-7 rounded-full bg-slate-300 dark:bg-slate-700 flex items-center justify-center shrink-0">
+                        {isAuthenticated ? (
+                          <Coins size={14} className="text-slate-600 dark:text-slate-300" />
+                        ) : (
+                          <LogIn size={14} className="text-slate-600 dark:text-slate-300" />
+                        )}
+                      </div>
+                      <div className="flex flex-col text-left min-w-0">
+                        <span className="text-xs font-semibold">
+                          {isAuthenticated ? t("convert.goToMarket") : t("common.authRequiredLogin")}
+                        </span>
+                        <span className="text-[10px] text-slate-500 truncate">
+                          {isAuthenticated ? t("convert.noCryptoPrompt") : t("convert.authPrompt")}
+                        </span>
+                      </div>
+                      <span className="flex-1 min-w-0 text-right text-lg font-semibold text-slate-600 dark:text-slate-400 truncate">
+                        ≈ 0.00000000
+                      </span>
+                    </button>
+                  )}
 
                   {fromCoins.map((fc, idx) => {
                     const asset = userAssets.find((a) => a.name === fc.coin.id);
@@ -550,12 +601,13 @@ export default function ConvertPage() {
                   type="button"
                   onClick={handleSwapSubmit}
                   disabled={
-                    fromCoins.length === 0 ||
-                    !toCoin ||
                     isSwapping ||
-                    totalUsdValue === 0 ||
-                    hasBalanceError ||
-                    sameCoinSelected
+                    (isAuthenticated &&
+                      (fromCoins.length === 0 ||
+                        !toCoin ||
+                        totalUsdValue === 0 ||
+                        hasBalanceError ||
+                        sameCoinSelected))
                   }
                   className="mt-3 w-full bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-semibold py-3 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all"
                 >
@@ -583,6 +635,11 @@ export default function ConvertPage() {
           }}
           coins={modalCoins}
           onSelect={handleCoinSelect}
+        />
+
+        <AuthRequiredModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
         />
       </main>
 

@@ -16,6 +16,9 @@
     "max": "Макс",
     "insufficientFunds": "Қаражат жеткіліксіз",
     "authRequired": "Авторизация қажет",
+    "authRequiredTitle": "Сіз кірмегенсіз",
+    "authRequiredText": "Бұл әрекетті орындау үшін аккаунтыңызға кіріңіз.",
+    "authRequiredLogin": "Аккаунтқа кіру",
     "emailPlaceholder": "you@example.com",
     "toTop": "Жоғарыға",
     "toggleTheme": "Тақырыпты ауыстыру"
@@ -540,7 +543,10 @@
     "insufficientCoin": "{{symbol}} жеткіліксіз",
     "errorForCoin": "{{symbol}} үшін қате: {{message}}",
     "priceError": "{{symbol}} үшін бағаны алу мүмкін болмады",
-    "selectCoin": "Монетаны таңдаңыз"
+    "selectCoin": "Монетаны таңдаңыз",
+    "authPrompt": "Криптовалюта айырбастау үшін аккаунтқа кіріңіз",
+    "noCryptoPrompt": "Сізде әзірге айырбастайтын криптовалюта жоқ",
+    "goToMarket": "Криптовалюта сатып алу"
   },
   "profile": {
     "verified": "Верификацияланған",

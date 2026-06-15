@@ -16,6 +16,9 @@
     "max": "Max",
     "insufficientFunds": "Insufficient funds",
     "authRequired": "Authorization required",
+    "authRequiredTitle": "You are not signed in",
+    "authRequiredText": "Sign in to your account to perform this action.",
+    "authRequiredLogin": "Sign in",
     "emailPlaceholder": "you@example.com",
     "toTop": "To top",
     "toggleTheme": "Toggle theme"
@@ -540,7 +543,10 @@
     "insufficientCoin": "Insufficient {{symbol}}",
     "errorForCoin": "Error for {{symbol}}: {{message}}",
     "priceError": "Failed to get price for {{symbol}}",
-    "selectCoin": "Select coin"
+    "selectCoin": "Select coin",
+    "authPrompt": "Sign in to exchange cryptocurrency",
+    "noCryptoPrompt": "You don't have any cryptocurrency to exchange yet",
+    "goToMarket": "Buy cryptocurrency"
   },
   "profile": {
     "verified": "Verified",
